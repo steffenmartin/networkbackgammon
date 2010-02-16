@@ -244,6 +244,7 @@ namespace NetworkBackgammon
             // Pen for the outline of the tray
             Pen trayOutlinePen = new Pen(System.Drawing.Color.Gray, 1.0f);
 
+            // TODO: Get ride of hard coded numbers
             // Draw players tray  
             for (int i = 0; i < m_maxNumChips; i++)
             {
