@@ -219,14 +219,14 @@ namespace NetworkBackgammon
             ///////////////////////////////////////////////////////////////////////////////////////
             // Paint all available chips
             ///////////////////////////////////////////////////////////////////////////////////////
-            
+
             // Paint this player's chips on the board
-            for(int i = 0; i < m_playerChipList.Count; i++)
+            for (int i = 0; i < m_playerChipList.Count; i++)
             {
                 NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_playerChipList[i];
                 // Draw the back ground image
                 e.Graphics.DrawImage(boardChip.ChipImage,
-                                     boardChip.ChipPixelPosition.X, 
+                                     boardChip.ChipPixelPosition.X,
                                      boardChip.ChipPixelPosition.Y);
             }
 
@@ -238,6 +238,41 @@ namespace NetworkBackgammon
                 e.Graphics.DrawImage(boardChip.ChipImage,
                                      boardChip.ChipPixelPosition.X,
                                      boardChip.ChipPixelPosition.Y);
+            }
+
+
+            // Pen for the outline of the tray
+            Pen trayOutlinePen = new Pen(System.Drawing.Color.Gray, 1.0f);
+
+            // Draw players tray  
+            for (int i = 0; i < m_maxNumChips; i++)
+            {
+                Rectangle rectPlayer = new Rectangle(531, 13 + 8 * (i), 32, 8); // 124
+                e.Graphics.DrawRectangle(trayOutlinePen, rectPlayer);
+
+                // Load the bitmap directly from the manifest resource
+                Icon trayIcon = new Icon(this.GetType(), "Resources.Player1TrayChip.ico");
+                // Set the chip bitmap
+                Bitmap trayImage = new Bitmap(trayIcon.ToBitmap());
+                // Draw the back ground image
+                e.Graphics.DrawImage(trayImage, 531, 13 + 8 * (i)) ;
+            }
+
+            // Draw opponents tray
+            for (int i = 0; i < m_maxNumChips; i++)
+            {
+                Rectangle rectOpponent = new Rectangle(531, 269 + 8*(i), 32, 8);
+                e.Graphics.DrawRectangle(trayOutlinePen, rectOpponent);
+
+                if (i < 5)
+                {
+                    // Load the bitmap directly from the manifest resource
+                    Icon trayIcon = new Icon(this.GetType(), "Resources.Player2TrayChip.ico");
+                    // Set the chip bitmap
+                    Bitmap trayImage = new Bitmap(trayIcon.ToBitmap());
+                    // Draw the back ground image
+                    e.Graphics.DrawImage(trayImage, 531, 269 + 8 * (i));
+                }
             }
         }
 
