@@ -65,6 +65,7 @@ namespace NetworkBackgammon
             set
             {
                 m_chipBoardPosition = value;
+                m_chipPixelPosition = m_chipBoardPosition.LocationPoint;
             }
         }
 
