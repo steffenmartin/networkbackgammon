@@ -19,9 +19,9 @@ namespace NetworkBackgammon
         // Initial point for player 2 first piece
         static Point m_startPoint2 = new Point(484, 359);
         // Moveable chip represent this players pieces
-        ArrayList m_moveableButtonList = new ArrayList();
+        ArrayList m_playerChipList = new ArrayList();
         // Static pieces that represent the opponents chips
-        ArrayList m_unmoveableButtonList = new ArrayList();
+        ArrayList m_opponentChipList = new ArrayList();
         // Available board position list
         ArrayList m_boardPositionList = new ArrayList();
         // Chip adjacent placement padding 
@@ -48,74 +48,19 @@ namespace NetworkBackgammon
                     m_boardPositionList.Add(new NetworkBackgammonBoardPosition(new Point(col, row)));
                 }
             }
-        }
 
-        // Check to see if a position is ontop
-
-        private void NetworkBackgammonBoard_Load(object sender, EventArgs e)
-        {
-            int i=0;
-            
             // Get all the chips into the array
-            for (i = 0; i < m_maxNumChips; i++)
+            for (int i = 0; i < m_maxNumChips; i++)
             {
-                m_moveableButtonList.Add(new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_1));
-                m_unmoveableButtonList.Add(new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_2));
+                m_playerChipList.Add(new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_1));
+                m_opponentChipList.Add(new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_2));
             }
-
-            int chipWidth = ((NetworkBackgammonChip)m_moveableButtonList[0]).ChipSize.Width;
-            int chipHeight = ((NetworkBackgammonChip)m_moveableButtonList[0]).ChipSize.Height;
-            int col = 0, row = 0;
-
-            // Build all the board positions based on chip and board properties
-            for (col = 0; col < m_maxCols; col++)
-            {
-                for (row = 0; row < m_maxRows; row++)
-                {
-                    int arrayPos = (row + col * m_maxRows);
-                    NetworkBackgammonBoardPosition tempObj = (NetworkBackgammonBoardPosition)m_boardPositionList[arrayPos];
-
-                    tempObj.LocationSize = (new Size(chipWidth,chipHeight));
-
-                    if (arrayPos >= 0 && arrayPos < 30)
-                    {
-                        tempObj.LocationPoint = new Point(m_startPoint1.X - col * (chipWidth + m_chipAdjPadding),
-                                                             m_startPoint1.Y + row * (chipHeight));
-                    }
-                    else if (arrayPos >= 30 && arrayPos < 60)
-                    {
-                        tempObj.LocationPoint = (new Point(m_startPoint1.X - col * (chipWidth + m_chipAdjPadding) - m_barWidth,
-                                                              m_startPoint1.Y + row * chipHeight));
-      
-                    }
-                    else if (arrayPos >= 60 && arrayPos < 120)
-                    {
-                        tempObj.LocationPoint = (new Point(GetBoardPosition((m_maxCols-1) - col, row).LocationPoint.X,
-                                                              m_startPoint2.Y - row * chipHeight));
-                    }
-                }
-            }
-
-            // Place the initial chip
-            NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_moveableButtonList[0];
-            boardChip.ChipPixelPosition = GetBoardPosition(0, 0).LocationPoint;
-            boardChip.ChipBoardPosition = GetBoardPosition(0, 0);
-            
-            // Place the second chip
-            NetworkBackgammonChip secondBoardChip = (NetworkBackgammonChip)m_moveableButtonList[1];
-            secondBoardChip.ChipPixelPosition = GetBoardPosition(0, 1).LocationPoint;
-            secondBoardChip.ChipBoardPosition = GetBoardPosition(0, 1);
-
-            // Place the second chip
-            NetworkBackgammonChip thirdBoardChip = (NetworkBackgammonChip)m_moveableButtonList[2];
-            thirdBoardChip.ChipPixelPosition = GetBoardPosition(20, 3).LocationPoint;
-            thirdBoardChip.ChipBoardPosition = GetBoardPosition(20, 3);
         }
 
         // Get the board position object based on col row identifier
         public NetworkBackgammonBoardPosition GetBoardPosition(int col, int row)
         {
-            NetworkBackgammonBoardPosition retval = new NetworkBackgammonBoardPosition(new Point(0,0));
+            NetworkBackgammonBoardPosition retval = new NetworkBackgammonBoardPosition(new Point(0, 0));
 
             for (int i = 0; i < m_boardPositionList.Count; i++)
             {
@@ -126,8 +71,138 @@ namespace NetworkBackgammon
                     break;
                 }
             }
-            
+
             return retval;
+        }
+
+        // Map board position objects to pixel locations on the board
+        private void MapBoardPositions()
+        {
+            int chipWidth = ((NetworkBackgammonChip)m_playerChipList[0]).ChipSize.Width;
+            int chipHeight = ((NetworkBackgammonChip)m_playerChipList[0]).ChipSize.Height;
+            int col = 0, row = 0;
+
+            // Build all the board positions based on chip and board properties
+            for (col = 0; col < m_maxCols; col++)
+            {
+                for (row = 0; row < m_maxRows; row++)
+                {
+                    int arrayPos = (row + col * m_maxRows);
+                    NetworkBackgammonBoardPosition tempObj = (NetworkBackgammonBoardPosition)m_boardPositionList[arrayPos];
+
+                    tempObj.LocationSize = (new Size(chipWidth, chipHeight));
+
+                    if (arrayPos >= 0 && arrayPos < 30)
+                    {
+                        tempObj.LocationPoint = new Point(m_startPoint1.X - col * (chipWidth + m_chipAdjPadding),
+                                                             m_startPoint1.Y + row * (chipHeight));
+                    }
+                    else if (arrayPos >= 30 && arrayPos < 60)
+                    {
+                        tempObj.LocationPoint = (new Point(m_startPoint1.X - col * (chipWidth + m_chipAdjPadding) - m_barWidth,
+                                                              m_startPoint1.Y + row * chipHeight));
+
+                    }
+                    else if (arrayPos >= 60 && arrayPos < 120)
+                    {
+                        tempObj.LocationPoint = (new Point(GetBoardPosition((m_maxCols - 1) - col, row).LocationPoint.X,
+                                                              m_startPoint2.Y - row * chipHeight));
+                    }
+                }
+            }
+        }
+
+        // Just for debugging purposes - this routine sets up the chips (player & opponent) in their
+        // initial game positions
+        private void TestGameStartPosition()
+        {
+            NetworkBackgammonChip boardChip;
+
+            ///////////////////////////////////////////////////////
+            // Player
+            ///////////////////////////////////////////////////////
+            boardChip = (NetworkBackgammonChip)m_playerChipList[0];
+            boardChip.ChipBoardPosition = GetBoardPosition(0, 0);
+            boardChip = (NetworkBackgammonChip)m_playerChipList[1];
+            boardChip.ChipBoardPosition = GetBoardPosition(0, 1);
+        
+            boardChip = (NetworkBackgammonChip)m_playerChipList[2];
+            boardChip.ChipBoardPosition = GetBoardPosition(11, 0);
+            boardChip = (NetworkBackgammonChip)m_playerChipList[3];
+            boardChip.ChipBoardPosition = GetBoardPosition(11, 1);
+            boardChip = (NetworkBackgammonChip)m_playerChipList[4];
+            boardChip.ChipBoardPosition = GetBoardPosition(11, 2);
+            boardChip = (NetworkBackgammonChip)m_playerChipList[5];
+            boardChip.ChipBoardPosition = GetBoardPosition(11, 3);
+            boardChip = (NetworkBackgammonChip)m_playerChipList[6];
+            boardChip.ChipBoardPosition = GetBoardPosition(11, 4);
+
+            boardChip = (NetworkBackgammonChip)m_playerChipList[7];
+            boardChip.ChipBoardPosition = GetBoardPosition(16, 0);
+            boardChip = (NetworkBackgammonChip)m_playerChipList[8];
+            boardChip.ChipBoardPosition = GetBoardPosition(16, 1);
+            boardChip = (NetworkBackgammonChip)m_playerChipList[9];
+            boardChip.ChipBoardPosition = GetBoardPosition(16, 2);
+
+            boardChip = (NetworkBackgammonChip)m_playerChipList[10];
+            boardChip.ChipBoardPosition = GetBoardPosition(18, 0);
+            boardChip = (NetworkBackgammonChip)m_playerChipList[11];
+            boardChip.ChipBoardPosition = GetBoardPosition(18, 1);
+            boardChip = (NetworkBackgammonChip)m_playerChipList[12];
+            boardChip.ChipBoardPosition = GetBoardPosition(18, 2);
+            boardChip = (NetworkBackgammonChip)m_playerChipList[13];
+            boardChip.ChipBoardPosition = GetBoardPosition(18, 3);
+            boardChip = (NetworkBackgammonChip)m_playerChipList[14];
+            boardChip.ChipBoardPosition = GetBoardPosition(18, 4);
+
+            ///////////////////////////////////////////////////////
+            // Opponent
+            ///////////////////////////////////////////////////////
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[0];
+            boardChip.ChipBoardPosition = GetBoardPosition(23, 0);
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[1];
+            boardChip.ChipBoardPosition = GetBoardPosition(23, 1);
+
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[2];
+            boardChip.ChipBoardPosition = GetBoardPosition(12, 0);
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[3];
+            boardChip.ChipBoardPosition = GetBoardPosition(12, 1);
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[4];
+            boardChip.ChipBoardPosition = GetBoardPosition(12, 2);
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[5];
+            boardChip.ChipBoardPosition = GetBoardPosition(12, 3);
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[6];
+            boardChip.ChipBoardPosition = GetBoardPosition(12, 4);
+
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[7];
+            boardChip.ChipBoardPosition = GetBoardPosition(7, 0);
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[8];
+            boardChip.ChipBoardPosition = GetBoardPosition(7, 1);
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[9];
+            boardChip.ChipBoardPosition = GetBoardPosition(7, 2);
+
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[10];
+            boardChip.ChipBoardPosition = GetBoardPosition(5, 0);
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[11];
+            boardChip.ChipBoardPosition = GetBoardPosition(5, 1);
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[12];
+            boardChip.ChipBoardPosition = GetBoardPosition(5, 2);
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[13];
+            boardChip.ChipBoardPosition = GetBoardPosition(5, 3);
+            boardChip = (NetworkBackgammonChip)m_opponentChipList[14];
+            boardChip.ChipBoardPosition = GetBoardPosition(5, 4);
+        }
+
+        // Overriden load function of the form
+        private void NetworkBackgammonBoard_Load(object sender, EventArgs e)
+        {
+            // Map each board position coordinate to a specific pixel coordinate location 
+            MapBoardPositions();
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            // TEST
+            TestGameStartPosition();
+            //////////////////////////////////////////////////////////////////////////////////////
         }
 
         private void NetworkBackgammonBoard_Paint(object sender, PaintEventArgs e)
@@ -141,22 +216,36 @@ namespace NetworkBackgammon
                    new Rectangle(0, 0, backgroundImage.Width, backgroundImage.Height),
                   GraphicsUnit.Pixel);
 
+            ///////////////////////////////////////////////////////////////////////////////////////
             // Paint all available chips
-            for(int i = 0; i < m_moveableButtonList.Count; i++)
+            ///////////////////////////////////////////////////////////////////////////////////////
+            
+            // Paint this player's chips on the board
+            for(int i = 0; i < m_playerChipList.Count; i++)
             {
-                NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_moveableButtonList[i];
+                NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_playerChipList[i];
                 // Draw the back ground image
                 e.Graphics.DrawImage(boardChip.ChipImage,
                                      boardChip.ChipPixelPosition.X, 
+                                     boardChip.ChipPixelPosition.Y);
+            }
+
+            // Paint oppponent's chips on the board
+            for (int i = 0; i < m_opponentChipList.Count; i++)
+            {
+                NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_opponentChipList[i];
+                // Draw the back ground image
+                e.Graphics.DrawImage(boardChip.ChipImage,
+                                     boardChip.ChipPixelPosition.X,
                                      boardChip.ChipPixelPosition.Y);
             }
         }
 
         private void NetworkBackgammonBoard_MouseDown(object sender, MouseEventArgs e)
         {
-            for(int i = (m_moveableButtonList.Count-1); i != -1 ; i--)
+            for(int i = (m_playerChipList.Count-1); i != -1 ; i--)
             {
-                NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_moveableButtonList[i];
+                NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_playerChipList[i];
                if( boardChip.IsOnChip( new Point(e.X, e.Y) ) )
                {
                    boardChip.Moving = true;
@@ -183,9 +272,9 @@ namespace NetworkBackgammon
             }
 
             // Any mouse up click will reset the moving flag
-            for (int chipIndex = 0; chipIndex < m_moveableButtonList.Count; chipIndex++)
+            for (int chipIndex = 0; chipIndex < m_playerChipList.Count; chipIndex++)
             {
-                NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_moveableButtonList[chipIndex];
+                NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_playerChipList[chipIndex];
 
                 if (boardChip.Moving )
                 {
@@ -213,9 +302,9 @@ namespace NetworkBackgammon
         private void NetworkBackgammonBoard_MouseMove(object sender, MouseEventArgs e)
         {
             // Any mouse up click will reset the moving flag
-            for (int i = 0; i < m_moveableButtonList.Count; i++)
+            for (int i = 0; i < m_playerChipList.Count; i++)
             {
-                NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_moveableButtonList[i];
+                NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_playerChipList[i];
                 if (boardChip.Moving)
                 {
                     boardChip.ChipPixelPosition = new Point(e.X - boardChip.ChipSize.Width/2, 
