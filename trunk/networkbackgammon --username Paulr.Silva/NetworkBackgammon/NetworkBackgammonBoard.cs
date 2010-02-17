@@ -43,11 +43,11 @@ namespace NetworkBackgammon
         // Button rolling dice
         Button m_rollDiceButton = new Button();
         // Dice animation count down timer
-        int m_diceTimer = 0;
+        int m_diceTimer = 100;
         // Dice index for the current player
-        //int m_playerDiceIndex new int(2];
-         // Dice index for the current player
-        //int m_opponentDiceIndex[2];
+        int[] m_playerDiceIndex = new int[2];
+        // Dice index for the current player
+        int[] m_opponentDiceIndex = new int[2];
 
         // Constructor
         public NetworkBackgammonBoard()
@@ -220,6 +220,9 @@ namespace NetworkBackgammon
         // Overriden load function of the form
         private void NetworkBackgammonBoard_Load(object sender, EventArgs e)
         {
+            // Start the dice roll timer
+            timerRollDice.Start();
+
             // Map each board position coordinate to a specific pixel coordinate location 
             MapBoardPositions();
 
@@ -327,22 +330,17 @@ namespace NetworkBackgammon
         {
             if (m_diceRolling)
             {
-                if (m_diceTimer-- > 0)
+               // Draw the back ground image
+               e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
+               e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
+            }
+            else // Check here if its the current players turn
+            {
+                if (!m_playerRollDice)
                 {
-                    Random random = new Random();
-
-                    int dieIndex1 = random.Next(0, 5);
-                    int dieIndex2 = random.Next(0, 5);
-
                     // Draw the back ground image
-                    e.Graphics.DrawImage((Bitmap)m_diceIconList[dieIndex1], 385, 185);
-                    e.Graphics.DrawImage((Bitmap)m_diceIconList[dieIndex2], 417, 185);
-
-                    Refresh();
-                }
-                else
-                {
-                    m_diceRolling = false;
+                    e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
+                    e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
                 }
             }
         }
@@ -368,11 +366,14 @@ namespace NetworkBackgammon
         // Button handler for the dice roll button
         private void OnClickRollButton(object sender, System.EventArgs e)
         {
-            m_playerRollDice = false;
-            m_diceRolling = true;
-            m_diceTimer = 5;
-            // Repaint the screen
-            Refresh();
+            if (m_playerRollDice)
+            {
+                m_playerRollDice = false;
+                m_diceRolling = true;
+                m_diceTimer = 10;
+                // Repaint the screen
+                Refresh();
+            }
         }
 
         // Handle mouse down event - check if mouse click position is inside a players chip
@@ -459,6 +460,35 @@ namespace NetworkBackgammon
                     }
                 }
             }
+        }
+
+        // Roll dice timer event
+        private void timerRollDice_Tick(object sender, EventArgs e)
+        {
+            // Check if we are rolling our dice
+            if (m_diceRolling)
+            {
+                if (m_diceTimer-- > 0)
+                {
+                    Random random = new Random();
+
+                    m_playerDiceIndex[0] = random.Next(0, 5);
+                    m_playerDiceIndex[1] = random.Next(0, 5);
+                }
+                else
+                {
+                    m_diceRolling = false;
+                }
+
+                Refresh();
+            }
+        }
+
+        // Handle the event when the form is closing
+        private void NetworkBackgammonBoard_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Stop the timer loop
+            timerRollDice.Stop();
         }
     }
 }

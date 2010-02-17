@@ -28,7 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            this.timerRollDice = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
+            // 
+            // timerRollDice
+            // 
+            this.timerRollDice.Interval = 200;
+            this.timerRollDice.Tick += new System.EventHandler(this.timerRollDice_Tick);
             // 
             // NetworkBackgammonBoard
             // 
@@ -44,12 +51,15 @@
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.NetworkBackgammonBoard_MouseUp);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.NetworkBackgammonBoard_Paint);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.NetworkBackgammonBoard_MouseDown);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NetworkBackgammonBoard_FormClosing);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.NetworkBackgammonBoard_MouseMove);
             this.ResumeLayout(false);
 
         }
 
         #endregion
+
+        private System.Windows.Forms.Timer timerRollDice;
 
     }
 }
