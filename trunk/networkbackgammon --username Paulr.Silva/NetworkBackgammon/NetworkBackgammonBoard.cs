@@ -43,7 +43,7 @@ namespace NetworkBackgammon
         // Button rolling dice
         Button m_rollDiceButton = new Button();
         // Dice animation count down timer
-        int m_diceTimer = 100;
+        int m_diceTimer = 0;
         // Dice index for the current player
         int[] m_playerDiceIndex = new int[2];
         // Dice index for the current player
@@ -248,6 +248,9 @@ namespace NetworkBackgammon
 
             // Draw the animated dice rolling
             DrawRollingDice(sender, e);
+
+             // Draw opponents current dice roll
+            DrawOpponentDice(sender, e);
         }
 
         // Draw the board background image
@@ -343,6 +346,27 @@ namespace NetworkBackgammon
                     e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
                 }
             }
+        }
+
+        // Draw opponents current dice roll
+        private void DrawOpponentDice(object sender, PaintEventArgs e)
+        {
+           /* if (m_diceRolling)
+            {
+                // Draw the back ground image
+                e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
+                e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
+            }
+            else // Check here if its the current players turn
+            {
+                if (!m_playerRollDice)
+                {
+                    // Draw the back ground image
+                    e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
+                    e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
+                }
+            }
+            */
         }
 
         // Draw the roll dice button and hook up the handlers
