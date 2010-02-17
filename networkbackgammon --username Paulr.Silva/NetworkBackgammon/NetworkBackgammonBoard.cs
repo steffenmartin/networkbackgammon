@@ -44,6 +44,10 @@ namespace NetworkBackgammon
         Button m_rollDiceButton = new Button();
         // Dice animation count down timer
         int m_diceTimer = 0;
+        // Dice index for the current player
+        //int m_playerDiceIndex new int(2];
+         // Dice index for the current player
+        //int m_opponentDiceIndex[2];
 
         // Constructor
         public NetworkBackgammonBoard()
@@ -227,19 +231,36 @@ namespace NetworkBackgammon
 
         private void NetworkBackgammonBoard_Paint(object sender, PaintEventArgs e)
         {
-            // Get this type's assembly
-            Assembly assem = this.GetType().Assembly;
-            // Load the bitmap directly from the manifest resource
+            // Draw the board background image
+            DrawBoardBackground(sender, e);
+
+            // Draw all the available chips for the current player and the opponent
+            DrawBoardChips(sender, e);
+
+            // Draw board trays - includes player and opponent
+            DrawBoardTrays(sender, e);
+
+            // Check if the dice need rolling
+            DrawDiceButton(sender, e);
+
+            // Draw the animated dice rolling
+            DrawRollingDice(sender, e);
+        }
+
+        // Draw the board background image
+        private void DrawBoardBackground(object sender, PaintEventArgs e)
+        {
+              // Load the bitmap directly from the manifest resource
             Bitmap backgroundImage = new Bitmap(this.GetType(), "Resources.BackgammonBoard.bmp");
             // Draw the back ground image
             e.Graphics.DrawImage(backgroundImage, this.ClientRectangle,
                    new Rectangle(0, 0, backgroundImage.Width, backgroundImage.Height),
                   GraphicsUnit.Pixel);
+        }
 
-            ///////////////////////////////////////////////////////////////////////////////////////
-            // Paint all available chips
-            ///////////////////////////////////////////////////////////////////////////////////////
-
+        // Draw all the available chips for the current player and the opponent
+        private void DrawBoardChips(object sender, PaintEventArgs e)
+        {
             // Paint this player's chips on the board
             for (int i = 0; i < m_playerChipList.Count; i++)
             {
@@ -259,8 +280,11 @@ namespace NetworkBackgammon
                                      boardChip.ChipPixelPosition.X,
                                      boardChip.ChipPixelPosition.Y);
             }
+        }
 
-
+        // Draw board trays - includes this player and opponents chips
+        private void DrawBoardTrays(object sender, PaintEventArgs e)
+        {
             // Pen for the outline of the tray
             Pen trayOutlinePen = new Pen(System.Drawing.Color.Gray, 1.0f);
 
@@ -277,13 +301,13 @@ namespace NetworkBackgammon
                 // Set the chip bitmap
                 Bitmap trayImage = new Bitmap(trayIcon.ToBitmap());
                 // Draw the back ground image
-                e.Graphics.DrawImage(trayImage, 531, 13 + 8 * (i)) ;
+                e.Graphics.DrawImage(trayImage, 531, 13 + 8 * (i));
             }
 
             // Draw opponents tray
             for (int i = 0; i < m_maxNumChips; i++)
             {
-                Rectangle rectOpponent = new Rectangle(531, 269 + 8*(i), 32, 8);
+                Rectangle rectOpponent = new Rectangle(531, 269 + 8 * (i), 32, 8);
                 e.Graphics.DrawRectangle(trayOutlinePen, rectOpponent);
 
                 if (i < 5)
@@ -296,29 +320,30 @@ namespace NetworkBackgammon
                     e.Graphics.DrawImage(trayImage, 531, 269 + 8 * (i));
                 }
             }
-
-            // Check if the dice need rolling
-            DrawDiceButton(sender, e);
-
-            // Draw the animated dice rolling
-            DrawRollingDice(sender, e);
         }
 
-         // Draw/Animate the rolling dice
+        // Draw/Animate the rolling dice
         private void DrawRollingDice(object sender, PaintEventArgs e)
         {
-            if (m_diceRolling && (m_diceTimer-- > 0) )
+            if (m_diceRolling)
             {
-                Random random = new Random();
+                if (m_diceTimer-- > 0)
+                {
+                    Random random = new Random();
 
-                int dieIndex1 = random.Next(0, 5);
-                int dieIndex2 = random.Next(0, 5);
-                
-                // Draw the back ground image
-                e.Graphics.DrawImage((Bitmap)m_diceIconList[dieIndex1], 375, 185);
-                e.Graphics.DrawImage((Bitmap)m_diceIconList[dieIndex2], 407, 185);
+                    int dieIndex1 = random.Next(0, 5);
+                    int dieIndex2 = random.Next(0, 5);
 
-                Refresh();
+                    // Draw the back ground image
+                    e.Graphics.DrawImage((Bitmap)m_diceIconList[dieIndex1], 385, 185);
+                    e.Graphics.DrawImage((Bitmap)m_diceIconList[dieIndex2], 417, 185);
+
+                    Refresh();
+                }
+                else
+                {
+                    m_diceRolling = false;
+                }
             }
         }
 
@@ -330,7 +355,7 @@ namespace NetworkBackgammon
                 m_rollDiceButton.Text = "Roll Dice";
                 m_rollDiceButton.Name = "rollDiceButton";
                 m_rollDiceButton.Size = new System.Drawing.Size(70, 32);
-                m_rollDiceButton.Location = new System.Drawing.Point(375, 185);
+                m_rollDiceButton.Location = new System.Drawing.Point(385, 185);
                 this.Controls.Add(m_rollDiceButton);
                 m_rollDiceButton.Click += new System.EventHandler(OnClickRollButton);
             }
@@ -340,6 +365,7 @@ namespace NetworkBackgammon
             }
         }
 
+        // Button handler for the dice roll button
         private void OnClickRollButton(object sender, System.EventArgs e)
         {
             m_playerRollDice = false;
@@ -349,76 +375,88 @@ namespace NetworkBackgammon
             Refresh();
         }
 
+        // Handle mouse down event - check if mouse click position is inside a players chip
         private void NetworkBackgammonBoard_MouseDown(object sender, MouseEventArgs e)
         {
-            for(int i = (m_playerChipList.Count-1); i != -1 ; i--)
+            if (!m_playerRollDice && !m_diceRolling )
             {
-                NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_playerChipList[i];
-               if( boardChip.IsOnChip( new Point(e.X, e.Y) ) )
-               {
-                   boardChip.Moving = true;
-                   break;
-               }
+                for (int i = (m_playerChipList.Count - 1); i != -1; i--)
+                {
+                    NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_playerChipList[i];
+                    if (boardChip.IsOnChip(new Point(e.X, e.Y)))
+                    {
+                        boardChip.Moving = true;
+                        break;
+                    }
+                }
             }
         }
 
+        // Handle mouse up click event - check if moving a chip and whether or not it can repositioned
         private void NetworkBackgammonBoard_MouseUp(object sender, MouseEventArgs e)
         {
-            int i = -1;
-            
-            for (i = 0; i < m_boardPositionList.Count; i++)
+            if (!m_playerRollDice && !m_diceRolling)
             {
-                NetworkBackgammonBoardPosition tempObj = (NetworkBackgammonBoardPosition)m_boardPositionList[i];
-               
-                if ( (e.X >= tempObj.LocationPoint.X) &&
-                     (e.X < tempObj.LocationPoint.X + tempObj.LocationSize.Width) &&
-                     (e.Y >= tempObj.LocationPoint.Y) &&
-                     (e.Y < tempObj.LocationPoint.Y + tempObj.LocationSize.Height))
-                {
-                    break;
-                }
-            }
+                int i = -1;
 
-            // Any mouse up click will reset the moving flag
-            for (int chipIndex = 0; chipIndex < m_playerChipList.Count; chipIndex++)
-            {
-                NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_playerChipList[chipIndex];
-
-                if (boardChip.Moving )
+                for (i = 0; i < m_boardPositionList.Count; i++)
                 {
-                    if (i == m_boardPositionList.Count)
+                    NetworkBackgammonBoardPosition tempObj = (NetworkBackgammonBoardPosition)m_boardPositionList[i];
+
+                    if ((e.X >= tempObj.LocationPoint.X) &&
+                         (e.X < tempObj.LocationPoint.X + tempObj.LocationSize.Width) &&
+                         (e.Y >= tempObj.LocationPoint.Y) &&
+                         (e.Y < tempObj.LocationPoint.Y + tempObj.LocationSize.Height))
                     {
-                        // Move the location to the drop chip position
-                        boardChip.ChipPixelPosition = boardChip.ChipBoardPosition.LocationPoint;
-                    }
-                    else
-                    {
-                        // Move the location to the drop chip position
-                        boardChip.ChipPixelPosition = ((NetworkBackgammonBoardPosition)m_boardPositionList[i]).LocationPoint;
-                        // Move the board location to the drop chip position
-                        boardChip.ChipBoardPosition = (NetworkBackgammonBoardPosition)m_boardPositionList[i];
+                        break;
                     }
                 }
 
-                boardChip.Moving = false;
+                // Any mouse up click will reset the moving flag
+                for (int chipIndex = 0; chipIndex < m_playerChipList.Count; chipIndex++)
+                {
+                    NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_playerChipList[chipIndex];
 
-                // Redraw the board
-                Refresh();
+                    if (boardChip.Moving)
+                    {
+                        if (i == m_boardPositionList.Count)
+                        {
+                            // Move the location to the drop chip position
+                            boardChip.ChipPixelPosition = boardChip.ChipBoardPosition.LocationPoint;
+                        }
+                        else
+                        {
+                            // Move the location to the drop chip position
+                            boardChip.ChipPixelPosition = ((NetworkBackgammonBoardPosition)m_boardPositionList[i]).LocationPoint;
+                            // Move the board location to the drop chip position
+                            boardChip.ChipBoardPosition = (NetworkBackgammonBoardPosition)m_boardPositionList[i];
+                        }
+                    }
+
+                    boardChip.Moving = false;
+
+                    // Redraw the board
+                    Refresh();
+                }
             }
         }
 
+        // Handle mouse move event - move the currently selected players chip (if any)
         private void NetworkBackgammonBoard_MouseMove(object sender, MouseEventArgs e)
         {
-            // Any mouse up click will reset the moving flag
-            for (int i = 0; i < m_playerChipList.Count; i++)
+            if (!m_playerRollDice && !m_diceRolling)
             {
-                NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_playerChipList[i];
-                if (boardChip.Moving)
+                // Any mouse up click will reset the moving flag
+                for (int i = 0; i < m_playerChipList.Count; i++)
                 {
-                    boardChip.ChipPixelPosition = new Point(e.X - boardChip.ChipSize.Width/2, 
-                                                            e.Y - boardChip.ChipSize.Height/2);
-                    // Redraw the board
-                    Refresh();
+                    NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_playerChipList[i];
+                    if (boardChip.Moving)
+                    {
+                        boardChip.ChipPixelPosition = new Point(e.X - boardChip.ChipSize.Width / 2,
+                                                                e.Y - boardChip.ChipSize.Height / 2);
+                        // Redraw the board
+                        Refresh();
+                    }
                 }
             }
         }
