@@ -34,6 +34,12 @@ namespace NetworkBackgammon
         int m_maxCols = 24;
         // Max number of chips (per player)
         int m_maxNumChips = 15;
+        // Player needs to roll the dice
+        bool m_playerRollDice = true;
+        // Dice are currently being rolled
+        bool m_diceRolling = false;
+        // Button rolling dice
+        Button m_rollDiceButton = new Button();
 
         // Constructor
         public NetworkBackgammonBoard()
@@ -275,6 +281,34 @@ namespace NetworkBackgammon
                     e.Graphics.DrawImage(trayImage, 531, 269 + 8 * (i));
                 }
             }
+
+            // Check if the dice need rolling
+            DrawDiceButton(sender, e);
+        }
+
+        // Draw the roll dice button and hook up the handlers
+        private void DrawDiceButton(object sender, PaintEventArgs e)
+        {
+            if (m_playerRollDice)
+            {
+                m_rollDiceButton.Text = "Roll Dice";
+                m_rollDiceButton.Name = "rollDiceButton";
+                m_rollDiceButton.Size = new System.Drawing.Size(70, 32);
+                m_rollDiceButton.Location = new System.Drawing.Point(375, 185);
+                this.Controls.Add(m_rollDiceButton);
+                m_rollDiceButton.Click += new System.EventHandler(OnClickRollButton);
+            }
+            else
+            {
+                this.Controls.Remove(m_rollDiceButton);
+            }
+        }
+
+        private void OnClickRollButton(object sender, System.EventArgs e)
+        {
+            m_playerRollDice = false;
+            
+            Refresh();
         }
 
         private void NetworkBackgammonBoard_MouseDown(object sender, MouseEventArgs e)
