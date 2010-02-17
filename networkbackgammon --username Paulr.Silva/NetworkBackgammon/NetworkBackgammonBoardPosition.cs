@@ -17,6 +17,7 @@ namespace NetworkBackgammon
         {
             m_positionID = posID;
         }
+
         // Constructor - defines a position ID, Center Location, and Size
         public NetworkBackgammonBoardPosition(Point posID, Point posCenterLoc, Size posSize)
         {
@@ -24,8 +25,6 @@ namespace NetworkBackgammon
             m_positionLocation = posCenterLoc;
             m_locationSize = posSize;
         }
-
-        // Properties
 
         // Position ID property
         public Point PositionID
