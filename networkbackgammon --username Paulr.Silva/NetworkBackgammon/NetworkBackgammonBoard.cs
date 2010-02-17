@@ -24,6 +24,8 @@ namespace NetworkBackgammon
         ArrayList m_opponentChipList = new ArrayList();
         // Available board position list
         ArrayList m_boardPositionList = new ArrayList();
+        // List of available dice icon images
+        ArrayList m_diceIconList = new ArrayList();
         // Chip adjacent placement padding 
         int m_chipAdjPadding = 4;
         // Bar width
@@ -40,6 +42,8 @@ namespace NetworkBackgammon
         bool m_diceRolling = false;
         // Button rolling dice
         Button m_rollDiceButton = new Button();
+        // Dice animation count down timer
+        int m_diceTimer = 0;
 
         // Constructor
         public NetworkBackgammonBoard()
@@ -60,6 +64,16 @@ namespace NetworkBackgammon
             {
                 m_playerChipList.Add(new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_1));
                 m_opponentChipList.Add(new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_2));
+            }
+
+            // Create icon image list
+            for (int i = 1; i < 7; i++)
+            {
+                // Load the bitmap directly from the manifest resource
+                Icon diceIcon = new Icon(this.GetType(), "Resources.Dice" + i + ".ico");
+                // Set the chip bitmap
+                Bitmap diceImage = new Bitmap(diceIcon.ToBitmap());
+                m_diceIconList.Add( diceImage );
             }
         }
 
@@ -251,6 +265,7 @@ namespace NetworkBackgammon
             Pen trayOutlinePen = new Pen(System.Drawing.Color.Gray, 1.0f);
 
             // TODO: Get ride of hard coded numbers
+
             // Draw players tray  
             for (int i = 0; i < m_maxNumChips; i++)
             {
@@ -284,6 +299,27 @@ namespace NetworkBackgammon
 
             // Check if the dice need rolling
             DrawDiceButton(sender, e);
+
+            // Draw the animated dice rolling
+            DrawRollingDice(sender, e);
+        }
+
+         // Draw/Animate the rolling dice
+        private void DrawRollingDice(object sender, PaintEventArgs e)
+        {
+            if (m_diceRolling && (m_diceTimer-- > 0) )
+            {
+                Random random = new Random();
+
+                int dieIndex1 = random.Next(0, 5);
+                int dieIndex2 = random.Next(0, 5);
+                
+                // Draw the back ground image
+                e.Graphics.DrawImage((Bitmap)m_diceIconList[dieIndex1], 375, 185);
+                e.Graphics.DrawImage((Bitmap)m_diceIconList[dieIndex2], 407, 185);
+
+                Refresh();
+            }
         }
 
         // Draw the roll dice button and hook up the handlers
@@ -307,7 +343,9 @@ namespace NetworkBackgammon
         private void OnClickRollButton(object sender, System.EventArgs e)
         {
             m_playerRollDice = false;
-            
+            m_diceRolling = true;
+            m_diceTimer = 5;
+            // Repaint the screen
             Refresh();
         }
 
