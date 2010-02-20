@@ -288,7 +288,7 @@ namespace NetworkBackgammon
             }
         }
 
-        // Draw board trays - includes this player and opponents chips
+        // Draw board trays - includes this player and opponent's chips
         private void DrawBoardTrays(object sender, PaintEventArgs e)
         {
             // Pen for the outline of the tray
