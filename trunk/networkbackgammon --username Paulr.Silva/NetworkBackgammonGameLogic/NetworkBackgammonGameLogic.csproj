@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Checker.cs" />
+    <Compile Include="GameEngine.cs" />
     <Compile Include="GameRoom.cs" />
     <Compile Include="GameSession.cs" />
     <Compile Include="Move.cs" />
