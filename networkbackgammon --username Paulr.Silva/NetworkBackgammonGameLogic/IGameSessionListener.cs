@@ -5,10 +5,8 @@ using System.Text;
 
 namespace NetworkBackgammonGameLogic
 {
-    public class Checker
+    public interface IGameSessionListener
     {
-        private Position currentPosition = null;
-
-        private Move[] possibleMoves = new Move[2];
+        void Notify(GameSessionEvent _event, GameSessionSubject _subject);
     }
 }

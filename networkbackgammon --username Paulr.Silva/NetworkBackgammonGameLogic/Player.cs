@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NetworkBackgammonGameLogic
 {
-    public class Player
+    public class Player : GameSessionSubject
     {
         private string strPlayerName = "";
         private Checker[] checkers = null;
@@ -21,6 +21,21 @@ namespace NetworkBackgammonGameLogic
             {
                 return strPlayerName;
             }
+        }
+
+        public string RollDice()
+        {
+            uint dice1 = 3;
+            uint dice2 = 2;
+
+            Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.DiceRolled), this);
+
+            return dice1.ToString() + ", " + dice2.ToString();
+        }
+
+        public override string ToString()
+        {
+            return strPlayerName;
         }
     }
 }
