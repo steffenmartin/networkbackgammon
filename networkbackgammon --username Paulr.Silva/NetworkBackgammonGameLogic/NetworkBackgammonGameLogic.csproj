@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Checker.cs" />
+    <Compile Include="Dice.cs" />
     <Compile Include="GameEngine.cs" />
     <Compile Include="GameRoom.cs" />
     <Compile Include="GameRoomEvent.cs" />

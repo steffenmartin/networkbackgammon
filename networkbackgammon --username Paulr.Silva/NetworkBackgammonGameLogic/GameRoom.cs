@@ -10,6 +10,12 @@ namespace NetworkBackgammonGameLogic
         private List<Player> connectedPlayers = new List<Player>();
         private List<GameSession> gameSessions = new List<GameSession>();
 
+        ~GameRoom()
+        {
+            gameSessions.Clear();
+            connectedPlayers.Clear();
+        }
+
         public Player Login(string _playerName)
         {
             Player newPlayer = new Player(_playerName);
@@ -51,6 +57,17 @@ namespace NetworkBackgammonGameLogic
 
                 newSession.Start();
             }
+        }
+
+        public void Shutdown()
+        {
+            foreach (GameSession session in gameSessions)
+            {
+                session.Stop();
+            }
+
+            gameSessions.Clear();
+            connectedPlayers.Clear();
         }
 
         public List<Player> ConnectedPlayers

@@ -5,10 +5,11 @@ using System.Text;
 
 namespace NetworkBackgammonGameLogic
 {
-    public class Player : GameSessionSubject
+    public class Player : GameSessionSubject, IGameSessionListener
     {
         private string strPlayerName = "";
         private Checker[] checkers = null;
+        private bool bActive = false;
 
         public Player(string _strPlayerName)
         {
@@ -20,6 +21,18 @@ namespace NetworkBackgammonGameLogic
             get
             {
                 return strPlayerName;
+            }
+        }
+
+        public bool Active
+        {
+            get
+            {
+                return bActive;
+            }
+            set
+            {
+                bActive = value;
             }
         }
 
@@ -37,5 +50,14 @@ namespace NetworkBackgammonGameLogic
         {
             return strPlayerName;
         }
+
+        #region IGameSessionListener Members
+
+        public void Notify(GameSessionEvent _event, GameSessionSubject _subject)
+        {
+            // throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }
