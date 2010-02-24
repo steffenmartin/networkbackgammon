@@ -5,7 +5,11 @@ using System.Text;
 
 namespace NetworkBackgammonGameLogic
 {
-    class GameEngine
+    public class GameEngine
     {
+        public static bool CalculatePossibleMoves(Player player1, Player player2)
+        {
+            return true;
+        }
     }
 }
