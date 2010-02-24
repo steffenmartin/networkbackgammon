@@ -36,6 +36,7 @@
             // 
             // playerControl1
             // 
+            this.playerControl1.ConnectedGameRoom = null;
             this.playerControl1.Location = new System.Drawing.Point(12, 12);
             this.playerControl1.Name = "playerControl1";
             this.playerControl1.Size = new System.Drawing.Size(352, 306);
@@ -43,6 +44,7 @@
             // 
             // playerControl2
             // 
+            this.playerControl2.ConnectedGameRoom = null;
             this.playerControl2.Location = new System.Drawing.Point(378, 12);
             this.playerControl2.Name = "playerControl2";
             this.playerControl2.Size = new System.Drawing.Size(352, 306);
@@ -76,6 +78,7 @@
             this.Controls.Add(this.playerControl1);
             this.Name = "MainWindow";
             this.Text = "MainWindow";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
