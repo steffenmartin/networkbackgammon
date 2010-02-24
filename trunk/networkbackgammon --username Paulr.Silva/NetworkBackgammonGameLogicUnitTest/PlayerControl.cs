@@ -19,6 +19,11 @@ namespace NetworkBackgammonGameLogicUnitTest
         {
             InitializeComponent();
         }
+        ~PlayerControl()
+        {
+            gameRoom = null;
+            player = null;
+        }
 
         public GameRoom ConnectedGameRoom
         {

@@ -51,5 +51,10 @@ namespace NetworkBackgammonGameLogicUnitTest
         }
 
         #endregion
+
+        private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            gameRoom.Shutdown();
+        }
     }
 }
