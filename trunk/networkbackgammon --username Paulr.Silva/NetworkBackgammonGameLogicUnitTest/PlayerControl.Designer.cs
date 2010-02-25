@@ -36,7 +36,8 @@
             this.listBoxCheckers = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.buttonRollDice = new System.Windows.Forms.Button();
+            this.buttonMove = new System.Windows.Forms.Button();
+            this.listBoxLog = new System.Windows.Forms.ListBox();
             this.groupBoxGameControls.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -72,10 +73,10 @@
             this.groupBoxGameControls.Controls.Add(this.listBoxCheckers);
             this.groupBoxGameControls.Controls.Add(this.label3);
             this.groupBoxGameControls.Controls.Add(this.label2);
-            this.groupBoxGameControls.Controls.Add(this.buttonRollDice);
+            this.groupBoxGameControls.Controls.Add(this.buttonMove);
             this.groupBoxGameControls.Location = new System.Drawing.Point(3, 58);
             this.groupBoxGameControls.Name = "groupBoxGameControls";
-            this.groupBoxGameControls.Size = new System.Drawing.Size(346, 245);
+            this.groupBoxGameControls.Size = new System.Drawing.Size(346, 248);
             this.groupBoxGameControls.TabIndex = 3;
             this.groupBoxGameControls.TabStop = false;
             this.groupBoxGameControls.Text = "Game Controls";
@@ -95,6 +96,7 @@
             this.listBoxCheckers.Name = "listBoxCheckers";
             this.listBoxCheckers.Size = new System.Drawing.Size(157, 173);
             this.listBoxCheckers.TabIndex = 2;
+            this.listBoxCheckers.SelectedIndexChanged += new System.EventHandler(this.listBoxCheckers_SelectedIndexChanged);
             // 
             // label3
             // 
@@ -114,26 +116,35 @@
             this.label2.TabIndex = 1;
             this.label2.Text = "Checkers";
             // 
-            // buttonRollDice
+            // buttonMove
             // 
-            this.buttonRollDice.Location = new System.Drawing.Point(9, 216);
-            this.buttonRollDice.Name = "buttonRollDice";
-            this.buttonRollDice.Size = new System.Drawing.Size(328, 23);
-            this.buttonRollDice.TabIndex = 0;
-            this.buttonRollDice.Text = "Roll Dice / Move";
-            this.buttonRollDice.UseVisualStyleBackColor = true;
-            this.buttonRollDice.Click += new System.EventHandler(this.buttonRollDice_Click);
+            this.buttonMove.Location = new System.Drawing.Point(9, 211);
+            this.buttonMove.Name = "buttonMove";
+            this.buttonMove.Size = new System.Drawing.Size(328, 23);
+            this.buttonMove.TabIndex = 0;
+            this.buttonMove.Text = "Move";
+            this.buttonMove.UseVisualStyleBackColor = true;
+            this.buttonMove.Click += new System.EventHandler(this.buttonMove_Click);
+            // 
+            // listBoxLog
+            // 
+            this.listBoxLog.FormattingEnabled = true;
+            this.listBoxLog.Location = new System.Drawing.Point(3, 312);
+            this.listBoxLog.Name = "listBoxLog";
+            this.listBoxLog.Size = new System.Drawing.Size(346, 69);
+            this.listBoxLog.TabIndex = 3;
             // 
             // PlayerControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.listBoxLog);
             this.Controls.Add(this.groupBoxGameControls);
             this.Controls.Add(this.buttonConnect);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxPlayerName);
             this.Name = "PlayerControl";
-            this.Size = new System.Drawing.Size(352, 306);
+            this.Size = new System.Drawing.Size(352, 392);
             this.Load += new System.EventHandler(this.PlayerControl_Load);
             this.groupBoxGameControls.ResumeLayout(false);
             this.groupBoxGameControls.PerformLayout();
@@ -150,8 +161,9 @@
         private System.Windows.Forms.GroupBox groupBoxGameControls;
         private System.Windows.Forms.ListBox listBoxCheckers;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button buttonRollDice;
+        private System.Windows.Forms.Button buttonMove;
         private System.Windows.Forms.ListBox listBoxMoves;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ListBox listBoxLog;
     }
 }

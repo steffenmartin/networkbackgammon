@@ -10,7 +10,7 @@ using NetworkBackgammonGameLogic;
 
 namespace NetworkBackgammonGameLogicUnitTest
 {
-    public partial class PlayerControl : UserControl
+    public partial class PlayerControl : UserControl, IGameSessionListener
     {
         GameRoom gameRoom = null;
         Player player = null;
@@ -57,6 +57,8 @@ namespace NetworkBackgammonGameLogicUnitTest
                             buttonConnect.Text = "Disconnect";
                             textBoxPlayerName.Enabled = false;
                             groupBoxGameControls.Enabled = true;
+
+                            player.AddListener(this);
                         }
                         else
                         {
@@ -79,6 +81,8 @@ namespace NetworkBackgammonGameLogicUnitTest
                 {
                     gameRoom.Logout(player);
 
+                    player.RemoveListener(this);
+
                     player = null;
                 }
 
@@ -88,11 +92,62 @@ namespace NetworkBackgammonGameLogicUnitTest
             }
         }
 
-        private void buttonRollDice_Click(object sender, EventArgs e)
+        private void buttonMove_Click(object sender, EventArgs e)
         {
             if (player != null)
             {
-                player.RollDice();
+                
+            }
+        }
+
+        public delegate void NotifyDelegate(GameSessionEvent _event, GameSessionSubject _subject);
+
+        #region IGameSessionListener Members
+
+        public void Notify(GameSessionEvent _event, GameSessionSubject _subject)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new NotifyDelegate(Notify), new object[]{_event, _subject});
+            }
+            else
+            {
+                listBoxCheckers.Items.Clear();
+
+                try
+                {
+                    GameSession gameSession = (GameSession)_subject;
+
+                    foreach (Checker checker in player.Checkers)
+                    {
+                        listBoxCheckers.Items.Add(checker);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    listBoxLog.Items.Add(ex.Message);
+                }
+            }
+        }
+
+        #endregion
+
+        private void listBoxCheckers_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            listBoxMoves.Items.Clear();
+
+            try
+            {
+                Checker selectedChecker = (Checker)listBoxCheckers.SelectedItem;
+
+                foreach (Dice.DiceValue diceValue in selectedChecker.PossibleMoves)
+                {
+                    listBoxMoves.Items.Add(diceValue);
+                }
+            }
+            catch (Exception ex)
+            {
+                listBoxLog.Items.Add(ex.Message);
             }
         }
     }

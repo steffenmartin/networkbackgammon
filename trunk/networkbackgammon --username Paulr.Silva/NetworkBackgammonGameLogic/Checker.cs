@@ -7,8 +7,33 @@ namespace NetworkBackgammonGameLogic
 {
     public class Checker
     {
-        private Position currentPosition = null;
+        private Position currentPosition;
 
-        private Move[] possibleMoves = new Move[2];
+        private List<Dice.DiceValue> possibleMoves = new List<Dice.DiceValue>();
+
+        public Checker(Position _position)
+        {
+            currentPosition = _position;
+        }
+
+        public List<Dice.DiceValue> PossibleMoves
+        {
+            get
+            {
+                return possibleMoves;
+            }
+        }
+        public Position CurrentPosition
+        {
+            get
+            {
+                return currentPosition;
+            }
+        }
+
+        public override string ToString()
+        {
+            return currentPosition.ToString();
+        }
     }
 }

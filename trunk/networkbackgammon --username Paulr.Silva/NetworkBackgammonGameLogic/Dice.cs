@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NetworkBackgammonGameLogic
 {
-    class Dice
+    public class Dice
     {
         public enum DiceValue
         {
@@ -20,7 +20,17 @@ namespace NetworkBackgammonGameLogic
         };
 
         private DiceValue currentValue = DiceValue.ONE;
-        Random rand = new Random();
+        Random rand = null;
+
+        public Dice()
+        {
+            rand = new Random();
+        }
+
+        public Dice(Int32 _seed)
+        {
+            rand = new Random(_seed);
+        }
 
         public DiceValue Roll()
         {

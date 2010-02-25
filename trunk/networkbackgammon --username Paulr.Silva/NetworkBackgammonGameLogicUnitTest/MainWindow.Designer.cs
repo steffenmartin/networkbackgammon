@@ -39,7 +39,7 @@
             this.playerControl1.ConnectedGameRoom = null;
             this.playerControl1.Location = new System.Drawing.Point(12, 12);
             this.playerControl1.Name = "playerControl1";
-            this.playerControl1.Size = new System.Drawing.Size(352, 306);
+            this.playerControl1.Size = new System.Drawing.Size(352, 384);
             this.playerControl1.TabIndex = 0;
             // 
             // playerControl2
@@ -47,21 +47,21 @@
             this.playerControl2.ConnectedGameRoom = null;
             this.playerControl2.Location = new System.Drawing.Point(378, 12);
             this.playerControl2.Name = "playerControl2";
-            this.playerControl2.Size = new System.Drawing.Size(352, 306);
+            this.playerControl2.Size = new System.Drawing.Size(352, 384);
             this.playerControl2.TabIndex = 1;
             // 
             // listBoxConnectedPlayers
             // 
             this.listBoxConnectedPlayers.FormattingEnabled = true;
-            this.listBoxConnectedPlayers.Location = new System.Drawing.Point(12, 337);
+            this.listBoxConnectedPlayers.Location = new System.Drawing.Point(12, 415);
             this.listBoxConnectedPlayers.Name = "listBoxConnectedPlayers";
-            this.listBoxConnectedPlayers.Size = new System.Drawing.Size(718, 95);
+            this.listBoxConnectedPlayers.Size = new System.Drawing.Size(718, 108);
             this.listBoxConnectedPlayers.TabIndex = 2;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 321);
+            this.label1.Location = new System.Drawing.Point(12, 399);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(96, 13);
             this.label1.TabIndex = 3;
@@ -71,7 +71,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(742, 526);
+            this.ClientSize = new System.Drawing.Size(742, 537);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listBoxConnectedPlayers);
             this.Controls.Add(this.playerControl2);

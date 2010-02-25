@@ -11,7 +11,7 @@ namespace NetworkBackgammonGameLogic
         // Thread which runs the event based state machine
         Thread threadStateMachine = null;
         // Semaphore to signal events to the state machine (wake-up calls)
-        Semaphore semStateMachine = new Semaphore(0, 1);
+        Semaphore semStateMachine = new Semaphore(1, 1);
         // Flag to allow shutting down of state machine
         bool bStateMachineKeepRunning = true;
 
@@ -46,7 +46,7 @@ namespace NetworkBackgammonGameLogic
         Queue<GameSessionEventQueueElement> eventQueue = new Queue<GameSessionEventQueueElement>();
 
         // The dice for this Game Session
-        Dice []dice = new Dice[] {new Dice(), new Dice()};
+        Dice []dice = new Dice[] {new Dice(1), new Dice(2)};
 
         enum GameSessionState
         {
@@ -134,7 +134,7 @@ namespace NetworkBackgammonGameLogic
                         // Use random number generator to figure out which player starts
                         RollDice();
 
-                        while (dice[0] == dice[1])
+                        while (dice[0].CurrentValue == dice[1].CurrentValue)
                         {
                             RollDice();
                         }
@@ -148,7 +148,7 @@ namespace NetworkBackgammonGameLogic
                             player2.Active = true;
 
                         // Calculate possible moves for active player
-                        GameEngine.CalculatePossibleMoves(player1, player2);
+                        GameEngine.CalculatePossibleMoves(ref player1, ref player2, dice);
                         // Send initial checkers with positions (and possible valid moves
                         // for the active player) to both players
                         Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.CheckerUpdated), this);
@@ -194,9 +194,13 @@ namespace NetworkBackgammonGameLogic
 
         public void Notify(GameSessionEvent _event, GameSessionSubject _subject)
         {
-            eventQueue.Enqueue(new GameSessionEventQueueElement(_event, _subject));
+            // Filter out our own broadcasts
+            if (_subject != this)
+            {
+                eventQueue.Enqueue(new GameSessionEventQueueElement(_event, _subject));
 
-            semStateMachine.Release();
+                semStateMachine.Release();
+            }
         }
 
         #endregion
