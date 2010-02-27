@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkBackgammonGameLogic"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkBackgammonGameLogicUnitTest", "NetworkBackgammonGameLogicUnitTest\NetworkBackgammonGameLogicUnitTest.csproj", "{CC9D0D0B-EBDF-41DF-BEF3-EF09CDCC7DA5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemotingBiDirectionalSpike", "RemotingBiDirectionalSpike\RemotingBiDirectionalSpike.csproj", "{97DDCB0F-23F9-4496-94C2-5F740159D900}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{CC9D0D0B-EBDF-41DF-BEF3-EF09CDCC7DA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC9D0D0B-EBDF-41DF-BEF3-EF09CDCC7DA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC9D0D0B-EBDF-41DF-BEF3-EF09CDCC7DA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97DDCB0F-23F9-4496-94C2-5F740159D900}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97DDCB0F-23F9-4496-94C2-5F740159D900}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97DDCB0F-23F9-4496-94C2-5F740159D900}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97DDCB0F-23F9-4496-94C2-5F740159D900}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
