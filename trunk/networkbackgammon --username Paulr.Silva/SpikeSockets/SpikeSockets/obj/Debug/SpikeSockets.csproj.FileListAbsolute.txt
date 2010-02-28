@@ -1,0 +1,24 @@
+C:\Documents and Settings\plombrozo\My Documents\Visual Studio 2008\Projects\SpikeSockets\SpikeSockets\bin\Debug\SpikeSockets.exe
+C:\Documents and Settings\plombrozo\My Documents\Visual Studio 2008\Projects\SpikeSockets\SpikeSockets\bin\Debug\SpikeSockets.pdb
+C:\Documents and Settings\plombrozo\My Documents\Visual Studio 2008\Projects\SpikeSockets\SpikeSockets\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\plombrozo\My Documents\Visual Studio 2008\Projects\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.Form1.resources
+C:\Documents and Settings\plombrozo\My Documents\Visual Studio 2008\Projects\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.Properties.Resources.resources
+C:\Documents and Settings\plombrozo\My Documents\Visual Studio 2008\Projects\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.csproj.GenerateResource.Cache
+C:\Documents and Settings\plombrozo\My Documents\Visual Studio 2008\Projects\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.exe
+C:\Documents and Settings\plombrozo\My Documents\Visual Studio 2008\Projects\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.pdb
+C:\Users\Peter\Documents\Visual Studio 2008\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.exe
+C:\Users\Peter\Documents\Visual Studio 2008\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.pdb
+C:\Users\Peter\Documents\Visual Studio 2008\SpikeSockets\SpikeSockets\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Peter\Documents\Visual Studio 2008\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.MyIRC.resources
+C:\Users\Peter\Documents\Visual Studio 2008\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.Properties.Resources.resources
+C:\Users\Peter\Documents\Visual Studio 2008\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.csproj.GenerateResource.Cache
+C:\Users\Peter\Documents\Visual Studio 2008\SpikeSockets\SpikeSockets\bin\Debug\SpikeSockets.exe
+C:\Users\Peter\Documents\Visual Studio 2008\SpikeSockets\SpikeSockets\bin\Debug\SpikeSockets.pdb
+C:\p4\src\sbcc\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.exe
+C:\p4\src\sbcc\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.pdb
+C:\p4\src\sbcc\SpikeSockets\SpikeSockets\bin\Debug\SpikeSockets.exe
+C:\p4\src\sbcc\SpikeSockets\SpikeSockets\bin\Debug\SpikeSockets.pdb
+C:\p4\src\sbcc\SpikeSockets\SpikeSockets\obj\Debug\ResolveAssemblyReference.cache
+C:\p4\src\sbcc\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.MyIRC.resources
+C:\p4\src\sbcc\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.Properties.Resources.resources
+C:\p4\src\sbcc\SpikeSockets\SpikeSockets\obj\Debug\SpikeSockets.csproj.GenerateResource.Cache
