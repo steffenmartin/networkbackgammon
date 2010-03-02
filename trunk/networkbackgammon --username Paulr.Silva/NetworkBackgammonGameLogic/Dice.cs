@@ -59,5 +59,10 @@ namespace NetworkBackgammonGameLogic
                 return Convert.ToUInt32(currentValue);
             }
         }
+
+        public override string ToString()
+        {
+            return currentValue.ToString();
+        }
     }
 }

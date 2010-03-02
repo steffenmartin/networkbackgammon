@@ -31,11 +31,19 @@ namespace NetworkBackgammonGameLogic
             listeners.Remove(_listener);
         }
 
-        protected void Broadcast(GameSessionEvent _event, GameSessionSubject _subject)
+        public void Broadcast(GameSessionEvent _event, GameSessionSubject _subject)
         {
             foreach (IGameSessionListener listener in listeners)
             {
-                listener.Notify(_event, _subject);
+                listener.Notify(_event, _subject, null);
+            }
+        }
+
+        public void Broadcast(GameSessionEvent _event, GameSessionSubject _subject, IPlayerEventInfo _playerInfo)
+        {
+            foreach (IGameSessionListener listener in listeners)
+            {
+                listener.Notify(_event, _subject, _playerInfo);
             }
         }
     }

@@ -7,6 +7,6 @@ namespace NetworkBackgammonGameLogic
 {
     public interface IGameSessionListener
     {
-        void Notify(GameSessionEvent _event, GameSessionSubject _subject);
+        void Notify(GameSessionEvent _event, GameSessionSubject _subject, IPlayerEventInfo _playerInfo);
     }
 }

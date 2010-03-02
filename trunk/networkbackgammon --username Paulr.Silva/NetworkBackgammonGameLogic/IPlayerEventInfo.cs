@@ -5,7 +5,9 @@ using System.Text;
 
 namespace NetworkBackgammonGameLogic
 {
-    public class Move
+    public interface IPlayerEventInfo
     {
+        Checker GetSelectedChecker();
+        Dice GetSelectedMove();
     }
 }

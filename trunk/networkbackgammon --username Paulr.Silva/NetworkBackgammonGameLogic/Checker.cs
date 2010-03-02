@@ -9,14 +9,19 @@ namespace NetworkBackgammonGameLogic
     {
         private Position currentPosition;
 
-        private List<Dice.DiceValue> possibleMoves = new List<Dice.DiceValue>();
+        private List<Dice> possibleMoves = new List<Dice>();
 
         public Checker(Position _position)
         {
             currentPosition = _position;
         }
 
-        public List<Dice.DiceValue> PossibleMoves
+        public void MoveChecker(Dice _move)
+        {
+            currentPosition += _move;
+        }
+
+        public List<Dice> PossibleMoves
         {
             get
             {
