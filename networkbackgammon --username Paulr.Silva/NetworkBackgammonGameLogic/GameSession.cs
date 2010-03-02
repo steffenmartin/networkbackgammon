@@ -19,11 +19,13 @@ namespace NetworkBackgammonGameLogic
         {
             private GameSessionEvent gameSessionEvent;
             private GameSessionSubject gameSessionSubject;
+            private IPlayerEventInfo playerEventInfo;
 
-            public GameSessionEventQueueElement(GameSessionEvent _event, GameSessionSubject _subject)
+            public GameSessionEventQueueElement(GameSessionEvent _event, GameSessionSubject _subject, IPlayerEventInfo _playerInfo)
             {
                 gameSessionEvent = _event;
                 gameSessionSubject = _subject;
+                playerEventInfo = _playerInfo;
             }
 
             public GameSessionEvent Event
@@ -41,6 +43,14 @@ namespace NetworkBackgammonGameLogic
                     return gameSessionSubject;
                 }
             }
+
+            public IPlayerEventInfo PlayerInfo
+            {
+                get
+                {
+                    return playerEventInfo;
+                }
+            }
         }
 
         Queue<GameSessionEventQueueElement> eventQueue = new Queue<GameSessionEventQueueElement>();
@@ -51,7 +61,8 @@ namespace NetworkBackgammonGameLogic
         enum GameSessionState
         {
             InitialDiceRoll,
-            MoveExpected
+            MoveExpected,
+            GameWon
         };
 
         public GameSession(Player _player1, Player _player2)
@@ -123,10 +134,22 @@ namespace NetworkBackgammonGameLogic
         {
             GameSessionState currentState = GameSessionState.InitialDiceRoll;
 
+            GameSessionEventQueueElement eventQueueElement = null;
+
+            // Number of moves left for the active player
+            UInt32 activePlayerMovesLeft = 0;
+            bool activePlayerMoveDoubles = false;
+
             while (bStateMachineKeepRunning)
             {
                 // Wait for another event
                 semStateMachine.WaitOne();
+
+                // Read the event element queue to get information on the next event to be processed
+                if (eventQueue.Count > 0)
+                {
+                    eventQueueElement = eventQueue.Dequeue();
+                }
 
                 switch (currentState)
                 {
@@ -134,6 +157,7 @@ namespace NetworkBackgammonGameLogic
                         // Use random number generator to figure out which player starts
                         RollDice();
 
+                        // Roll dice until they're both different (no tie)
                         while (dice[0].CurrentValue == dice[1].CurrentValue)
                         {
                             RollDice();
@@ -147,28 +171,85 @@ namespace NetworkBackgammonGameLogic
                         else
                             player2.Active = true;
 
+                        // Roll dice for the first move of active player
+                        RollDice();
+
+                        // Calculate number of moves left for active player (based on dice values)
+                        activePlayerMoveDoubles = dice[0].CurrentValue == dice[1].CurrentValue;
+                        activePlayerMovesLeft = (UInt32) (activePlayerMoveDoubles ? 4 : 2);
+
                         // Calculate possible moves for active player
-                        GameEngine.CalculatePossibleMoves(ref player1, ref player2, dice);
+                        GameEngine.CalculatePossibleMoves(ref player1, ref player2, activePlayerMoveDoubles ? new Dice[] { dice[0] } : dice);
                         // Send initial checkers with positions (and possible valid moves
                         // for the active player) to both players
                         Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.CheckerUpdated), this);
-                        // Inform active player to make a move
+                        // Set next iteration's state
                         currentState = GameSessionState.MoveExpected;
                         break;
 
                     case GameSessionState.MoveExpected:
-                        // Perform the selected move of the active player
-                        // Figure out the next active player (could be the current
-                        // active player since up to 4 moves are allowed per turn)
-                        // Calculate possible moves for active player
-                        // Send updated checkers with positions (and possible valid moves
-                        // for the active player) to both players
-                        // Inform active player to make a move
+                        if (eventQueueElement != null)
+                        {
+                            try
+                            {
+                                Player sendingPlayer = (Player)eventQueueElement.Subject;
+
+                                // Check whether the active player attempted to move
+                                if (sendingPlayer.Active)
+                                {
+                                    // Perform the selected move of the active player (and check whether the active player won the game
+                                    if (!GameEngine.ExecuteMove(ref player1, ref player2, eventQueueElement.PlayerInfo.GetSelectedChecker(), eventQueueElement.PlayerInfo.GetSelectedMove()))
+                                    {
+                                        // Figure out the next active player (could be the current
+                                        // active player since up to 4 moves are allowed per turn)
+                                        if (--activePlayerMovesLeft <= 0)
+                                        {
+                                            player1.Active = !player1.Active;
+                                            player2.Active = !player2.Active;
+
+                                            // Roll dice for active player
+                                            RollDice();
+
+                                            // Calculate number of moves left for active player (based on dice values)
+                                            activePlayerMoveDoubles = dice[0].CurrentValue == dice[1].CurrentValue;
+                                            activePlayerMovesLeft = (UInt32)(activePlayerMoveDoubles ? 4 : 2);
+                                        }
+
+                                        // Calculate possible moves for active player
+                                        GameEngine.CalculatePossibleMoves(
+                                            ref player1,
+                                            ref player2,
+                                            activePlayerMoveDoubles ?
+                                                new Dice[] { dice[0] } :
+                                                activePlayerMovesLeft == 2 ?
+                                                dice :
+                                                new Dice[] { dice[0] == eventQueueElement.PlayerInfo.GetSelectedMove() ? dice[1] : dice[0] });
+                                        // Send updated checkers with positions (and possible valid moves
+                                        // for the active player) to both players
+                                        Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.CheckerUpdated), this);
+                                    }
+                                    else
+                                    {
+                                        // Inform both players that the game has been won by the active player
+                                    }
+                                }
+                                else
+                                {
+                                    Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.Error), this);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.Error), this);
+                            }
+                        }
                         break;
 
                     default:
                         break;
                 }
+
+                eventQueueElement = null;
             }
         }
 
@@ -192,12 +273,12 @@ namespace NetworkBackgammonGameLogic
 
         #region IGameSessionListener Members
 
-        public void Notify(GameSessionEvent _event, GameSessionSubject _subject)
+        public void Notify(GameSessionEvent _event, GameSessionSubject _subject, IPlayerEventInfo _playerInfo)
         {
             // Filter out our own broadcasts
             if (_subject != this)
             {
-                eventQueue.Enqueue(new GameSessionEventQueueElement(_event, _subject));
+                eventQueue.Enqueue(new GameSessionEventQueueElement(_event, _subject, _playerInfo));
 
                 semStateMachine.Release();
             }

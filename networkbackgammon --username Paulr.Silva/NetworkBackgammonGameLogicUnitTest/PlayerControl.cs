@@ -10,10 +10,12 @@ using NetworkBackgammonGameLogic;
 
 namespace NetworkBackgammonGameLogicUnitTest
 {
-    public partial class PlayerControl : UserControl, IGameSessionListener
+    public partial class PlayerControl : UserControl, IGameSessionListener, IPlayerEventInfo
     {
         GameRoom gameRoom = null;
         Player player = null;
+        Checker checkerSelected = null;
+        Dice moveSelected = null;
 
         public PlayerControl()
         {
@@ -94,38 +96,56 @@ namespace NetworkBackgammonGameLogicUnitTest
 
         private void buttonMove_Click(object sender, EventArgs e)
         {
-            if (player != null)
+            try
             {
-                
+                if (player != null)
+                {
+                    if (listBoxCheckers.SelectedItem != null &&
+                        listBoxMoves.SelectedItem != null)
+                    {
+                        checkerSelected = (Checker) listBoxCheckers.SelectedItem;
+                        moveSelected = (Dice) listBoxMoves.SelectedItem;
+
+                        player.Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.MoveSelected), player, this);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                listBoxLog.Items.Add(ex.Message);
             }
         }
 
-        public delegate void NotifyDelegate(GameSessionEvent _event, GameSessionSubject _subject);
+        public delegate void NotifyDelegate(GameSessionEvent _event, GameSessionSubject _subject, IPlayerEventInfo _playerInfo);
 
         #region IGameSessionListener Members
 
-        public void Notify(GameSessionEvent _event, GameSessionSubject _subject)
+        public void Notify(GameSessionEvent _event, GameSessionSubject _subject, IPlayerEventInfo _playerInfo)
         {
             if (InvokeRequired)
             {
-                Invoke(new NotifyDelegate(Notify), new object[]{_event, _subject});
+                Invoke(new NotifyDelegate(Notify), new object[]{_event, _subject, _playerInfo});
             }
             else
             {
-                listBoxCheckers.Items.Clear();
-
-                try
+                // Filter out broadcasts from our own player
+                if (_subject != player)
                 {
-                    GameSession gameSession = (GameSession)_subject;
+                    listBoxCheckers.Items.Clear();
 
-                    foreach (Checker checker in player.Checkers)
+                    try
                     {
-                        listBoxCheckers.Items.Add(checker);
+                        GameSession gameSession = (GameSession)_subject;
+
+                        foreach (Checker checker in player.Checkers)
+                        {
+                            listBoxCheckers.Items.Add(checker);
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    listBoxLog.Items.Add(ex.Message);
+                    catch (Exception ex)
+                    {
+                        listBoxLog.Items.Add(ex.Message);
+                    }
                 }
             }
         }
@@ -140,7 +160,7 @@ namespace NetworkBackgammonGameLogicUnitTest
             {
                 Checker selectedChecker = (Checker)listBoxCheckers.SelectedItem;
 
-                foreach (Dice.DiceValue diceValue in selectedChecker.PossibleMoves)
+                foreach (Dice diceValue in selectedChecker.PossibleMoves)
                 {
                     listBoxMoves.Items.Add(diceValue);
                 }
@@ -150,5 +170,19 @@ namespace NetworkBackgammonGameLogicUnitTest
                 listBoxLog.Items.Add(ex.Message);
             }
         }
+
+        #region IPlayerEventInfo Members
+
+        public Checker GetSelectedChecker()
+        {
+            return checkerSelected;
+        }
+
+        public Dice GetSelectedMove()
+        {
+            return moveSelected;
+        }
+
+        #endregion
     }
 }

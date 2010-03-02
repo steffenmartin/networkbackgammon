@@ -80,10 +80,14 @@ namespace NetworkBackgammonGameLogic
 
         #region IGameSessionListener Members
 
-        public void Notify(GameSessionEvent _event, GameSessionSubject _subject)
+        public void Notify(GameSessionEvent _event, GameSessionSubject _subject, IPlayerEventInfo _playerInfo)
         {
-            // Forward event
-            Broadcast(_event, _subject);
+            // Filter out our own broadcasts
+            if (_subject != this)
+            {
+                // Forward event
+                Broadcast(_event, _subject);
+            }
         }
 
         #endregion

@@ -9,8 +9,8 @@ namespace NetworkBackgammonGameLogic
     {
         public enum GameBoardPosition
         {
-            NORMAL_MIN = 1,
-            ONE = NORMAL_MIN,
+            NORMAL_START = 1,
+            ONE = NORMAL_START,
             TWO,
             THREE,
             FOUR,
@@ -34,10 +34,12 @@ namespace NetworkBackgammonGameLogic
             TWENTYTWO,
             TWENTYTHREE,
             TWENTYFOUR,
-            NORMAL_MAX = TWENTYFOUR,
+            NORMAL_END = TWENTYFOUR,
             BAR,
             OFFBOARD,
-            INVALID
+            INVALID,
+            HOME_START = NINETEEN,
+            HOME_END = TWENTYFOUR
         }
 
         private GameBoardPosition currentPosition;
@@ -73,7 +75,7 @@ namespace NetworkBackgammonGameLogic
                 default:
                     UInt32 newPos = Convert.ToUInt32(a.CurrentPosition) + Convert.ToUInt32(b.CurrentValue);
 
-                    if (newPos > Convert.ToUInt32(GameBoardPosition.NORMAL_MAX))
+                    if (newPos > Convert.ToUInt32(GameBoardPosition.NORMAL_END))
                     {
                         retVal = new Position(GameBoardPosition.OFFBOARD);
                     }

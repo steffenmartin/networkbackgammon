@@ -12,7 +12,9 @@ namespace NetworkBackgammonGameLogic
             PlayerResigned,
             GameFinished,
             DiceRolled,
-            CheckerUpdated
+            CheckerUpdated,
+            MoveSelected,
+            Error
         };
 
         GameSessionEventType type;
