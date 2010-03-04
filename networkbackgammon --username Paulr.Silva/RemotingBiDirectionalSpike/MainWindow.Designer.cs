@@ -206,6 +206,7 @@
             this.MaximizeBox = false;
             this.Name = "MainWindow";
             this.Text = "Bi-Directional Remoting Spike";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.tabControlType.ResumeLayout(false);
             this.tabPageServer.ResumeLayout(false);
             this.tabPageServer.PerformLayout();
