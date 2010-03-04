@@ -6,34 +6,30 @@ using System.Windows.Forms;
 
 namespace RemotingBiDirectionalSpike
 {
-    public class RemotingServer : MarshalByRefObject, IRemotingServer
+    public class RemotingServer : MarshalByRefObject
     {
-        private Dictionary<RemotingServerObject, RemotingClient.ClientCallback> clientCallbackList = new Dictionary<RemotingServerObject, RemotingClient.ClientCallback>();
-
-        #region IRemotingServer Members
+        #region RemotingServer Members
 
         public event RemotingClient.ClientCallback messageCallback;
 
         public void SendMessage(string _message)
         {
-            messageCallback(_message);
+            //messageCallback(_message);
 
-            if (MainWindow.mainWindow != null)
-            {
-                MainWindow.mainWindow.OnMessageReceivedOnServer(_message);
-            }
-        }
+            Delegate[] chain = messageCallback.GetInvocationList();
 
-        public void SendMessage(string _message, RemotingServerObject _serverObject)
-        {
-            if (clientCallbackList.ContainsKey(_serverObject))
+            for (int i = 0; i < chain.Length; i++)
             {
-                clientCallbackList[_serverObject](_message);
-            }
+                RemotingClient.ClientCallback cur = (RemotingClient.ClientCallback)chain[i];
 
-            if (MainWindow.mainWindow != null)
-            {
-                MainWindow.mainWindow.OnMessageReceivedOnServer(_message);
+                try
+                {
+                    cur(_message);
+                }
+                catch (Exception ex)
+                {
+                    messageCallback -= cur;
+                }
             }
         }
 
@@ -45,15 +41,6 @@ namespace RemotingBiDirectionalSpike
         public void UnregisterMessageCallback(RemotingClient.ClientCallback callback)
         {
             messageCallback -= callback;
-        }
-
-        public RemotingServerObject RegisterMessageCallbackOne(RemotingClient.ClientCallback callback)
-        {
-            RemotingServerObject newServerObject = new RemotingServerObject();
-
-            clientCallbackList.Add(newServerObject, callback);
-
-            return newServerObject;
         }
 
         #endregion

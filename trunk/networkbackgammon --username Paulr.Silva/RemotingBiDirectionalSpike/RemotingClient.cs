@@ -7,13 +7,13 @@ using System.Runtime.Remoting.Messaging;
 
 namespace RemotingBiDirectionalSpike
 {
-    public class RemotingClient : MarshalByRefObject, IRemotingClient
+    public class RemotingClient : MarshalByRefObject
     {
         public delegate void ClientCallback(string _message);
 
-        #region IRemotingClient Members
+        public event ClientCallback clientCallback;
 
-        public event RemotingClient.ClientCallback clientCallback;
+        #region RemotingClient Members
 
         public void SendMessage(string _message)
         {
