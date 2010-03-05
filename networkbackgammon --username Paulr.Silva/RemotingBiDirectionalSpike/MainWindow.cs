@@ -11,6 +11,8 @@ using System.Collections;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Http;
+using System.Net;
+using System.Net.Sockets;
 
 namespace RemotingBiDirectionalSpike
 {
@@ -19,11 +21,14 @@ namespace RemotingBiDirectionalSpike
         private HttpChannel channel = null;
         private RemotingServer server = null;
         private RemotingClient client = null;
+        private RemotingClient.ClientCallback clientCallback = null;
 
         public MainWindow()
         {
             InitializeComponent();
         }
+
+        #region GUI Control Event Handler
 
         private void buttonStartServer_Click(object sender, EventArgs e)
         {
@@ -33,14 +38,14 @@ namespace RemotingBiDirectionalSpike
                 {
                     if (channel == null)
                     {
-                        SoapServerFormatterSinkProvider serverProv = new SoapServerFormatterSinkProvider();
+                        // We need to use binary formatters, which allow the serialization of generic collections
+                        BinaryServerFormatterSinkProvider serverProv = new BinaryServerFormatterSinkProvider();
                         serverProv.TypeFilterLevel = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
-                        SoapClientFormatterSinkProvider clientProv = new SoapClientFormatterSinkProvider();
+                        BinaryClientFormatterSinkProvider clientProv = new BinaryClientFormatterSinkProvider();
 
                         IDictionary props = new Hashtable();
                         props["port"] = Convert.ToInt32(textBoxServerPort.Text);
 
-                        // HttpChannel channel = new HttpChannel(Convert.ToInt32(textBoxServerPort.Text));
                         channel = new HttpChannel(props, clientProv, serverProv);
                     }
 
@@ -88,29 +93,41 @@ namespace RemotingBiDirectionalSpike
                     // Creates a client object that 'lives' here on the client.
                     client = new RemotingClient();
 
+                    listBoxLog.Items.Add("Created client with ID " + client.ClientID);
+
                     // Hook into the event exposed on the Sink object so we can transfer a server 
                     // message through to this class.
-                    client.clientCallback += new RemotingClient.ClientCallback(OnMessageReceived);
+                    client.clientCallback += OnMessageReceived;
+
+                    // Hook into the event to allow the server to send (other) notifications
+                    // (Currently only asserted when clients connect or disconnect from server by
+                    //  means of registering respective event handlers associated with their client
+                    //  references)
+                    client.serverNotificationCallback += OnServerNotification;
 
                     if (channel == null)
                     {
-                        int clientChannel = 9001;
-                        bool searchForChannel = true;
+                        int clientChannel = FindUnusedPort(IPAddress.Loopback);
 
-                        while (searchForChannel)
+                        listBoxLog.Items.Add("Using (unused) client port " + clientChannel);
+
+                        if (clientChannel != 0)
                         {
-                            try
-                            {
-                                // Register a client channel so the server an communicate back - it needs a channel
-                                // opened for the callback to the CallbackSink object that is anchored on the client!
-                                channel = new HttpChannel(clientChannel++);
+                            BinaryServerFormatterSinkProvider serverProv = new BinaryServerFormatterSinkProvider();
+                            serverProv.TypeFilterLevel = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
+                            BinaryClientFormatterSinkProvider clientProv = new BinaryClientFormatterSinkProvider();
 
-                                searchForChannel = false;
-                            }
-                            catch (Exception ex)
-                            {
-                                
-                            }
+                            IDictionary props = new Hashtable();
+                            props["port"] = clientChannel;
+
+                            // Register a client channel so the server an communicate back - it needs a channel
+                            // opened for the callback to the CallbackSink object that is anchored on the client!
+                            // channel = new HttpChannel(clientChannel++);
+                            channel = new HttpChannel(props, clientProv, serverProv);
+                        }
+                        else
+                        {
+                            throw new Exception("Couldn't find unused client port!");
                         }
                     }
 
@@ -121,8 +138,17 @@ namespace RemotingBiDirectionalSpike
                     MarshalByRefObject obj = (MarshalByRefObject)RemotingServices.Connect(typeof(RemotingServer), "http://" + textBoxServerIPAddress.Text + ":" + textBoxServerPortConnect.Text + "/Server");
                     server = obj as RemotingServer;
 
+                    // Create messaging callback objects
+                    clientCallback = new RemotingClient.ClientCallback(client.SendMessage);
+
                     // Register callback
-                    server.RegisterMessageCallback(new RemotingClient.ClientCallback(client.SendMessage));
+                    if (clientCallback != null)
+                    {
+                        // Simple messaging callback for broadcasting of messages from one client
+                        server.RegisterMessageCallback(clientCallback);
+                        // Messaging callback associated with the client to allow for sending messages to a particular client
+                        server.RegisterMessageCallback(clientCallback, client);
+                    }
 
                     buttonConnect.Text = "Disconnect";
                     textBoxServerIPAddress.Enabled = false;
@@ -137,17 +163,41 @@ namespace RemotingBiDirectionalSpike
                 {
                     if (server != null)
                     {
-                        server.UnregisterMessageCallback(new RemotingClient.ClientCallback(client.SendMessage));
+                        if (clientCallback != null)
+                        {
+                            server.UnregisterMessageCallback(clientCallback);
+                        }
 
-                        server = null;
+                        if (client != null)
+                        {
+                            server.UnregisterMessageCallback(client);
+                        }
+                    }
+
+                    if (client != null)
+                    {
+                        client.clientCallback -= OnMessageReceived;
+                        client.serverNotificationCallback -= OnServerNotification;
                     }
 
                     if (channel != null)
                     {
-                        ChannelServices.UnregisterChannel(channel);
+                        ChannelDataStore cds = (ChannelDataStore)channel.ChannelData;
 
-                        channel = null;
+                        foreach (string s in cds.ChannelUris)
+                        {
+                            channel.StopListening(s);
+                        }
+
+                        ChannelServices.UnregisterChannel(channel);
                     }
+
+                    clientCallback = null;
+                    server = null;
+                    client = null;
+                    channel = null;
+
+                    OnServerNotification();
 
                     buttonConnect.Text = "Connect";
                     textBoxServerIPAddress.Enabled = true;
@@ -171,7 +221,16 @@ namespace RemotingBiDirectionalSpike
             {
                 if (server != null)
                 {
-                    server.SendMessage(textBoxMessage.Text);
+                    // If client (item) has been selected, send respective message to it ...
+                    if (listBoxConnectedClients.SelectedItem != null)
+                    {
+                        server.SendMessage((RemotingClient)listBoxConnectedClients.SelectedItem, textBoxMessage.Text);
+                    }
+                    // ... otherwise send broadcast message (to all currently connected clients)
+                    else
+                    {
+                        server.SendMessage(textBoxMessage.Text);
+                    }
                 }
             }
             catch (Exception ex)
@@ -180,8 +239,47 @@ namespace RemotingBiDirectionalSpike
             }
         }
 
-        private delegate void OnMessageReceivedDelegate(string _message);
+        #endregion
 
+        #region Delegates and respective handlers
+
+        private delegate void OnMessageReceivedDelegate(string _message);
+        private delegate void OnServerNotificationDelegate();
+
+        public void OnServerNotification()
+        {
+            if (InvokeRequired)
+            {
+                // In case the caller has called this routine on a different thread
+                BeginInvoke(new OnServerNotificationDelegate(OnServerNotification));
+            }
+            else
+            {
+                try
+                {
+                    listBoxConnectedClients.Items.Clear();
+
+                    if (server != null)
+                    {
+                        foreach (RemotingClient remoteClient in server.ClientCallbackList.Keys)
+                        {
+                            if (remoteClient != client)
+                            {
+                                listBoxConnectedClients.Items.Add(remoteClient);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        listBoxConnectedClients.Items.Clear();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    listBoxLog.Items.Add(ex.Message);
+                }
+            }
+        }
         public void OnMessageReceived(string _message)
         {
             if (InvokeRequired)
@@ -195,22 +293,40 @@ namespace RemotingBiDirectionalSpike
             }
         }
 
-        internal void OnMessageReceivedOnServer(string _message)
+        #endregion
+
+        #region Misc members
+
+        public int FindUnusedPort(IPAddress localAddr)
         {
-            if (InvokeRequired)
+            int retVal = 0;
+
+            for (int p = 1024; p <= IPEndPoint.MaxPort; p++)
             {
-                // In case the caller has called this routine on a different thread
-                BeginInvoke(new OnMessageReceivedDelegate(OnMessageReceivedOnServer), _message);
+                Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+                try
+                {
+                    s.Bind(new IPEndPoint(localAddr, p));
+                    s.Close();
+
+                    retVal = p;
+
+                    break;
+                }
+                catch (SocketException)
+                {
+                    // EADDRINUSE?
+                    // if (ex.ErrorCode == 10048)
+                        continue;
+                    // else
+                        // throw;
+                }
             }
-            else
-            {
-                listBoxLog.Items.Add("Client -> Server: " + _message);
-            }
+
+            return retVal;
         }
 
-        private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
-        {
-
-        }
+        #endregion
     }
 }
