@@ -43,6 +43,8 @@
             this.tabPageServer = new System.Windows.Forms.TabPage();
             this.tabPageClient = new System.Windows.Forms.TabPage();
             this.label4 = new System.Windows.Forms.Label();
+            this.listBoxConnectedClients = new System.Windows.Forms.ListBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.tabControlType.SuspendLayout();
             this.tabPageServer.SuspendLayout();
             this.tabPageClient.SuspendLayout();
@@ -122,7 +124,7 @@
             // listBoxLog
             // 
             this.listBoxLog.FormattingEnabled = true;
-            this.listBoxLog.Location = new System.Drawing.Point(12, 205);
+            this.listBoxLog.Location = new System.Drawing.Point(12, 337);
             this.listBoxLog.Name = "listBoxLog";
             this.listBoxLog.Size = new System.Drawing.Size(317, 95);
             this.listBoxLog.TabIndex = 3;
@@ -195,24 +197,43 @@
             this.label4.TabIndex = 1;
             this.label4.Text = "Message:";
             // 
+            // listBoxConnectedClients
+            // 
+            this.listBoxConnectedClients.FormattingEnabled = true;
+            this.listBoxConnectedClients.Location = new System.Drawing.Point(12, 218);
+            this.listBoxConnectedClients.Name = "listBoxConnectedClients";
+            this.listBoxConnectedClients.Size = new System.Drawing.Size(317, 108);
+            this.listBoxConnectedClients.TabIndex = 3;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(13, 202);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(96, 13);
+            this.label5.TabIndex = 1;
+            this.label5.Text = "Connected Clients:";
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(342, 314);
+            this.ClientSize = new System.Drawing.Size(342, 438);
             this.Controls.Add(this.tabControlType);
+            this.Controls.Add(this.listBoxConnectedClients);
             this.Controls.Add(this.listBoxLog);
+            this.Controls.Add(this.label5);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "MainWindow";
             this.Text = "Bi-Directional Remoting Spike";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.tabControlType.ResumeLayout(false);
             this.tabPageServer.ResumeLayout(false);
             this.tabPageServer.PerformLayout();
             this.tabPageClient.ResumeLayout(false);
             this.tabPageClient.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -233,6 +254,8 @@
         private System.Windows.Forms.TabPage tabPageServer;
         private System.Windows.Forms.TabPage tabPageClient;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ListBox listBoxConnectedClients;
+        private System.Windows.Forms.Label label5;
     }
 }
 
