@@ -58,6 +58,14 @@ namespace NetworkBackgammonGameLogic
         // The dice for this Game Session
         Dice []dice = new Dice[] {new Dice(1), new Dice(2)};
 
+        public Dice[] CurrentDice
+        {
+            get
+            {
+                return dice;
+            }
+        }
+
         enum GameSessionState
         {
             InitialDiceRoll,
