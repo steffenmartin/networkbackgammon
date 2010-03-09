@@ -47,6 +47,7 @@
             this.textBoxPlayerName.Name = "textBoxPlayerName";
             this.textBoxPlayerName.Size = new System.Drawing.Size(282, 20);
             this.textBoxPlayerName.TabIndex = 0;
+            this.textBoxPlayerName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxPlayerName_KeyPress);
             // 
             // label1
             // 

@@ -109,10 +109,39 @@ namespace NetworkBackgammonGameLogicUnitTest
                         player.Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.MoveSelected), player, this);
                     }
                 }
+
+                listBoxMoves.Items.Clear();
             }
             catch (Exception ex)
             {
                 listBoxLog.Items.Add(ex.Message);
+            }
+        }
+
+        private void listBoxCheckers_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            listBoxMoves.Items.Clear();
+
+            try
+            {
+                Checker selectedChecker = (Checker)listBoxCheckers.SelectedItem;
+
+                foreach (Dice diceValue in selectedChecker.PossibleMoves)
+                {
+                    listBoxMoves.Items.Add(diceValue);
+                }
+            }
+            catch (Exception ex)
+            {
+                listBoxLog.Items.Add(ex.Message);
+            }
+        }
+
+        private void textBoxPlayerName_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == 13)
+            {
+                buttonConnect_Click(sender, e);
             }
         }
 
@@ -137,6 +166,20 @@ namespace NetworkBackgammonGameLogicUnitTest
                     {
                         GameSession gameSession = (GameSession)_subject;
 
+                        if (player.Active)
+                        {
+                            listBoxLog.Items.Add("I'm the active player, expected to make the next move ...");
+                        }
+
+                        string strDice = "";
+
+                        foreach (Dice d in gameSession.CurrentDice)
+                        {
+                            strDice += " " + d.CurrentValue;
+                        }
+
+                        listBoxLog.Items.Add("Dice: " + strDice);
+
                         foreach (Checker checker in player.Checkers)
                         {
                             listBoxCheckers.Items.Add(checker);
@@ -151,25 +194,6 @@ namespace NetworkBackgammonGameLogicUnitTest
         }
 
         #endregion
-
-        private void listBoxCheckers_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            listBoxMoves.Items.Clear();
-
-            try
-            {
-                Checker selectedChecker = (Checker)listBoxCheckers.SelectedItem;
-
-                foreach (Dice diceValue in selectedChecker.PossibleMoves)
-                {
-                    listBoxMoves.Items.Add(diceValue);
-                }
-            }
-            catch (Exception ex)
-            {
-                listBoxLog.Items.Add(ex.Message);
-            }
-        }
 
         #region IPlayerEventInfo Members
 
