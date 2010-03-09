@@ -7,8 +7,14 @@ namespace NetworkBackgammonGameLogic
 {
     public class Position
     {
+        /// <summary>
+        /// (Possible) positions of checkers on the game board
+        /// </summary>
         public enum GameBoardPosition
         {
+            /// <summary>
+            /// Start of "normal" positions (i.e. between 1 and 24)
+            /// </summary>
             NORMAL_START = 1,
             ONE = NORMAL_START,
             TWO,
@@ -34,11 +40,26 @@ namespace NetworkBackgammonGameLogic
             TWENTYTWO,
             TWENTYTHREE,
             TWENTYFOUR,
+            /// <summary>
+            /// End of "normal" positions (i.e. between 1 and 24)
+            /// </summary>
             NORMAL_END = TWENTYFOUR,
+            /// <summary>
+            /// Bar
+            /// </summary>
             BAR,
+            /// <summary>
+            /// Off the board
+            /// </summary>
             OFFBOARD,
             INVALID,
+            /// <summary>
+            /// Start of "home" positions (i.e. between 19 and 24)
+            /// </summary>
             HOME_START = NINETEEN,
+            /// <summary>
+            /// End of "home" positions (i.e. between 19 and 24)
+            /// </summary>
             HOME_END = TWENTYFOUR
         }
 
@@ -97,6 +118,32 @@ namespace NetworkBackgammonGameLogic
         public static bool operator !=(Position a, Position b)
         {
             return a.currentPosition != b.currentPosition;
+        }
+
+        public void Reset()
+        {
+            currentPosition = GameBoardPosition.BAR;
+        }
+
+        public Position GetOppositePosition()
+        {
+            Position retVal = null;
+
+            if (currentPosition >= Position.GameBoardPosition.NORMAL_START &&
+                currentPosition <= Position.GameBoardPosition.NORMAL_END)
+            {
+                UInt32 oppositeValue = (UInt32)GameBoardPosition.NORMAL_END - (UInt32)currentPosition + 1;
+
+                GameBoardPosition oppositePosition = (GameBoardPosition)oppositeValue;
+
+                retVal = new Position(oppositePosition);
+            }
+            else
+            {
+                retVal = new Position(GameBoardPosition.INVALID);
+            }
+
+            return retVal;
         }
 
         public override string ToString()
