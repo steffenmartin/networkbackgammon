@@ -10,8 +10,10 @@ using NetworkBackgammonGameLogic;
 
 namespace NetworkBackgammonGameLogicUnitTest
 {
-    public partial class MainWindow : Form, IGameRoomListener
+    public partial class MainWindow : Form, INetworkBackgammonListener
     {
+        INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
+
         GameRoom gameRoom = new GameRoom();
 
         public MainWindow()
@@ -22,7 +24,7 @@ namespace NetworkBackgammonGameLogicUnitTest
             playerControl1.ConnectedGameRoom = gameRoom;
             playerControl2.ConnectedGameRoom = gameRoom;
 
-            gameRoom.AddListener(this);
+            ((INetworkBackgammonNotifier)gameRoom).AddListener(this);
         }
 
         public void UpdateGUI()
@@ -35,18 +37,36 @@ namespace NetworkBackgammonGameLogicUnitTest
             }
         }
 
-        #region GameRoomListener Members
+        #region INetworkBackgammonListener Members
 
-        public void Notify(GameRoomEvent _event)
+        public bool AddNotifier(INetworkBackgammonNotifier notifier)
         {
-            switch (_event.EventType)
+            return defaultListener.AddNotifier(notifier);
+        }
+
+        public bool RemoveNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return defaultListener.RemoveNotifier(notifier);
+        }
+
+        public void OnEventNotification(INetworkBackgammonNotifier sender, INetworkBackgammonEvent e)
+        {
+            try
             {
-                case GameRoomEvent.GameRoomEventType.PlayerConnected:
-                    UpdateGUI();
-                    break;
-                case GameRoomEvent.GameRoomEventType.PlayerDisconnected:
-                    UpdateGUI();
-                    break;
+                GameRoomEvent _event = (GameRoomEvent)e;
+
+                switch (_event.EventType)
+                {
+                    case GameRoomEvent.GameRoomEventType.PlayerConnected:
+                        UpdateGUI();
+                        break;
+                    case GameRoomEvent.GameRoomEventType.PlayerDisconnected:
+                        UpdateGUI();
+                        break;
+                }
+            }
+            catch (Exception)
+            {
             }
         }
 

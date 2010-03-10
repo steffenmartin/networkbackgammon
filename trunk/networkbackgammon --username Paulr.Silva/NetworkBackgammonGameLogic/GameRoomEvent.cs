@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NetworkBackgammonGameLogic
 {
-    public class GameRoomEvent
+    public class GameRoomEvent : INetworkBackgammonEvent
     {
         public enum GameRoomEventType
         {

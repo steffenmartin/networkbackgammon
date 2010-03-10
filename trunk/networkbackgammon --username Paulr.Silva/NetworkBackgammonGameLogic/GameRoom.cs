@@ -5,8 +5,10 @@ using System.Text;
 
 namespace NetworkBackgammonGameLogic
 {
-    public class GameRoom : GameRoomSubject
+    public class GameRoom : INetworkBackgammonNotifier
     {
+        INetworkBackgammonNotifier defaultNotifier = new NetworkBackgammonNotifier();
+
         private List<Player> connectedPlayers = new List<Player>();
         private List<GameSession> gameSessions = new List<GameSession>();
 
@@ -22,7 +24,7 @@ namespace NetworkBackgammonGameLogic
 
             connectedPlayers.Add(newPlayer);
 
-            BroadCast(new GameRoomEvent(GameRoomEvent.GameRoomEventType.PlayerConnected));
+            Broadcast(new GameRoomEvent(GameRoomEvent.GameRoomEventType.PlayerConnected));
 
             // Automatically create a game session once 2 players have logged in
             // First player logged in will be the challenged one, the second one will
@@ -42,7 +44,7 @@ namespace NetworkBackgammonGameLogic
                 connectedPlayers.Remove(_player);
             }
 
-            BroadCast(new GameRoomEvent(GameRoomEvent.GameRoomEventType.PlayerDisconnected));
+            ((INetworkBackgammonNotifier)this).Broadcast(new GameRoomEvent(GameRoomEvent.GameRoomEventType.PlayerDisconnected));
         }
 
         public void StartGame(Player _challengingPlayer, Player _challengedPlayer)
@@ -77,5 +79,24 @@ namespace NetworkBackgammonGameLogic
                 return connectedPlayers;
             }
         }
+
+        #region INetworkBackgammonNotifier Members
+
+        public bool AddListener(INetworkBackgammonListener listener)
+        {
+            return defaultNotifier.AddListener(listener);
+        }
+
+        public bool RemoveListener(INetworkBackgammonListener listener)
+        {
+            return defaultNotifier.RemoveListener(listener);
+        }
+
+        public void Broadcast(INetworkBackgammonEvent notificationEvent)
+        {
+            defaultNotifier.Broadcast(notificationEvent);
+        }
+
+        #endregion
     }
 }

@@ -5,8 +5,8 @@ using System.Text;
 
 namespace NetworkBackgammonGameLogic
 {
-    public interface IGameRoomListener
+    public interface IGameRoomListener : INetworkBackgammonListener
     {
-        void Notify(GameRoomEvent _event);
+        void OnEventNotification(GameRoomEvent _event);
     }
 }

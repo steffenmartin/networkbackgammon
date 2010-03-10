@@ -1,39 +1,45 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace NetworkBackgammon
+namespace NetworkBackgammonGameLogic
 {
-    public class NetworkBackgammonListener
+    /// <summary>
+    /// "Default" implementation
+    /// </summary>
+    public class NetworkBackgammonListener : INetworkBackgammonListener
     {
         // List of notifiers that this class is registered with 
-        ArrayList m_attachedNotifiers = new ArrayList();
+        List<INetworkBackgammonNotifier> m_attachedNotifiers = new List<INetworkBackgammonNotifier>();
 
         // Destructor removes itself from all notifiers it is registered with
         ~NetworkBackgammonListener()
         {
-            foreach (NetworkBackgammonNotifier notifier in m_attachedNotifiers)
+            foreach (INetworkBackgammonNotifier notifier in m_attachedNotifiers)
             {
                 notifier.RemoveListener(this);
             }
         }
 
+        #region INetworkBackgammonListener Members
+
         // Add a notifier to the list - fails if notifier already is in list
-        public bool AddNotifier(NetworkBackgammonNotifier notifier)
+        bool INetworkBackgammonListener.AddNotifier(INetworkBackgammonNotifier notifier)
         {
             bool retval = false;
 
             if (!m_attachedNotifiers.Contains(notifier))
             {
-                retval = (m_attachedNotifiers.Add(notifier) >= 0 ? true : false);
+                m_attachedNotifiers.Add(notifier);
+                retval = true;
             }
 
             return retval;
         }
 
         // Remove a notifier from the list - fails if cannot find notifier
-        public bool RemoveNotifier(NetworkBackgammonNotifier notifier)
+        bool INetworkBackgammonListener.RemoveNotifier(INetworkBackgammonNotifier notifier)
         {
             bool retval = false;
 
@@ -48,6 +54,8 @@ namespace NetworkBackgammon
         }
 
         // Handle incoming notification from a notifier
-        public void OnEventNotification(NetworkBackgammonNotifier sender, INetworkBackgammonEvent e) { }
+        void INetworkBackgammonListener.OnEventNotification(INetworkBackgammonNotifier sender, INetworkBackgammonEvent e) { }
+
+        #endregion
     }
 }
