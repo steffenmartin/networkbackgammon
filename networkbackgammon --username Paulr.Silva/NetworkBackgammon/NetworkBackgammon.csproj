@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{9832AE8E-C998-46F4-B19A-04123E57F315}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -48,7 +48,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="INetworkBackgammonEvent.cs" />
     <Compile Include="NetworkBackgammonBoard.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -69,8 +68,6 @@
     <Compile Include="NetworkBackgammonForm.Designer.cs">
       <DependentUpon>NetworkBackgammonForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="NetworkBackgammonListener.cs" />
-    <Compile Include="NetworkBackgammonNotifier.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="NetworkBackgammonBoard.resx">

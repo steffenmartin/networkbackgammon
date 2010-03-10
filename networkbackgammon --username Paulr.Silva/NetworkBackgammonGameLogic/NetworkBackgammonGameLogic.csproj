@@ -51,14 +51,19 @@
     <Compile Include="GameRoom.cs" />
     <Compile Include="GameRoomEvent.cs" />
     <Compile Include="IGameRoomListener.cs" />
-    <Compile Include="GameRoomSubject.cs" />
     <Compile Include="GameSession.cs" />
     <Compile Include="GameSessionEvent.cs" />
     <Compile Include="IGameSessionListener.cs" />
     <Compile Include="GameSessionSubject.cs" />
+    <Compile Include="INetworkBackgammonEvent.cs" />
+    <Compile Include="INetworkBackgammonListener.cs" />
+    <Compile Include="INetworkBackgammonNotifier.cs" />
     <Compile Include="IPlayerEventInfo.cs" />
     <Compile Include="Move.cs" />
+    <Compile Include="NetworkBackgammonListener.cs" />
+    <Compile Include="NetworkBackgammonNotifier.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PlayerEvent.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

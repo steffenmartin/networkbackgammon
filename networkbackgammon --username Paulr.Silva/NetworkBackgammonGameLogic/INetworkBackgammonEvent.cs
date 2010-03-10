@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace NetworkBackgammon
+namespace NetworkBackgammonGameLogic
 {
-    public class INetworkBackgammonEvent
+    public interface INetworkBackgammonEvent
     {
     }
 }

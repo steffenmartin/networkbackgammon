@@ -1,19 +1,22 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace NetworkBackgammon
+namespace NetworkBackgammonGameLogic
 {
-    public class NetworkBackgammonNotifier
+    /// <summary>
+    /// "Default" implementation
+    /// </summary>
+    public class NetworkBackgammonNotifier : INetworkBackgammonNotifier
     {
         // List of registered listeners
-        ArrayList m_listeners = new ArrayList();
+        List<INetworkBackgammonListener> m_listeners = new List<INetworkBackgammonListener>();
 
         // Destructor clears all listeners
         ~NetworkBackgammonNotifier()
         {
-            foreach (NetworkBackgammonListener listner in m_listeners)
+            foreach (INetworkBackgammonListener listner in m_listeners)
             {
                 listner.RemoveNotifier(this);
             }
@@ -21,28 +24,32 @@ namespace NetworkBackgammon
             m_listeners.Clear();
         }
 
+        #region INetworkBackgammonNotifier Members
+
         // Register a listener - fails if already in the list
-        public bool AddListener(NetworkBackgammonListener listener)
+        public bool AddListener(INetworkBackgammonListener listener)
         {
             bool retval = false;
 
             if (!m_listeners.Contains(listener))
             {
                 listener.AddNotifier(this);
-                retval = (m_listeners.Add(listener) >= 0 ? true : false);
+                m_listeners.Add(listener);
+
+                retval = true;
             }
 
             return retval;
         }
 
         // Remove listener - fails if not found
-        public bool RemoveListener(NetworkBackgammonListener listener)
+        public bool RemoveListener(INetworkBackgammonListener listener)
         {
             bool retval = false;
 
             retval = m_listeners.Contains(listener);
-            
-            if( retval )
+
+            if (retval)
             {
                 listener.RemoveNotifier(this);
                 m_listeners.Remove(listener);
@@ -50,14 +57,16 @@ namespace NetworkBackgammon
 
             return retval;
         }
-    
+
         // Broadcast notification to listeners
         public void Broadcast(INetworkBackgammonEvent notificationEvent)
         {
-            foreach (NetworkBackgammonListener listner in m_listeners)
+            foreach (INetworkBackgammonListener listner in m_listeners)
             {
                 listner.OnEventNotification(this, notificationEvent);
             }
         }
+
+        #endregion
     }
 }
