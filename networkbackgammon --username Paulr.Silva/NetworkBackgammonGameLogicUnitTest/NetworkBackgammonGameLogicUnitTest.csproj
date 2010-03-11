@@ -92,6 +92,10 @@
       <Project>{9C2CACC4-FB79-4E06-8643-75580669B6BD}</Project>
       <Name>NetworkBackgammonGameLogic</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NetworkBackgammonLib\NetworkBackgammonLib.csproj">
+      <Project>{D43DCC49-2262-47CD-8355-A215BEC431BA}</Project>
+      <Name>NetworkBackgammonLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

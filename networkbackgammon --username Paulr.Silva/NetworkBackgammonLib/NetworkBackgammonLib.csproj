@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{9C2CACC4-FB79-4E06-8643-75580669B6BD}</ProjectGuid>
+    <ProjectGuid>{D43DCC49-2262-47CD-8355-A215BEC431BA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NetworkBackgammonGameLogic</RootNamespace>
-    <AssemblyName>NetworkBackgammonGameLogic</AssemblyName>
+    <RootNamespace>NetworkBackgammonLib</RootNamespace>
+    <AssemblyName>NetworkBackgammonLib</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -45,27 +45,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Checker.cs" />
-    <Compile Include="Dice.cs" />
-    <Compile Include="GameEngine.cs" />
-    <Compile Include="GameRoom.cs" />
-    <Compile Include="GameRoomEvent.cs" />
-    <Compile Include="IGameRoomListener.cs" />
-    <Compile Include="GameSession.cs" />
-    <Compile Include="GameSessionEvent.cs" />
-    <Compile Include="IGameSessionListener.cs" />
-    <Compile Include="GameSessionSubject.cs" />
-    <Compile Include="IPlayerEventInfo.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="PlayerEvent.cs" />
-    <Compile Include="Position.cs" />
+    <Compile Include="INetworkBackgammonEvent.cs" />
+    <Compile Include="INetworkBackgammonListener.cs" />
+    <Compile Include="INetworkBackgammonNotifier.cs" />
+    <Compile Include="NetworkBackgammonChatEvent.cs" />
+    <Compile Include="NetworkBackgammonListener.cs" />
+    <Compile Include="NetworkBackgammonNotifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\NetworkBackgammonLib\NetworkBackgammonLib.csproj">
-      <Project>{D43DCC49-2262-47CD-8355-A215BEC431BA}</Project>
-      <Name>NetworkBackgammonLib</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
