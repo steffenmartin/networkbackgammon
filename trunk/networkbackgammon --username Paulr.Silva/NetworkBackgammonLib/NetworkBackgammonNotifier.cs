@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace NetworkBackgammonGameLogic
+namespace NetworkBackgammonLib
 {
     /// <summary>
     /// "Default" implementation
     /// </summary>
     public class NetworkBackgammonNotifier : INetworkBackgammonNotifier
     {
+        /**
+         * Listener list with associated event type list
+         */
+       // Dictionary<INetworkBackgammonListener, List<String>> m_listeners = new Dictionary<INetworkBackgammonListener, List<String> >();
+
         // List of registered listeners
         List<INetworkBackgammonListener> m_listeners = new List<INetworkBackgammonListener>();
 
