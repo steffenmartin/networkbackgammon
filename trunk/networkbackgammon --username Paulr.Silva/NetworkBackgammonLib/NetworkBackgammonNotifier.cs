@@ -18,6 +18,15 @@ namespace NetworkBackgammonLib
         // List of registered listeners
         List<INetworkBackgammonListener> m_listeners = new List<INetworkBackgammonListener>();
 
+        // The actual notifier (sender)
+        INetworkBackgammonNotifier sender = null;
+
+        // Constructor sets the actual notifier
+        public NetworkBackgammonNotifier(INetworkBackgammonNotifier _sender)
+        {
+            sender = _sender;
+        }
+
         // Destructor clears all listeners
         ~NetworkBackgammonNotifier()
         {
@@ -68,7 +77,16 @@ namespace NetworkBackgammonLib
         {
             foreach (INetworkBackgammonListener listner in m_listeners)
             {
-                listner.OnEventNotification(this, notificationEvent);
+                listner.OnEventNotification(sender, notificationEvent);
+            }
+        }
+
+        // Broadcast notification to listeners on behalt of a sender
+        public void Broadcast(INetworkBackgammonEvent notificationEvent, INetworkBackgammonNotifier notifier)
+        {
+            foreach (INetworkBackgammonListener listner in m_listeners)
+            {
+                listner.OnEventNotification(notifier, notificationEvent);
             }
         }
 

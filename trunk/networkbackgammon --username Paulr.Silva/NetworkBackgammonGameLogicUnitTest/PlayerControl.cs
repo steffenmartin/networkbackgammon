@@ -7,15 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using NetworkBackgammonGameLogic;
+using NetworkBackgammonLib;
 
 namespace NetworkBackgammonGameLogicUnitTest
 {
-    public partial class PlayerControl : UserControl, IGameSessionListener, IPlayerEventInfo
+    public partial class PlayerControl : UserControl, INetworkBackgammonListener
     {
+        INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
+
         GameRoom gameRoom = null;
         Player player = null;
-        Checker checkerSelected = null;
-        Dice moveSelected = null;
 
         public PlayerControl()
         {
@@ -103,10 +104,7 @@ namespace NetworkBackgammonGameLogicUnitTest
                     if (listBoxCheckers.SelectedItem != null &&
                         listBoxMoves.SelectedItem != null)
                     {
-                        checkerSelected = (Checker) listBoxCheckers.SelectedItem;
-                        moveSelected = (Dice) listBoxMoves.SelectedItem;
-
-                        player.Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.MoveSelected), player, this);
+                        player.Broadcast(new GameSessionMoveSelectedEvent((Checker) listBoxCheckers.SelectedItem, (Dice) listBoxMoves.SelectedItem));
                     }
                 }
 
@@ -145,26 +143,36 @@ namespace NetworkBackgammonGameLogicUnitTest
             }
         }
 
-        public delegate void NotifyDelegate(GameSessionEvent _event, GameSessionSubject _subject, IPlayerEventInfo _playerInfo);
+        public delegate void NotifyDelegate(INetworkBackgammonNotifier _notifier, INetworkBackgammonEvent _event);
 
-        #region IGameSessionListener Members
+        #region INetworkBackgammonListener Members
 
-        public void Notify(GameSessionEvent _event, GameSessionSubject _subject, IPlayerEventInfo _playerInfo)
+        public bool AddNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return defaultListener.AddNotifier(notifier);
+        }
+
+        public bool RemoveNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return defaultListener.RemoveNotifier(notifier);
+        }
+
+        public void OnEventNotification(INetworkBackgammonNotifier sender, INetworkBackgammonEvent e)
         {
             if (InvokeRequired)
             {
-                Invoke(new NotifyDelegate(Notify), new object[]{_event, _subject, _playerInfo});
+                Invoke(new NotifyDelegate(OnEventNotification), new object[] { sender, e });
             }
             else
             {
                 // Filter out broadcasts from our own player
-                if (_subject != player)
+                if (sender != player)
                 {
                     listBoxCheckers.Items.Clear();
 
                     try
                     {
-                        GameSession gameSession = (GameSession)_subject;
+                        GameSession gameSession = (GameSession)sender;
 
                         if (player.Active)
                         {
@@ -191,20 +199,6 @@ namespace NetworkBackgammonGameLogicUnitTest
                     }
                 }
             }
-        }
-
-        #endregion
-
-        #region IPlayerEventInfo Members
-
-        public Checker GetSelectedChecker()
-        {
-            return checkerSelected;
-        }
-
-        public Dice GetSelectedMove()
-        {
-            return moveSelected;
         }
 
         #endregion

@@ -2,17 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using NetworkBackgammonLib;
 
 namespace NetworkBackgammonGameLogic
 {
-    public class Player : GameSessionSubject, IGameSessionListener
+    public class Player : INetworkBackgammonNotifier, INetworkBackgammonListener
     {
+        INetworkBackgammonNotifier defaultNotifier = null;
+        INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
+
         private string strPlayerName = "";
         private List<Checker> checkers = new List<Checker>();
         private bool bActive = false;
 
         public Player(string _strPlayerName)
         {
+            defaultNotifier = new NetworkBackgammonNotifier(this);
+
             strPlayerName = _strPlayerName;
 
             InitCheckers();
@@ -78,15 +84,49 @@ namespace NetworkBackgammonGameLogic
             return strPlayerName;
         }
 
-        #region IGameSessionListener Members
+        #region INetworkBackgammonNotifier Members
 
-        public void Notify(GameSessionEvent _event, GameSessionSubject _subject, IPlayerEventInfo _playerInfo)
+        public bool AddListener(INetworkBackgammonListener listener)
+        {
+            return defaultNotifier != null ? defaultNotifier.AddListener(listener) : false;
+        }
+
+        public bool RemoveListener(INetworkBackgammonListener listener)
+        {
+            return defaultNotifier != null ? defaultNotifier.RemoveListener(listener) : false;
+        }
+
+        public void Broadcast(INetworkBackgammonEvent notificationEvent)
+        {
+            defaultNotifier.Broadcast(notificationEvent);
+        }
+
+        public void Broadcast(INetworkBackgammonEvent notificationEvent, INetworkBackgammonNotifier notifier)
+        {
+            defaultNotifier.Broadcast(notificationEvent, notifier);
+        }
+
+        #endregion
+
+        #region INetworkBackgammonListener Members
+
+        public bool AddNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return defaultListener.AddNotifier(notifier);
+        }
+
+        public bool RemoveNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return defaultListener.RemoveNotifier(notifier);
+        }
+
+        public void OnEventNotification(INetworkBackgammonNotifier sender, INetworkBackgammonEvent e)
         {
             // Filter out our own broadcasts
-            if (_subject != this)
+            if (sender != this)
             {
                 // Forward event
-                Broadcast(_event, _subject);
+                Broadcast(e, sender);
             }
         }
 

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using NetworkBackgammonLib;
 
-namespace NetworkBackgammonGameLogic
+namespace NetworkBackgammonLib
 {
-    public class GameRoomEvent : INetworkBackgammonEvent
+    public class NetworkBackgammonGameRoomEvent : INetworkBackgammonEvent
     {
         public enum GameRoomEventType
         {
@@ -16,7 +16,7 @@ namespace NetworkBackgammonGameLogic
 
         GameRoomEventType type;
 
-        public GameRoomEvent(GameRoomEventType _type)
+        public NetworkBackgammonGameRoomEvent(GameRoomEventType _type)
         {
             type = _type;
         }

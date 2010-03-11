@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using NetworkBackgammonLib;
 
 namespace NetworkBackgammonGameLogic
 {
-    public class GameSession : GameSessionSubject, IGameSessionListener
+    public class GameSession : INetworkBackgammonNotifier, INetworkBackgammonListener
     {
+        INetworkBackgammonNotifier defaultNotifier = null;
+        INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
+
         // Thread which runs the event based state machine
         Thread threadStateMachine = null;
         // Semaphore to signal events to the state machine (wake-up calls)
@@ -15,20 +19,18 @@ namespace NetworkBackgammonGameLogic
         // Flag to allow shutting down of state machine
         bool bStateMachineKeepRunning = true;
 
-        public class GameSessionEventQueueElement
+        public class EventQueueElement
         {
-            private GameSessionEvent gameSessionEvent;
-            private GameSessionSubject gameSessionSubject;
-            private IPlayerEventInfo playerEventInfo;
+            private INetworkBackgammonEvent gameSessionEvent;
+            private INetworkBackgammonNotifier gameSessionNotifier;
 
-            public GameSessionEventQueueElement(GameSessionEvent _event, GameSessionSubject _subject, IPlayerEventInfo _playerInfo)
+            public EventQueueElement(INetworkBackgammonEvent _event, INetworkBackgammonNotifier _notifier)
             {
                 gameSessionEvent = _event;
-                gameSessionSubject = _subject;
-                playerEventInfo = _playerInfo;
+                gameSessionNotifier = _notifier;
             }
 
-            public GameSessionEvent Event
+            public INetworkBackgammonEvent Event
             {
                 get
                 {
@@ -36,24 +38,16 @@ namespace NetworkBackgammonGameLogic
                 }
             }
 
-            public GameSessionSubject Subject
+            public INetworkBackgammonNotifier Notifier
             {
                 get
                 {
-                    return gameSessionSubject;
-                }
-            }
-
-            public IPlayerEventInfo PlayerInfo
-            {
-                get
-                {
-                    return playerEventInfo;
+                    return gameSessionNotifier;
                 }
             }
         }
 
-        Queue<GameSessionEventQueueElement> eventQueue = new Queue<GameSessionEventQueueElement>();
+        Queue<EventQueueElement> eventQueue = new Queue<EventQueueElement>();
 
         // The dice for this Game Session
         Dice []dice = new Dice[] {new Dice(1), new Dice(2)};
@@ -75,6 +69,8 @@ namespace NetworkBackgammonGameLogic
 
         public GameSession(Player _player1, Player _player2)
         {
+            defaultNotifier = new NetworkBackgammonNotifier(this);
+
             player1 = _player1;
             // Game Session is listening for events from Player 1
             player1.AddListener(this);
@@ -142,7 +138,7 @@ namespace NetworkBackgammonGameLogic
         {
             GameSessionState currentState = GameSessionState.InitialDiceRoll;
 
-            GameSessionEventQueueElement eventQueueElement = null;
+            EventQueueElement eventQueueElement = null;
 
             // Number of moves left for the active player
             UInt32 activePlayerMovesLeft = 0;
@@ -190,7 +186,7 @@ namespace NetworkBackgammonGameLogic
                         GameEngine.CalculatePossibleMoves(ref player1, ref player2, activePlayerMoveDoubles ? new Dice[] { dice[0] } : dice);
                         // Send initial checkers with positions (and possible valid moves
                         // for the active player) to both players
-                        Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.CheckerUpdated), this);
+                        Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.CheckerUpdated));
                         // Set next iteration's state
                         currentState = GameSessionState.MoveExpected;
                         break;
@@ -200,13 +196,14 @@ namespace NetworkBackgammonGameLogic
                         {
                             try
                             {
-                                Player sendingPlayer = (Player)eventQueueElement.Subject;
+                                Player sendingPlayer = (Player)eventQueueElement.Notifier;
+                                GameSessionMoveSelectedEvent moveSelectedEvent = (GameSessionMoveSelectedEvent)eventQueueElement.Event;
 
                                 // Check whether the active player attempted to move
                                 if (sendingPlayer.Active)
                                 {
                                     // Perform the selected move of the active player (and check whether the active player won the game
-                                    if (!GameEngine.ExecuteMove(ref player1, ref player2, eventQueueElement.PlayerInfo.GetSelectedChecker(), eventQueueElement.PlayerInfo.GetSelectedMove()))
+                                    if (!GameEngine.ExecuteMove(ref player1, ref player2, moveSelectedEvent.CheckerSelected, moveSelectedEvent.MoveSelected))
                                     {
                                         // Figure out the next active player (could be the current
                                         // active player since up to 4 moves are allowed per turn)
@@ -231,10 +228,10 @@ namespace NetworkBackgammonGameLogic
                                                 new Dice[] { dice[0] } :
                                                 activePlayerMovesLeft == 2 ?
                                                 dice :
-                                                new Dice[] { dice[0] == eventQueueElement.PlayerInfo.GetSelectedMove() ? dice[1] : dice[0] });
+                                                new Dice[] { dice[0] == moveSelectedEvent.MoveSelected ? dice[1] : dice[0] });
                                         // Send updated checkers with positions (and possible valid moves
                                         // for the active player) to both players
-                                        Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.CheckerUpdated), this);
+                                        Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.CheckerUpdated));
                                     }
                                     else
                                     {
@@ -243,12 +240,12 @@ namespace NetworkBackgammonGameLogic
                                 }
                                 else
                                 {
-                                    Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.Error), this);
+                                    Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.Error));
                                 }
                             }
                             catch (Exception ex)
                             {
-                                Broadcast(new GameSessionEvent(GameSessionEvent.GameSessionEventType.Error), this);
+                                Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.Error));
                             }
                         }
                         break;
@@ -279,14 +276,48 @@ namespace NetworkBackgammonGameLogic
             }
         }
 
-        #region IGameSessionListener Members
+        #region INetworkBackgammonNotifier Members
 
-        public void Notify(GameSessionEvent _event, GameSessionSubject _subject, IPlayerEventInfo _playerInfo)
+        public bool AddListener(INetworkBackgammonListener listener)
+        {
+            return defaultNotifier != null ? defaultNotifier.AddListener(listener) : false;
+        }
+
+        public bool RemoveListener(INetworkBackgammonListener listener)
+        {
+            return defaultNotifier != null ? defaultNotifier.RemoveListener(listener) : false;
+        }
+
+        public void Broadcast(INetworkBackgammonEvent notificationEvent)
+        {
+            defaultNotifier.Broadcast(notificationEvent);
+        }
+
+        public void Broadcast(INetworkBackgammonEvent notificationEvent, INetworkBackgammonNotifier notifier)
+        {
+            defaultNotifier.Broadcast(notificationEvent, notifier);
+        }
+
+        #endregion
+
+        #region INetworkBackgammonListener Members
+
+        public bool AddNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return defaultListener.AddNotifier(notifier);
+        }
+
+        public bool RemoveNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return defaultListener.RemoveNotifier(notifier);
+        }
+
+        public void OnEventNotification(INetworkBackgammonNotifier sender, INetworkBackgammonEvent e)
         {
             // Filter out our own broadcasts
-            if (_subject != this)
+            if (sender != this)
             {
-                eventQueue.Enqueue(new GameSessionEventQueueElement(_event, _subject, _playerInfo));
+                eventQueue.Enqueue(new EventQueueElement(e, sender));
 
                 semStateMachine.Release();
             }
