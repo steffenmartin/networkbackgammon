@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace NetworkBackgammonGameLogic
+namespace NetworkBackgammonLib
 {
-    public class GameSessionEvent
+    public class NetworkBackgammonGameSessionEvent : INetworkBackgammonEvent
     {
         public enum GameSessionEventType
         {
@@ -17,9 +17,9 @@ namespace NetworkBackgammonGameLogic
             Error
         };
 
-        GameSessionEventType type;
+        protected GameSessionEventType type;
 
-        public GameSessionEvent(GameSessionEventType _type)
+        public NetworkBackgammonGameSessionEvent(GameSessionEventType _type)
         {
             type = _type;
         }

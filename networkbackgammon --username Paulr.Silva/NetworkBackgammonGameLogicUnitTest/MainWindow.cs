@@ -54,14 +54,14 @@ namespace NetworkBackgammonGameLogicUnitTest
         {
             try
             {
-                GameRoomEvent _event = (GameRoomEvent)e;
+                NetworkBackgammonGameRoomEvent _event = (NetworkBackgammonGameRoomEvent)e;
 
                 switch (_event.EventType)
                 {
-                    case GameRoomEvent.GameRoomEventType.PlayerConnected:
+                    case NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerConnected:
                         UpdateGUI();
                         break;
-                    case GameRoomEvent.GameRoomEventType.PlayerDisconnected:
+                    case NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected:
                         UpdateGUI();
                         break;
                 }

@@ -8,11 +8,15 @@ namespace NetworkBackgammonGameLogic
 {
     public class GameRoom : INetworkBackgammonNotifier
     {
-        INetworkBackgammonNotifier defaultNotifier = new NetworkBackgammonNotifier();
+        INetworkBackgammonNotifier defaultNotifier = null;
 
         private List<Player> connectedPlayers = new List<Player>();
         private List<GameSession> gameSessions = new List<GameSession>();
 
+        public GameRoom()
+        {
+            defaultNotifier = new NetworkBackgammonNotifier(this);
+        }
         ~GameRoom()
         {
             gameSessions.Clear();
@@ -25,7 +29,7 @@ namespace NetworkBackgammonGameLogic
 
             connectedPlayers.Add(newPlayer);
 
-            Broadcast(new GameRoomEvent(GameRoomEvent.GameRoomEventType.PlayerConnected));
+            Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerConnected));
 
             // Automatically create a game session once 2 players have logged in
             // First player logged in will be the challenged one, the second one will
@@ -45,7 +49,7 @@ namespace NetworkBackgammonGameLogic
                 connectedPlayers.Remove(_player);
             }
 
-            ((INetworkBackgammonNotifier)this).Broadcast(new GameRoomEvent(GameRoomEvent.GameRoomEventType.PlayerDisconnected));
+            ((INetworkBackgammonNotifier)this).Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected));
         }
 
         public void StartGame(Player _challengingPlayer, Player _challengedPlayer)
@@ -85,17 +89,22 @@ namespace NetworkBackgammonGameLogic
 
         public bool AddListener(INetworkBackgammonListener listener)
         {
-            return defaultNotifier.AddListener(listener);
+            return defaultNotifier != null ? defaultNotifier.AddListener(listener) : false;
         }
 
         public bool RemoveListener(INetworkBackgammonListener listener)
         {
-            return defaultNotifier.RemoveListener(listener);
+            return defaultNotifier != null ? defaultNotifier.RemoveListener(listener) : false;
         }
 
         public void Broadcast(INetworkBackgammonEvent notificationEvent)
         {
             defaultNotifier.Broadcast(notificationEvent);
+        }
+
+        public void Broadcast(INetworkBackgammonEvent notificationEvent, INetworkBackgammonNotifier notifier)
+        {
+            defaultNotifier.Broadcast(notificationEvent, notifier);
         }
 
         #endregion

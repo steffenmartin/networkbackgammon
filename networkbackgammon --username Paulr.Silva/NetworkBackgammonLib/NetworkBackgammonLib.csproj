@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NetworkBackgammonGameRoomEvent.cs" />
+    <Compile Include="NetworkBackgammonGameSessionEvent.cs" />
     <Compile Include="INetworkBackgammonEvent.cs" />
     <Compile Include="INetworkBackgammonListener.cs" />
     <Compile Include="INetworkBackgammonNotifier.cs" />

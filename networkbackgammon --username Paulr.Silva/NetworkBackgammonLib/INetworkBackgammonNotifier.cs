@@ -27,5 +27,12 @@ namespace NetworkBackgammonLib
         * @param notificationEvent INetworkBackgammonEvent object broadcast
         */
         void Broadcast(INetworkBackgammonEvent notificationEvent);
+
+        /**
+        * Broadcast an event to all registered listeners on behalf of a certain notifier
+        * @param notificationEvent INetworkBackgammonEvent object broadcast
+        * @param notifier INetworkBackgammonNotifier object sender
+        */
+        void Broadcast(INetworkBackgammonEvent notificationEvent, INetworkBackgammonNotifier notifier);
     }
 }
