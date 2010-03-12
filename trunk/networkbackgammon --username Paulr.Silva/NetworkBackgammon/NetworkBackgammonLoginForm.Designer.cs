@@ -40,7 +40,7 @@
             this.m_portTextBox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.m_maskedIPAddressTextBox = new System.Windows.Forms.MaskedTextBox();
+            this.m_ipAddrTextBox = new System.Windows.Forms.TextBox();
             this.m_loginGroup.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -115,11 +115,11 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.m_ipAddrTextBox);
             this.groupBox2.Controls.Add(this.m_connectButton);
             this.groupBox2.Controls.Add(this.m_portTextBox);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Controls.Add(this.m_maskedIPAddressTextBox);
             this.groupBox2.Location = new System.Drawing.Point(13, 12);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(237, 115);
@@ -162,13 +162,12 @@
             this.label3.TabIndex = 1;
             this.label3.Text = "IP Address:";
             // 
-            // m_maskedIPAddressTextBox
+            // m_ipAddrTextBox
             // 
-            this.m_maskedIPAddressTextBox.Location = new System.Drawing.Point(73, 19);
-            this.m_maskedIPAddressTextBox.Mask = "000.000.000.000";
-            this.m_maskedIPAddressTextBox.Name = "m_maskedIPAddressTextBox";
-            this.m_maskedIPAddressTextBox.Size = new System.Drawing.Size(90, 20);
-            this.m_maskedIPAddressTextBox.TabIndex = 0;
+            this.m_ipAddrTextBox.Location = new System.Drawing.Point(73, 19);
+            this.m_ipAddrTextBox.Name = "m_ipAddrTextBox";
+            this.m_ipAddrTextBox.Size = new System.Drawing.Size(90, 20);
+            this.m_ipAddrTextBox.TabIndex = 5;
             // 
             // NetworkBackgammonLoginForm
             // 
@@ -202,10 +201,10 @@
         private System.Windows.Forms.Button m_loginButton;
         private System.Windows.Forms.Button m_registerRegister;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.MaskedTextBox m_maskedIPAddressTextBox;
         private System.Windows.Forms.Button m_connectButton;
         private System.Windows.Forms.TextBox m_portTextBox;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox m_ipAddrTextBox;
     }
 }

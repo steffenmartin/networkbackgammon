@@ -82,5 +82,11 @@ namespace NetworkBackgammon
             // Load the game on successful selection of a opponent
             LoadGameBoard();
         }
+
+        private void NetworkBackGammonForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Disconnect from the server upon exit
+            NetworkBackgammonClient.Instance.DisconnectServer();
+        }
     }
 }
