@@ -6,26 +6,26 @@ using NetworkBackgammonLib;
 
 namespace NetworkBackgammonGameLogic
 {
-    public class GameRoom : INetworkBackgammonNotifier
+    public class NetworkBackgammonGameRoom : INetworkBackgammonNotifier
     {
         INetworkBackgammonNotifier defaultNotifier = null;
 
-        private List<Player> connectedPlayers = new List<Player>();
-        private List<GameSession> gameSessions = new List<GameSession>();
+        private List<NetworkBackgammonPlayer> connectedPlayers = new List<NetworkBackgammonPlayer>();
+        private List<NetworkBackgammonGameSession> gameSessions = new List<NetworkBackgammonGameSession>();
 
-        public GameRoom()
+        public NetworkBackgammonGameRoom()
         {
             defaultNotifier = new NetworkBackgammonNotifier(this);
         }
-        ~GameRoom()
+        ~NetworkBackgammonGameRoom()
         {
             gameSessions.Clear();
             connectedPlayers.Clear();
         }
 
-        public Player Login(string _playerName)
+        public NetworkBackgammonPlayer Login(string _playerName)
         {
-            Player newPlayer = new Player(_playerName);
+            NetworkBackgammonPlayer newPlayer = new NetworkBackgammonPlayer(_playerName);
 
             connectedPlayers.Add(newPlayer);
 
@@ -42,7 +42,7 @@ namespace NetworkBackgammonGameLogic
             return newPlayer;
         }
 
-        public void Logout(Player _player)
+        public void Logout(NetworkBackgammonPlayer _player)
         {
             if (connectedPlayers.Contains(_player))
             {
@@ -52,11 +52,11 @@ namespace NetworkBackgammonGameLogic
             ((INetworkBackgammonNotifier)this).Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected));
         }
 
-        public void StartGame(Player _challengingPlayer, Player _challengedPlayer)
+        public void StartGame(NetworkBackgammonPlayer _challengingPlayer, NetworkBackgammonPlayer _challengedPlayer)
         {
             // TODO: Check whether challenged player accepts or rejects challenge
 
-            GameSession newSession = new GameSession(_challengingPlayer, _challengedPlayer);
+            NetworkBackgammonGameSession newSession = new NetworkBackgammonGameSession(_challengingPlayer, _challengedPlayer);
 
             if (newSession != null)
             {
@@ -68,7 +68,7 @@ namespace NetworkBackgammonGameLogic
 
         public void Shutdown()
         {
-            foreach (GameSession session in gameSessions)
+            foreach (NetworkBackgammonGameSession session in gameSessions)
             {
                 session.Stop();
             }
@@ -77,7 +77,7 @@ namespace NetworkBackgammonGameLogic
             connectedPlayers.Clear();
         }
 
-        public List<Player> ConnectedPlayers
+        public List<NetworkBackgammonPlayer> ConnectedPlayers
         {
             get
             {
