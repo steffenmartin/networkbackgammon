@@ -15,7 +15,7 @@ namespace NetworkBackgammonGameLogicUnitTest
     {
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
 
-        GameRoom gameRoom = new GameRoom();
+        NetworkBackgammonGameRoom gameRoom = new NetworkBackgammonGameRoom();
 
         public MainWindow()
         {
@@ -32,7 +32,7 @@ namespace NetworkBackgammonGameLogicUnitTest
         {
             listBoxConnectedPlayers.Items.Clear();
 
-            foreach (Player player in gameRoom.ConnectedPlayers)
+            foreach (NetworkBackgammonPlayer player in gameRoom.ConnectedPlayers)
             {
                 listBoxConnectedPlayers.Items.Add(player);
             }

@@ -15,8 +15,8 @@ namespace NetworkBackgammonGameLogicUnitTest
     {
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
 
-        GameRoom gameRoom = null;
-        Player player = null;
+        NetworkBackgammonGameRoom gameRoom = null;
+        NetworkBackgammonPlayer player = null;
 
         public PlayerControl()
         {
@@ -28,7 +28,7 @@ namespace NetworkBackgammonGameLogicUnitTest
             player = null;
         }
 
-        public GameRoom ConnectedGameRoom
+        public NetworkBackgammonGameRoom ConnectedGameRoom
         {
             set
             {
@@ -104,7 +104,7 @@ namespace NetworkBackgammonGameLogicUnitTest
                     if (listBoxCheckers.SelectedItem != null &&
                         listBoxMoves.SelectedItem != null)
                     {
-                        player.Broadcast(new GameSessionMoveSelectedEvent((Checker) listBoxCheckers.SelectedItem, (Dice) listBoxMoves.SelectedItem));
+                        player.Broadcast(new GameSessionMoveSelectedEvent((NetworkBackgammonChecker)listBoxCheckers.SelectedItem, (NetworkBackgammonDice)listBoxMoves.SelectedItem));
                     }
                 }
 
@@ -122,9 +122,9 @@ namespace NetworkBackgammonGameLogicUnitTest
 
             try
             {
-                Checker selectedChecker = (Checker)listBoxCheckers.SelectedItem;
+                NetworkBackgammonChecker selectedChecker = (NetworkBackgammonChecker)listBoxCheckers.SelectedItem;
 
-                foreach (Dice diceValue in selectedChecker.PossibleMoves)
+                foreach (NetworkBackgammonDice diceValue in selectedChecker.PossibleMoves)
                 {
                     listBoxMoves.Items.Add(diceValue);
                 }
@@ -172,7 +172,7 @@ namespace NetworkBackgammonGameLogicUnitTest
 
                     try
                     {
-                        GameSession gameSession = (GameSession)sender;
+                        NetworkBackgammonGameSession gameSession = (NetworkBackgammonGameSession)sender;
 
                         if (player.Active)
                         {
@@ -181,14 +181,14 @@ namespace NetworkBackgammonGameLogicUnitTest
 
                         string strDice = "";
 
-                        foreach (Dice d in gameSession.CurrentDice)
+                        foreach (NetworkBackgammonDice d in gameSession.CurrentDice)
                         {
                             strDice += " " + d.CurrentValue;
                         }
 
                         listBoxLog.Items.Add("Dice: " + strDice);
 
-                        foreach (Checker checker in player.Checkers)
+                        foreach (NetworkBackgammonChecker checker in player.Checkers)
                         {
                             listBoxCheckers.Items.Add(checker);
                         }
