@@ -45,14 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Checker.cs" />
-    <Compile Include="Dice.cs" />
-    <Compile Include="GameEngine.cs" />
-    <Compile Include="GameRoom.cs" />
-    <Compile Include="GameSessionMoveSelectedEvent.cs" />
-    <Compile Include="GameSession.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="Position.cs" />
+    <Compile Include="NetworkBackgammonGameEngine.cs" />
+    <Compile Include="NetworkBackgammonGameRoom.cs" />
+    <Compile Include="NetworkBackgammonGameSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
