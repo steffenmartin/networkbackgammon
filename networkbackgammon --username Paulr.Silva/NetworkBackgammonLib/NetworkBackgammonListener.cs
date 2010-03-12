@@ -8,6 +8,7 @@ namespace NetworkBackgammonLib
     /// <summary>
     /// "Default" implementation
     /// </summary>
+    [Serializable]
     public class NetworkBackgammonListener : INetworkBackgammonListener
     {
         // List of notifiers that this class is registered with 

@@ -8,6 +8,7 @@ namespace NetworkBackgammonLib
     /// <summary>
     /// "Default" implementation
     /// </summary>
+    [Serializable]
     public class NetworkBackgammonNotifier : INetworkBackgammonNotifier
     {
         /**

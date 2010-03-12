@@ -16,8 +16,6 @@ namespace NetworkBackgammonRemotingLib
         INetworkBackgammonNotifier m_localNotifier = null;
         // Local delegate listener
         INetworkBackgammonListener m_localListener = new NetworkBackgammonListener();
-        // Registered callbacks from clients
-        event NetworkBackgammonRemoteClient.ClientCallback messageCallback;
         // Hashtable with clients username and passwords
         Dictionary<string, string> clientUsernameList = new Dictionary<string, string>();
         // Hashtable with clients username and passwords
@@ -32,7 +30,7 @@ namespace NetworkBackgammonRemotingLib
         // Constructor
         public NetworkBackgammonRemoteServer()
         {
-            Console.Write("\nHello\n");
+            Console.Write("\nRemote Server Created...\n");
 
             m_localNotifier = new NetworkBackgammonNotifier(this);
         }

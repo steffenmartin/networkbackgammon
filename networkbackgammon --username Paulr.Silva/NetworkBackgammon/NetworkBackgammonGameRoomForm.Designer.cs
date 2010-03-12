@@ -45,8 +45,7 @@
             // 
             // m_challengeButton
             // 
-            this.m_challengeButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.m_challengeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.m_challengeButton.Location = new System.Drawing.Point(12, 231);
             this.m_challengeButton.Name = "m_challengeButton";
             this.m_challengeButton.Size = new System.Drawing.Size(75, 23);
@@ -62,7 +61,9 @@
             this.ClientSize = new System.Drawing.Size(292, 266);
             this.Controls.Add(this.m_challengeButton);
             this.Controls.Add(this.m_gameRoomPlayerList);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "NetworkBackgammonGameRoomForm";
             this.Text = "NetworkBackgammonGameRoomForm";
             this.ResumeLayout(false);
