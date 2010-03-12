@@ -5,6 +5,7 @@ using System.Text;
 
 namespace NetworkBackgammonLib
 {
+    [Serializable]
     public class NetworkBackgammonGameSessionEvent : INetworkBackgammonEvent
     {
         public enum GameSessionEventType
