@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{9832AE8E-C998-46F4-B19A-04123E57F315}</ProjectGuid>
+    <ProjectGuid>{319155EF-381E-4A58-9582-B632656B1D5B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NetworkBackgammon</RootNamespace>
-    <AssemblyName>NetworkBackgammon</AssemblyName>
+    <RootNamespace>NetworkBackgammonServer</RootNamespace>
+    <AssemblyName>NetworkBackgammonServer</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -49,47 +49,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NetworkBackgammonGameRoomForm.cs">
+    <Compile Include="ServerControlForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NetworkBackgammonGameRoomForm.Designer.cs">
-      <DependentUpon>NetworkBackgammonGameRoomForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NetworkBackgammonLoginForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NetworkBackgammonLoginForm.Designer.cs">
-      <DependentUpon>NetworkBackgammonLoginForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NetworkBackgammonBoard.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NetworkBackgammonBoard.Designer.cs">
-      <DependentUpon>NetworkBackgammonBoard.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NetworkBackgammonBoardPosition.cs" />
-    <Compile Include="NetworkBackgammonChat.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NetworkBackgammonChat.Designer.cs">
-      <DependentUpon>NetworkBackgammonChat.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NetworkBackgammonChip.cs" />
-    <Compile Include="NetworkBackgammonForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NetworkBackgammonForm.Designer.cs">
-      <DependentUpon>NetworkBackgammonForm.cs</DependentUpon>
+    <Compile Include="ServerControlForm.Designer.cs">
+      <DependentUpon>ServerControlForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="NetworkBackgammonBoard.resx">
-      <DependentUpon>NetworkBackgammonBoard.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NetworkBackgammonForm.resx">
-      <DependentUpon>NetworkBackgammonForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
+    <EmbeddedResource Include="ServerControlForm.resx">
+      <DependentUpon>ServerControlForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -99,7 +68,6 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -110,45 +78,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="NetworkBackgammonScoreBoard.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NetworkBackgammonScoreBoard.Designer.cs">
-      <DependentUpon>NetworkBackgammonScoreBoard.cs</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="NetworkBackgammonChat.resx">
-      <DependentUpon>NetworkBackgammonChat.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\BackgammonBoard.bmp" />
-    <EmbeddedResource Include="Resources\BlackChip.ico" />
-    <EmbeddedResource Include="Resources\WhipChip.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Player2TrayChip.ico" />
-    <EmbeddedResource Include="Resources\Player1TrayChip.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="NetworkBackgammonGameRoomForm.resx">
-      <DependentUpon>NetworkBackgammonGameRoomForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NetworkBackgammonLoginForm.resx">
-      <DependentUpon>NetworkBackgammonLoginForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Dice1.ico" />
-    <EmbeddedResource Include="Resources\Dice2.ico" />
-    <EmbeddedResource Include="Resources\Dice3.ico" />
-    <EmbeddedResource Include="Resources\Dice4.ico" />
-    <EmbeddedResource Include="Resources\Dice5.ico" />
-    <EmbeddedResource Include="Resources\Dice6.ico" />
-    <EmbeddedResource Include="NetworkBackgammonScoreBoard.resx">
-      <DependentUpon>NetworkBackgammonScoreBoard.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NetworkBackgammonLib\NetworkBackgammonLib.csproj">
