@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkBackgammonRemotingLi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkBackgammonApp", "NetworkBackgammonApp\NetworkBackgammonApp.csproj", "{9832AE8E-C998-46F4-B19A-04123E57F315}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkBackgammonServer", "NetworkBackgammonServerApp\NetworkBackgammonServer.csproj", "{319155EF-381E-4A58-9582-B632656B1D5B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkBackgammonServerApp", "NetworkBackgammonServerApp\NetworkBackgammonServerApp.csproj", "{319155EF-381E-4A58-9582-B632656B1D5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
