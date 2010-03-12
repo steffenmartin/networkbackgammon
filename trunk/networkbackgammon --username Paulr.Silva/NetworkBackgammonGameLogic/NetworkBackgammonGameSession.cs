@@ -7,7 +7,7 @@ using NetworkBackgammonLib;
 
 namespace NetworkBackgammonGameLogic
 {
-    public class GameSession : INetworkBackgammonNotifier, INetworkBackgammonListener
+    public class NetworkBackgammonGameSession : INetworkBackgammonNotifier, INetworkBackgammonListener
     {
         INetworkBackgammonNotifier defaultNotifier = null;
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
@@ -50,9 +50,9 @@ namespace NetworkBackgammonGameLogic
         Queue<EventQueueElement> eventQueue = new Queue<EventQueueElement>();
 
         // The dice for this Game Session
-        Dice []dice = new Dice[] {new Dice(1), new Dice(2)};
+        NetworkBackgammonDice[] dice = new NetworkBackgammonDice[] { new NetworkBackgammonDice(1), new NetworkBackgammonDice(2) };
 
-        public Dice[] CurrentDice
+        public NetworkBackgammonDice[] CurrentDice
         {
             get
             {
@@ -67,7 +67,7 @@ namespace NetworkBackgammonGameLogic
             GameWon
         };
 
-        public GameSession(Player _player1, Player _player2)
+        public NetworkBackgammonGameSession(NetworkBackgammonPlayer _player1, NetworkBackgammonPlayer _player2)
         {
             defaultNotifier = new NetworkBackgammonNotifier(this);
 
@@ -83,14 +83,14 @@ namespace NetworkBackgammonGameLogic
             // Player 2 is listening for events from Game Session
             AddListener(player2);
         }
-        ~GameSession()
+        ~NetworkBackgammonGameSession()
         {
             Stop();
         }
 
         private void RollDice()
         {
-            foreach (Dice d in dice)
+            foreach (NetworkBackgammonDice d in dice)
             {
                 d.Roll();
             }
@@ -183,7 +183,7 @@ namespace NetworkBackgammonGameLogic
                         activePlayerMovesLeft = (UInt32) (activePlayerMoveDoubles ? 4 : 2);
 
                         // Calculate possible moves for active player
-                        GameEngine.CalculatePossibleMoves(ref player1, ref player2, activePlayerMoveDoubles ? new Dice[] { dice[0] } : dice);
+                        NetworkBackgammonGameEngine.CalculatePossibleMoves(ref player1, ref player2, activePlayerMoveDoubles ? new NetworkBackgammonDice[] { dice[0] } : dice);
                         // Send initial checkers with positions (and possible valid moves
                         // for the active player) to both players
                         Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.CheckerUpdated));
@@ -196,14 +196,14 @@ namespace NetworkBackgammonGameLogic
                         {
                             try
                             {
-                                Player sendingPlayer = (Player)eventQueueElement.Notifier;
+                                NetworkBackgammonPlayer sendingPlayer = (NetworkBackgammonPlayer)eventQueueElement.Notifier;
                                 GameSessionMoveSelectedEvent moveSelectedEvent = (GameSessionMoveSelectedEvent)eventQueueElement.Event;
 
                                 // Check whether the active player attempted to move
                                 if (sendingPlayer.Active)
                                 {
                                     // Perform the selected move of the active player (and check whether the active player won the game
-                                    if (!GameEngine.ExecuteMove(ref player1, ref player2, moveSelectedEvent.CheckerSelected, moveSelectedEvent.MoveSelected))
+                                    if (!NetworkBackgammonGameEngine.ExecuteMove(ref player1, ref player2, moveSelectedEvent.CheckerSelected, moveSelectedEvent.MoveSelected))
                                     {
                                         // Figure out the next active player (could be the current
                                         // active player since up to 4 moves are allowed per turn)
@@ -221,14 +221,14 @@ namespace NetworkBackgammonGameLogic
                                         }
 
                                         // Calculate possible moves for active player
-                                        GameEngine.CalculatePossibleMoves(
+                                        NetworkBackgammonGameEngine.CalculatePossibleMoves(
                                             ref player1,
                                             ref player2,
                                             activePlayerMoveDoubles ?
-                                                new Dice[] { dice[0] } :
+                                                new NetworkBackgammonDice[] { dice[0] } :
                                                 activePlayerMovesLeft == 2 ?
                                                 dice :
-                                                new Dice[] { dice[0] == moveSelectedEvent.MoveSelected ? dice[1] : dice[0] });
+                                                new NetworkBackgammonDice[] { dice[0] == moveSelectedEvent.MoveSelected ? dice[1] : dice[0] });
                                         // Send updated checkers with positions (and possible valid moves
                                         // for the active player) to both players
                                         Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.CheckerUpdated));
@@ -258,17 +258,17 @@ namespace NetworkBackgammonGameLogic
             }
         }
 
-        private Player player1 = null;
-        private Player player2 = null;
+        private NetworkBackgammonPlayer player1 = null;
+        private NetworkBackgammonPlayer player2 = null;
 
-        public Player Player1
+        public NetworkBackgammonPlayer Player1
         {
             get
             {
                 return player1;
             }
         }
-        public Player Player2
+        public NetworkBackgammonPlayer Player2
         {
             get
             {

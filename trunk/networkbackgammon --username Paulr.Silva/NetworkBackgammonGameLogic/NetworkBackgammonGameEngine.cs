@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using NetworkBackgammonLib;
 
 namespace NetworkBackgammonGameLogic
 {
-    public class GameEngine
+    public class NetworkBackgammonGameEngine
     {
         /// <summary>
         /// Calculates possible moves for the checkers of the active player.
@@ -17,7 +18,7 @@ namespace NetworkBackgammonGameLogic
         /// <remarks>
         /// Updates the active players list of possible moves.
         /// </remarks>
-        public static bool CalculatePossibleMoves(ref Player player1, ref Player player2, Dice [] _dice)
+        public static bool CalculatePossibleMoves(ref NetworkBackgammonPlayer player1, ref NetworkBackgammonPlayer player2, NetworkBackgammonDice[] _dice)
         {
             // Abbreviations:
             //
@@ -26,8 +27,8 @@ namespace NetworkBackgammonGameLogic
             // kvp: key-value-pair
 
             // Determine the active player
-            Player activePlayer = player1.Active ? player1 : player2;
-            Player waitingPlayer = player1.Active ? player2 : player1;
+            NetworkBackgammonPlayer activePlayer = player1.Active ? player1 : player2;
+            NetworkBackgammonPlayer waitingPlayer = player1.Active ? player2 : player1;
 
             bool bMovesCalulationDone = false;
             bool bAllCheckersHomeOrOffBoard = true;
@@ -36,13 +37,13 @@ namespace NetworkBackgammonGameLogic
             #region Preparation
 
             // Delete possible moves for both, active ...
-            foreach (Checker checkerAP in activePlayer.Checkers)
+            foreach (NetworkBackgammonChecker checkerAP in activePlayer.Checkers)
             {
                 checkerAP.PossibleMoves.Clear();
             }
 
             // ... and waiting player (just to be sure)
-            foreach (Checker checkerWP in waitingPlayer.Checkers)
+            foreach (NetworkBackgammonChecker checkerWP in waitingPlayer.Checkers)
             {
                 checkerWP.PossibleMoves.Clear();
             }
@@ -50,22 +51,22 @@ namespace NetworkBackgammonGameLogic
             // Check whether all checkers of active player are home or off the board
             // This is necessary to determine whether active player is able to bear off
             // checkers (off the board)
-            foreach (Checker checkerAP in activePlayer.Checkers)
+            foreach (NetworkBackgammonChecker checkerAP in activePlayer.Checkers)
             {
-                if (!((checkerAP.CurrentPosition.CurrentPosition >= Position.GameBoardPosition.HOME_START &&
-                    checkerAP.CurrentPosition.CurrentPosition <= Position.GameBoardPosition.HOME_END) ||
-                    checkerAP.CurrentPosition.CurrentPosition == Position.GameBoardPosition.OFFBOARD))
+                if (!((checkerAP.CurrentPosition.CurrentPosition >= NetworkBackgammonPosition.GameBoardPosition.HOME_START &&
+                    checkerAP.CurrentPosition.CurrentPosition <= NetworkBackgammonPosition.GameBoardPosition.HOME_END) ||
+                    checkerAP.CurrentPosition.CurrentPosition == NetworkBackgammonPosition.GameBoardPosition.OFFBOARD))
                 {
                     bAllCheckersHomeOrOffBoard = false;
                     break;
                 }
             }
 
-            Dictionary<Position.GameBoardPosition, UInt32> checkerHistogramAP = new Dictionary<Position.GameBoardPosition, uint>();
-            Dictionary<Position.GameBoardPosition, UInt32> checkerHistogramWP = new Dictionary<Position.GameBoardPosition, uint>();
+            Dictionary<NetworkBackgammonPosition.GameBoardPosition, UInt32> checkerHistogramAP = new Dictionary<NetworkBackgammonPosition.GameBoardPosition, uint>();
+            Dictionary<NetworkBackgammonPosition.GameBoardPosition, UInt32> checkerHistogramWP = new Dictionary<NetworkBackgammonPosition.GameBoardPosition, uint>();
 
             // Add checker position histogram containers for all positions checkers are sitting on (for active and waiting player)
-            foreach (Position.GameBoardPosition positionValue in Enum.GetValues(typeof(Position.GameBoardPosition)))
+            foreach (NetworkBackgammonPosition.GameBoardPosition positionValue in Enum.GetValues(typeof(NetworkBackgammonPosition.GameBoardPosition)))
             {
                 if (!checkerHistogramAP.ContainsKey(positionValue))
                 {
@@ -78,14 +79,14 @@ namespace NetworkBackgammonGameLogic
             }
 
             // Create checker position histograms
-            foreach (Checker checkerAP in activePlayer.Checkers)
+            foreach (NetworkBackgammonChecker checkerAP in activePlayer.Checkers)
             {
                 checkerHistogramAP[checkerAP.CurrentPosition.CurrentPosition] += 1;
             }
 
-            foreach (Checker checkerWP in activePlayer.Checkers)
+            foreach (NetworkBackgammonChecker checkerWP in activePlayer.Checkers)
             {
-                if (checkerWP.CurrentPosition.GetOppositePosition().CurrentPosition != Position.GameBoardPosition.INVALID)
+                if (checkerWP.CurrentPosition.GetOppositePosition().CurrentPosition != NetworkBackgammonPosition.GameBoardPosition.INVALID)
                 {
                     checkerHistogramWP[checkerWP.CurrentPosition.GetOppositePosition().CurrentPosition] += 1;
                 }
@@ -95,24 +96,24 @@ namespace NetworkBackgammonGameLogic
                 }
             }
 
-            Dictionary<Checker, KeyValuePair<Dice, Position>[]> potentialPositionHistogram = new Dictionary<Checker, KeyValuePair<Dice, Position>[]>();
+            Dictionary<NetworkBackgammonChecker, KeyValuePair<NetworkBackgammonDice, NetworkBackgammonPosition>[]> potentialPositionHistogram = new Dictionary<NetworkBackgammonChecker, KeyValuePair<NetworkBackgammonDice, NetworkBackgammonPosition>[]>();
 
             // Create potential positions for every checker
-            foreach (Checker checkerAP in activePlayer.Checkers)
+            foreach (NetworkBackgammonChecker checkerAP in activePlayer.Checkers)
             {
                 if (!potentialPositionHistogram.ContainsKey(checkerAP))
                 {
                     // List of potential positions associated associated with a certain dice value
-                    List<KeyValuePair<Dice, Position>> potPosList = new List<KeyValuePair<Dice, Position>>();
+                    List<KeyValuePair<NetworkBackgammonDice, NetworkBackgammonPosition>> potPosList = new List<KeyValuePair<NetworkBackgammonDice, NetworkBackgammonPosition>>();
 
-                    foreach (Dice dice in _dice)
+                    foreach (NetworkBackgammonDice dice in _dice)
                     {
                         // Moving a checker off the board (bear off) is only allowed if all checkers of active player are in the home position
                         // (or off the board already)
-                        if ((bAllCheckersHomeOrOffBoard) || 
-                            (checkerAP.CurrentPosition + dice).CurrentPosition < Position.GameBoardPosition.OFFBOARD)
+                        if ((bAllCheckersHomeOrOffBoard) ||
+                            (checkerAP.CurrentPosition + dice).CurrentPosition < NetworkBackgammonPosition.GameBoardPosition.OFFBOARD)
                         {
-                            potPosList.Add(new KeyValuePair<Dice,Position>(dice, checkerAP.CurrentPosition + dice));
+                            potPosList.Add(new KeyValuePair<NetworkBackgammonDice, NetworkBackgammonPosition>(dice, checkerAP.CurrentPosition + dice));
                         }
                     }
 
@@ -126,14 +127,14 @@ namespace NetworkBackgammonGameLogic
 
             // First pass: Check whether any checkers are on the bar
             // as they'll have to be moved before anything else
-            foreach (Checker checkerAP in activePlayer.Checkers)
+            foreach (NetworkBackgammonChecker checkerAP in activePlayer.Checkers)
             {
                 // Found a checker that's sitting on the bar
-                if (checkerAP.CurrentPosition.CurrentPosition == Position.GameBoardPosition.BAR)
+                if (checkerAP.CurrentPosition.CurrentPosition == NetworkBackgammonPosition.GameBoardPosition.BAR)
                 {
                     bMovesCalulationDone = true;
 
-                    foreach (Dice dice in _dice)
+                    foreach (NetworkBackgammonDice dice in _dice)
                     {
                         // Now, see whether opponents checker position allow us to move
                         if (checkerHistogramWP[(checkerAP.CurrentPosition + dice).CurrentPosition] <= 1)
@@ -149,9 +150,9 @@ namespace NetworkBackgammonGameLogic
             if (!bMovesCalulationDone)
             {
                 // Second pass: Check whether potential moves are valid
-                foreach (KeyValuePair<Checker, KeyValuePair<Dice, Position>[]> kvp in potentialPositionHistogram)
+                foreach (KeyValuePair<NetworkBackgammonChecker, KeyValuePair<NetworkBackgammonDice, NetworkBackgammonPosition>[]> kvp in potentialPositionHistogram)
                 {
-                    foreach (KeyValuePair<Dice, Position> kvpDicePos in kvp.Value)
+                    foreach (KeyValuePair<NetworkBackgammonDice, NetworkBackgammonPosition> kvpDicePos in kvp.Value)
                     {
                         // Check whether waiting player occupies the potential position for active players checker
                         // (i.e. waiting player has more than 1 checker on the potential position)
@@ -176,32 +177,35 @@ namespace NetworkBackgammonGameLogic
         /// <param name="_checker">Selected checker to be moved</param>
         /// <param name="_move">Selected move (according to one of the dice values)</param>
         /// <returns>Success (true) if the active player has won the game, otherwise false</returns>
-        public static bool ExecuteMove(ref Player player1, ref Player player2, Checker _checker, Dice _move)
+        public static bool ExecuteMove(ref NetworkBackgammonPlayer player1, 
+                                       ref NetworkBackgammonPlayer player2, 
+                                       NetworkBackgammonChecker _checker, 
+                                       NetworkBackgammonDice _move)
         {
             // Determine the active player
-            Player activePlayer = player1.Active ? player1 : player2;
-            Player waitingPlayer = player1.Active ? player2 : player1;
+            NetworkBackgammonPlayer activePlayer = player1.Active ? player1 : player2;
+            NetworkBackgammonPlayer waitingPlayer = player1.Active ? player2 : player1;
 
             bool bActivePlayerWon = true;
 
             // Find active player's checker that has been selected to move
-            foreach (Checker checkerAP in activePlayer.Checkers)
+            foreach (NetworkBackgammonChecker checkerAP in activePlayer.Checkers)
             {
                 // Found checker, now find checker's move that has been selected
                 if (checkerAP == _checker)
                 {
-                    foreach (Dice move in checkerAP.PossibleMoves)
+                    foreach (NetworkBackgammonDice move in checkerAP.PossibleMoves)
                     {
                         // Found move
                         if (move == _move)
                         {
                             checkerAP.MoveChecker(_move);
 
-                            if (checkerAP.CurrentPosition.CurrentPosition >= Position.GameBoardPosition.NORMAL_START &&
-                                checkerAP.CurrentPosition.CurrentPosition <= Position.GameBoardPosition.NORMAL_END)
+                            if (checkerAP.CurrentPosition.CurrentPosition >= NetworkBackgammonPosition.GameBoardPosition.NORMAL_START &&
+                                checkerAP.CurrentPosition.CurrentPosition <= NetworkBackgammonPosition.GameBoardPosition.NORMAL_END)
                             {
                                 // Check whether active player kicked checker of the waiting player onto the bar
-                                foreach (Checker checkerWP in waitingPlayer.Checkers)
+                                foreach (NetworkBackgammonChecker checkerWP in waitingPlayer.Checkers)
                                 {
                                     if (checkerWP.CurrentPosition.GetOppositePosition().CurrentPosition == checkerAP.CurrentPosition.CurrentPosition)
                                     {
@@ -215,9 +219,9 @@ namespace NetworkBackgammonGameLogic
             }
 
             // Check whether active player has won the game
-            foreach (Checker checker in activePlayer.Checkers)
+            foreach (NetworkBackgammonChecker checker in activePlayer.Checkers)
             {
-                if (checker.CurrentPosition.CurrentPosition != Position.GameBoardPosition.OFFBOARD)
+                if (checker.CurrentPosition.CurrentPosition != NetworkBackgammonPosition.GameBoardPosition.OFFBOARD)
                 {
                     bActivePlayerWon = false;
                     break;
