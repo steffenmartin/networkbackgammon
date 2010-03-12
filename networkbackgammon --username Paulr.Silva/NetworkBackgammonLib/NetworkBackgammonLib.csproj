@@ -45,6 +45,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NetworkBackgammonChecker.cs" />
+    <Compile Include="NetworkBackgammonDice.cs" />
+    <Compile Include="GameSessionMoveSelectedEvent.cs" />
+    <Compile Include="NetworkBackgammonMove.cs" />
     <Compile Include="NetworkBackgammonGameRoomEvent.cs" />
     <Compile Include="NetworkBackgammonGameSessionEvent.cs" />
     <Compile Include="INetworkBackgammonEvent.cs" />
@@ -53,6 +57,8 @@
     <Compile Include="NetworkBackgammonChatEvent.cs" />
     <Compile Include="NetworkBackgammonListener.cs" />
     <Compile Include="NetworkBackgammonNotifier.cs" />
+    <Compile Include="NetworkBackgammonPlayer.cs" />
+    <Compile Include="NetworkBackgammonPosition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

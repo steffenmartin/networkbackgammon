@@ -6,6 +6,7 @@ using NetworkBackgammonLib;
 
 namespace NetworkBackgammonLib
 {
+    [Serializable]
     public class NetworkBackgammonGameRoomEvent : INetworkBackgammonEvent
     {
         public enum GameRoomEventType
