@@ -101,6 +101,8 @@ namespace NetworkBackgammon
                     MarshalByRefObject obj = (MarshalByRefObject)RemotingServices.Connect(typeof(NetworkBackgammonRemoteServer), "http://" + m_maskedIPAddressTextBox.Text + ":" + m_portTextBox.Text + "/Server");
                     m_server = obj as NetworkBackgammonRemoteServer;
 
+                    // Register the client 
+                    m_server.AddListener(NetworkBackgammonClient.Instance.Client);
 
                     m_connectButton.Text = m_server.m_test;// "Disconnect";
                     m_maskedIPAddressTextBox.Enabled = false;

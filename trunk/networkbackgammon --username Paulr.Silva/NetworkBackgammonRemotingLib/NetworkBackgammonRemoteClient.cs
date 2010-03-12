@@ -8,45 +8,28 @@ using NetworkBackgammonLib;
 namespace NetworkBackgammonRemotingLib
 {
    [Serializable]
-    public class NetworkBackgammonRemoteClient : MarshalByRefObject
+    public class NetworkBackgammonRemoteClient : MarshalByRefObject,
+                                                 INetworkBackgammonNotifier,
+                                                 INetworkBackgammonListener
     {
-        public delegate void ClientCallback(string _message);
-        public delegate void ServerNotificationCallback();
-
-        public event ClientCallback clientCallback;
-        public event ServerNotificationCallback serverNotificationCallback;
-
-        #region NetworkBackgammonRemoteClient Members
-
-        // This really should be private but for proper serialization this is required to be public
-        // -> Need to find smarter solution
-        public int clientID = 0;
+        // Local delegate notifier
+        INetworkBackgammonNotifier m_localNotifier = null;
+        // Local delegate listener
+        INetworkBackgammonListener m_localListener = new NetworkBackgammonListener();
+        // Unique client ID
+        int clientID = 0;
 
         public NetworkBackgammonRemoteClient()
         {
             // Create a unique client ID (Is this function really creating just uniqe IDs?)
             clientID = System.Guid.NewGuid().GetHashCode();
+
+            m_localNotifier = new NetworkBackgammonNotifier(this);
         }
 
-        ~NetworkBackgammonRemoteClient()
-        {
-            clientID = 0;
-        }
+        ~NetworkBackgammonRemoteClient(){}
 
-        public void SendMessage(string _message)
-        {
-            if (clientCallback != null)
-                clientCallback(_message);
-        }
-
-        public void OnServerNotification()
-        {
-            if (serverNotificationCallback != null)
-            {
-                serverNotificationCallback();
-            }
-        }
-
+        // Unique client ID property
         public int ClientID
         {
             get
@@ -55,10 +38,7 @@ namespace NetworkBackgammonRemotingLib
             }
         }
 
-
-        #endregion
-
-        #region RemotingClient Operators
+        #region NetworkBackgammonRemoteClient Operators
 
         public static bool operator ==(NetworkBackgammonRemoteClient a, NetworkBackgammonRemoteClient b)
         {
@@ -112,6 +92,58 @@ namespace NetworkBackgammonRemotingLib
         {
             return clientID.ToString();
         }
+
+        #endregion
+
+        #region INetworkBackgammonNotifier Members
+
+        public bool AddListener(INetworkBackgammonListener listener)
+        {
+            return m_localNotifier != null ? m_localNotifier.AddListener(listener) : false;
+        }
+
+        public bool RemoveListener(INetworkBackgammonListener listener)
+        {
+            return m_localNotifier != null ? m_localNotifier.RemoveListener(listener) : false;
+        }
+
+        public void Broadcast(INetworkBackgammonEvent notificationEvent)
+        {
+            m_localNotifier.Broadcast(notificationEvent);
+        }
+
+        public void Broadcast(INetworkBackgammonEvent notificationEvent, INetworkBackgammonNotifier notifier)
+        {
+            m_localNotifier.Broadcast(notificationEvent, notifier);
+        }
+
+        #endregion
+
+        #region INetworkBackgammonListener Members
+
+        public bool AddNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return m_localListener.AddNotifier(notifier);
+        }
+
+        public bool RemoveNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return m_localListener.RemoveNotifier(notifier);
+        }
+
+        public void OnEventNotification(INetworkBackgammonNotifier sender, INetworkBackgammonEvent e)
+        {
+            // Filter out our own broadcasts
+            if (sender != this)
+            {
+                // Forward event
+                Broadcast(e, sender);
+            }
+
+            Console.WriteLine("***** Event ***** ");
+            Console.WriteLine("Sender: " + sender.ToString());
+            Console.WriteLine("Event: " + e.ToString());
+         }
 
         #endregion
     }

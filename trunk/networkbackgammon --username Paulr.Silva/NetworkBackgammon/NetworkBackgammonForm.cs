@@ -11,82 +11,76 @@ namespace NetworkBackgammon
 {
     public partial class NetworkBackGammonForm : Form
     {
+        NetworkBackgammonBoard m_backgammonBoard = new NetworkBackgammonBoard();
+        NetworkBackgammonChat m_backGammonChat = new NetworkBackgammonChat();
+        NetworkBackgammonScoreBoard m_backGammonScoreBoardPlayer1 = new NetworkBackgammonScoreBoard();
+        NetworkBackgammonScoreBoard m_backGammonScoreBoardPlayer2 = new NetworkBackgammonScoreBoard();
+        
         public NetworkBackGammonForm()
         {
             InitializeComponent();
         }
 
-        private void fileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void NetworkBackGammonForm_ResizeBegin(object sender, EventArgs e)
-        {
-
-        }
-
-        private void NetworkBackGammonForm_ResizeEnd(object sender, EventArgs e)
-        {
-
-        }
-
         private void NetworkBackGammonForm_Load(object sender, EventArgs e)
+        { 
+    
+        }
+
+        private void LoadGameBoard()
+        { 
+            // Set the Parent Form of the Child window.
+            m_backgammonBoard.MdiParent = this;
+            // Display the new form.
+            m_backgammonBoard.Show();
+             
+            // Set the Parent Form of the Child window.
+            m_backGammonChat.MdiParent = this;
+            m_backGammonChat.Left = m_backgammonBoard.Left;
+            m_backGammonChat.Top = m_backgammonBoard.Bottom;
+            m_backGammonChat.Width = this.Width - 10;
+            // Display the new form.
+            m_backGammonChat.Show();
+
+            // Set the Parent Form of the Child window.
+            m_backGammonScoreBoardPlayer1.MdiParent = this;
+            m_backGammonScoreBoardPlayer1.Left = m_backgammonBoard.Right;
+            m_backGammonScoreBoardPlayer1.Top = m_backgammonBoard.Top;
+            m_backGammonScoreBoardPlayer1.Width = 137;
+            m_backGammonScoreBoardPlayer1.Height = m_backgammonBoard.Height / 2;
+            // Display the new form.
+            m_backGammonScoreBoardPlayer1.Show();
+
+            // Set the Parent Form of the Child window.
+            m_backGammonScoreBoardPlayer2.MdiParent = this;
+            m_backGammonScoreBoardPlayer2.Left = m_backgammonBoard.Right;
+            m_backGammonScoreBoardPlayer2.Top = m_backGammonScoreBoardPlayer1.Bottom;
+            m_backGammonScoreBoardPlayer2.Width = 137;
+            m_backGammonScoreBoardPlayer2.Height = m_backgammonBoard.Height / 2;
+            // Display the new form.
+            m_backGammonScoreBoardPlayer2.Show();
+        }
+
+        private void UnloadGameBoard()
+        {
+            m_backgammonBoard.Hide();
+            m_backGammonChat.Hide();
+            m_backGammonScoreBoardPlayer1.Hide();
+            m_backGammonScoreBoardPlayer2.Hide();
+        }
+
+        private void serverToolStripMenuItem_Click(object sender, EventArgs e)
         {
             NetworkBackgammonLoginForm backgammonLogin = new NetworkBackgammonLoginForm();
             DialogResult res = backgammonLogin.ShowDialog();
+        }
 
-            if (res == DialogResult.OK)
-            {
-                NetworkBackgammonGameRoomForm gameRoomList = new NetworkBackgammonGameRoomForm();
-                // Set the Parent Form of the Child window.
-                gameRoomList.MdiParent = this;
-                gameRoomList.Left = 0;
-                gameRoomList.Top = 0;
-                gameRoomList.Width = this.Width;
-                gameRoomList.Height = this.Height;
-                // Display the new form.
-                gameRoomList.Show();
+        private void gameRoomToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            NetworkBackgammonGameRoomForm backgammonGameRoom = new NetworkBackgammonGameRoomForm();
+            DialogResult res = backgammonGameRoom.ShowDialog();
 
-                /*
-                 
-                 NetworkBackgammonBoard backgammonBoard = new NetworkBackgammonBoard();
-                // Set the Parent Form of the Child window.
-                backgammonBoard.MdiParent = this;
-                // Display the new form.
-                backgammonBoard.Show();
-                 * 
-                 * NetworkBackgammonChat backGammonChat = new NetworkBackgammonChat();
-                // Set the Parent Form of the Child window.
-                backGammonChat.MdiParent = this;
-                backGammonChat.Left = backgammonBoard.Left;
-                backGammonChat.Top = backgammonBoard.Bottom;
-                backGammonChat.Width = this.Width - 10;
-                //backGammonChat.Height = backGammonChat.Height ;
-                // Display the new form.
-                backGammonChat.Show();
-
-                NetworkBackgammonScoreBoard backGammonScoreBoardPlayer1 = new NetworkBackgammonScoreBoard();
-                // Set the Parent Form of the Child window.
-                backGammonScoreBoardPlayer1.MdiParent = this;
-                backGammonScoreBoardPlayer1.Left = backgammonBoard.Right;
-                backGammonScoreBoardPlayer1.Top = backgammonBoard.Top;
-                backGammonScoreBoardPlayer1.Width = 137;
-                backGammonScoreBoardPlayer1.Height = backgammonBoard.Height / 2;
-                // Display the new form.
-                backGammonScoreBoardPlayer1.Show();
-
-                NetworkBackgammonScoreBoard backGammonScoreBoardPlayer2 = new NetworkBackgammonScoreBoard();
-                // Set the Parent Form of the Child window.
-                backGammonScoreBoardPlayer2.MdiParent = this;
-                backGammonScoreBoardPlayer2.Left = backgammonBoard.Right;
-                backGammonScoreBoardPlayer2.Top = backGammonScoreBoardPlayer1.Bottom;
-                backGammonScoreBoardPlayer2.Width = 137;
-                backGammonScoreBoardPlayer2.Height = backgammonBoard.Height / 2;
-                // Display the new form.
-                backGammonScoreBoardPlayer2.Show();
-                */
-            }
+            // Load the game on successful selection of a opponent
+            LoadGameBoard();
         }
     }
 }

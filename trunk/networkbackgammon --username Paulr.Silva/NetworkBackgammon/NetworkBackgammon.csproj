@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{9832AE8E-C998-46F4-B19A-04123E57F315}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NetworkBackgammonClient.cs" />
     <Compile Include="NetworkBackgammonGameRoomForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -135,9 +136,11 @@
   <ItemGroup>
     <EmbeddedResource Include="NetworkBackgammonGameRoomForm.resx">
       <DependentUpon>NetworkBackgammonGameRoomForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="NetworkBackgammonLoginForm.resx">
       <DependentUpon>NetworkBackgammonLoginForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Dice1.ico" />
     <EmbeddedResource Include="Resources\Dice2.ico" />
