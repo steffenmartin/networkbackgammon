@@ -64,8 +64,6 @@ namespace NetworkBackgammonServer
                     MarshalByRefObject obj = (MarshalByRefObject)RemotingServices.Connect(typeof(NetworkBackgammonRemoteServer), "http://127.0.0.1:" + m_portText.Text + "/Server");
                     m_server = obj as NetworkBackgammonRemoteServer;
 
-                    m_server.m_test = "Started...";
- 
                     // Register delegated listener as a listener of the server object
                     m_server.AddListener(this);
             

@@ -21,8 +21,6 @@ namespace NetworkBackgammonRemotingLib
         // Hashtable with clients username and passwords
         List<string> clientActiveList = new List<string>();
 
-        public string m_test = "Incomplete...";
-
         #endregion
 
         #region NetworkBackgammonRemoteServer Public Members
@@ -30,8 +28,6 @@ namespace NetworkBackgammonRemotingLib
         // Constructor
         public NetworkBackgammonRemoteServer()
         {
-            Console.Write("\nRemote Server Created...\n");
-
             m_localNotifier = new NetworkBackgammonNotifier(this);
         }
 
@@ -45,13 +41,10 @@ namespace NetworkBackgammonRemotingLib
         {
             bool retval = !clientUsernameList.ContainsKey(username);
 
-            Console.Write("\nGonna register\n");
-
             if (retval)
             {
                 clientUsernameList.Add(username, pw);
 
-                Console.Write("\nAdded User\n" + username);
                 // Broadcast login event
                 Broadcast( new NetworkBackgammonChatEvent(), this);
             }
