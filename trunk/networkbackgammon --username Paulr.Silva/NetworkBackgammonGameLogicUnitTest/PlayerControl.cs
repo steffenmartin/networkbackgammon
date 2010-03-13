@@ -53,7 +53,7 @@ namespace NetworkBackgammonGameLogicUnitTest
                 {
                     if (gameRoom != null)
                     {
-                        player = gameRoom.Login(textBoxPlayerName.Text.Trim());
+                        player = gameRoom.Enter(textBoxPlayerName.Text.Trim());
 
                         if (player != null)
                         {
@@ -82,7 +82,7 @@ namespace NetworkBackgammonGameLogicUnitTest
             {
                 if (gameRoom != null)
                 {
-                    gameRoom.Logout(player);
+                    gameRoom.Leave(player);
 
                     player.RemoveListener(this);
 

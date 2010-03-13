@@ -11,7 +11,8 @@ namespace NetworkBackgammonGameLogic
     {
         INetworkBackgammonNotifier defaultNotifier = null;
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
-
+        NetworkBackgammonPlayer player1 = null;
+        NetworkBackgammonPlayer player2 = null;
         // Thread which runs the event based state machine
         Thread threadStateMachine = null;
         // Semaphore to signal events to the state machine (wake-up calls)
@@ -21,8 +22,8 @@ namespace NetworkBackgammonGameLogic
 
         public class EventQueueElement
         {
-            private INetworkBackgammonEvent gameSessionEvent;
-            private INetworkBackgammonNotifier gameSessionNotifier;
+            INetworkBackgammonEvent gameSessionEvent;
+            INetworkBackgammonNotifier gameSessionNotifier;
 
             public EventQueueElement(INetworkBackgammonEvent _event, INetworkBackgammonNotifier _notifier)
             {
@@ -83,6 +84,7 @@ namespace NetworkBackgammonGameLogic
             // Player 2 is listening for events from Game Session
             AddListener(player2);
         }
+
         ~NetworkBackgammonGameSession()
         {
             Stop();
@@ -107,6 +109,7 @@ namespace NetworkBackgammonGameLogic
 
             threadStateMachine.Start();
         }
+
         public void Stop()
         {
             if (threadStateMachine != null)
@@ -258,8 +261,10 @@ namespace NetworkBackgammonGameLogic
             }
         }
 
-        private NetworkBackgammonPlayer player1 = null;
-        private NetworkBackgammonPlayer player2 = null;
+        public bool ContainsPlayer( NetworkBackgammonPlayer player )
+        {
+            return ((player == player1) || (player == player2));
+        }
 
         public NetworkBackgammonPlayer Player1
         {

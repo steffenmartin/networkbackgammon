@@ -10,10 +10,9 @@ namespace NetworkBackgammonLib
     {
         INetworkBackgammonNotifier defaultNotifier = null;
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
-
-        private string strPlayerName = "";
-        private List<NetworkBackgammonChecker> checkers = new List<NetworkBackgammonChecker>();
-        private bool bActive = false;
+        List<NetworkBackgammonChecker> checkers = new List<NetworkBackgammonChecker>();
+        string strPlayerName = ""; 
+        bool bActive = false;
 
         public NetworkBackgammonPlayer(string _strPlayerName)
         {
@@ -24,9 +23,7 @@ namespace NetworkBackgammonLib
             InitCheckers();
         }
 
-        /// <summary>
-        /// Initialize list of checkers in their initial positions.
-        /// </summary>
+        // Initialize list of checkers in their initial positions.
         private void InitCheckers()
         {
             // 2 checkers on 1
@@ -52,6 +49,8 @@ namespace NetworkBackgammonLib
             checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
             checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
         }
+
+        #region Properties
 
         public string PlayerName
         {
@@ -83,6 +82,8 @@ namespace NetworkBackgammonLib
         {
             return strPlayerName;
         }
+
+        #endregion
 
         #region INetworkBackgammonNotifier Members
 

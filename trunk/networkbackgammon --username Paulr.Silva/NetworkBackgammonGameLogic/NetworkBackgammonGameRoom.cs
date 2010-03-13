@@ -9,63 +9,122 @@ namespace NetworkBackgammonGameLogic
     public class NetworkBackgammonGameRoom : INetworkBackgammonNotifier
     {
         INetworkBackgammonNotifier defaultNotifier = null;
-
-        private List<NetworkBackgammonPlayer> connectedPlayers = new List<NetworkBackgammonPlayer>();
-        private List<NetworkBackgammonGameSession> gameSessions = new List<NetworkBackgammonGameSession>();
+        List<NetworkBackgammonPlayer> connectedPlayers = new List<NetworkBackgammonPlayer>();
+        List<NetworkBackgammonGameSession> gameSessions = new List<NetworkBackgammonGameSession>();
 
         public NetworkBackgammonGameRoom()
         {
             defaultNotifier = new NetworkBackgammonNotifier(this);
         }
+
         ~NetworkBackgammonGameRoom()
         {
             gameSessions.Clear();
             connectedPlayers.Clear();
         }
 
-        public NetworkBackgammonPlayer Login(string _playerName)
+        /**
+         * Join a game room by player's name (username)
+         * @param string Username
+         * @return a valid (non-null) player object
+         */
+        public NetworkBackgammonPlayer Enter(string _playerName)
         {
             NetworkBackgammonPlayer newPlayer = new NetworkBackgammonPlayer(_playerName);
 
-            connectedPlayers.Add(newPlayer);
-
-            Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerConnected));
-
-            // Automatically create a game session once 2 players have logged in
-            // First player logged in will be the challenged one, the second one will
-            // be the challenger
-            if (connectedPlayers.Count == 2)
+            // Check the user is alread in the list
+            if (!connectedPlayers.Contains(newPlayer))
             {
-                StartGame(connectedPlayers[0], connectedPlayers[1]);
+                // Add new player object to the game room list
+                connectedPlayers.Add(newPlayer);
+
+                // Broadcast the player connected event to all registered listeners
+                Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerConnected));
+            }
+            else
+            {
+                newPlayer = null;
             }
 
             return newPlayer;
         }
 
-        public void Logout(NetworkBackgammonPlayer _player)
+        // Exit the game room by player's name (username)
+        public void Leave(NetworkBackgammonPlayer _player)
         {
             if (connectedPlayers.Contains(_player))
             {
                 connectedPlayers.Remove(_player);
-            }
 
-            ((INetworkBackgammonNotifier)this).Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected));
+                // Broadcast the player disconnected event to all registered listeners
+                ((INetworkBackgammonNotifier)this).Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected));
+            }
         }
 
-        public void StartGame(NetworkBackgammonPlayer _challengingPlayer, NetworkBackgammonPlayer _challengedPlayer)
+        // Challenge an opponent to a game
+        public bool Challenge(NetworkBackgammonPlayer _challengingPlayer, NetworkBackgammonPlayer _challengedPlayer)
         {
-            // TODO: Check whether challenged player accepts or rejects challenge
+            bool retval = false;
 
-            NetworkBackgammonGameSession newSession = new NetworkBackgammonGameSession(_challengingPlayer, _challengedPlayer);
-
-            if (newSession != null)
+            // Check if the players are in the available playe game room list
+            if (connectedPlayers.Contains(_challengingPlayer) && connectedPlayers.Contains(_challengedPlayer))
             {
-                gameSessions.Add(newSession);
-
-                newSession.Start();
+                // Check if players are currently free to participate in a game session
+                if (!IsPlayerInGameRoom(_challengingPlayer) && !IsPlayerInGameRoom(_challengedPlayer))
+                {
+                    // Broadcast a challenge event to the "challeged player"
+                    //NetworkBackgammonChaallengeEvent
+                    retval = true;
+                }
             }
+
+            return retval;
         }
 
+        // Revoke a challenge (the player no longer wants to challenge the player)
+        public bool RevokeChallenge(NetworkBackgammonPlayer _challengingPlayer)
+        {
+            bool retval = true;
+
+            return retval;
+        }
+
+        // Accept a challenge 
+        public bool AcceptChallenge(NetworkBackgammonPlayer _challengedPlayer)
+        {
+            bool retval = true;
+
+            return retval;
+        }   
+
+        // Start the game session with two consenting players
+        public bool StartGame(NetworkBackgammonPlayer _challengingPlayer, NetworkBackgammonPlayer _challengedPlayer)
+        {
+            bool retval = false;
+
+            // Check if the players are in the available playe game room list
+            if (connectedPlayers.Contains(_challengingPlayer) && connectedPlayers.Contains(_challengedPlayer))
+            {
+                // Check if players are currently free to participate in a game session
+                if (!IsPlayerInGameRoom(_challengingPlayer) && !IsPlayerInGameRoom(_challengedPlayer))
+                {
+                    // Create new game session with the consenting players
+                    NetworkBackgammonGameSession newSession = new NetworkBackgammonGameSession(_challengingPlayer, _challengedPlayer);
+
+                    // Add the game session to the game session list
+                    gameSessions.Add(newSession);
+
+                    // Startup the game...
+                    newSession.Start();
+
+                    retval = true;
+                }
+            }
+
+            return retval;
+        }
+
+        // Shutdown the game room - stop all sessions
         public void Shutdown()
         {
             foreach (NetworkBackgammonGameSession session in gameSessions)
@@ -77,6 +136,27 @@ namespace NetworkBackgammonGameLogic
             connectedPlayers.Clear();
         }
 
+        // Determine whether or not player is participating in a game session
+        public bool IsPlayerInGameRoom(NetworkBackgammonPlayer player)
+        {
+            bool retval = false;
+
+            // Look through the list of game sessions and make sure the player is not already playing in another room
+            foreach (NetworkBackgammonGameSession session in gameSessions)
+            {
+                if (session.ContainsPlayer(player))
+                {
+                    retval = false;
+                    break;
+                }
+            }
+
+            return retval;
+        }
+
+        #region Properties
+
+        // List of connected players
         public List<NetworkBackgammonPlayer> ConnectedPlayers
         {
             get
@@ -84,6 +164,8 @@ namespace NetworkBackgammonGameLogic
                 return connectedPlayers;
             }
         }
+
+        #endregion
 
         #region INetworkBackgammonNotifier Members
 
