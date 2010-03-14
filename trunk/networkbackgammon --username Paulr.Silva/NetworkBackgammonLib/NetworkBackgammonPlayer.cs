@@ -6,7 +6,10 @@ using NetworkBackgammonLib;
 
 namespace NetworkBackgammonLib
 {
-    public class NetworkBackgammonPlayer : INetworkBackgammonNotifier, INetworkBackgammonListener
+    [Serializable]
+    public class NetworkBackgammonPlayer : MarshalByRefObject,
+                                           INetworkBackgammonNotifier, 
+                                           INetworkBackgammonListener
     {
         INetworkBackgammonNotifier defaultNotifier = null;
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();

@@ -9,15 +9,19 @@ using System.Runtime.Remoting.Channels.Http;
 using System.Net;
 using System.Net.Sockets;
 using NetworkBackgammonRemotingLib;
+using NetworkBackgammonLib;
 
 namespace NetworkBackgammon
 {
     class NetworkBackgammonClient
     {
         static NetworkBackgammonClient instance=null;
+        // Lock to make the singleton thread sage
         static readonly object padlock = new object();
-        NetworkBackgammonRemoteClient client = new NetworkBackgammonRemoteClient();
-        NetworkBackgammonRemoteServer server = null;
+        // Remotable client object that will receive 
+        NetworkBackgammonPlayer player = null;
+        // Remote game room
+        NetworkBackgammonRemoteGameRoom gameRoom = null;
         HttpChannel channel = null;
         string serverIpAddress = "127.0.0.1";
         string serverPort = "8080";
@@ -44,20 +48,25 @@ namespace NetworkBackgammon
         }
 
         // Remotable client object
-        public NetworkBackgammonRemoteClient Client
+        public NetworkBackgammonPlayer Player
         {
             get
             {
-                return client;
+                return player;
+            }
+
+            set
+            {
+                player = value;
             }
         }
 
         // Remotable server object
-        public NetworkBackgammonRemoteServer Server
+        public NetworkBackgammonRemoteGameRoom GameRoom
         {
             get
             {
-                return server;
+                return gameRoom;
             }
         }
 
@@ -66,7 +75,7 @@ namespace NetworkBackgammon
         {
             get
             {
-                return (server == null ? false : true);
+                return (gameRoom == null ? false : true);
             }
         }
 
@@ -124,14 +133,13 @@ namespace NetworkBackgammon
                 ChannelServices.RegisterChannel(channel, false);
 
                 // Now create a transparent proxy to the server component
-                MarshalByRefObject obj = (MarshalByRefObject)RemotingServices.Connect(typeof(NetworkBackgammonRemoteServer), "http://" + ipAddr + ":" + port + "/Server");
-                server = obj as NetworkBackgammonRemoteServer;
+                MarshalByRefObject obj = (MarshalByRefObject)RemotingServices.Connect(typeof(NetworkBackgammonRemoteGameRoom), "http://" + ipAddr + ":" + port + "/GameRoom");
+                gameRoom = obj as NetworkBackgammonRemoteGameRoom;
 
                 serverIpAddress = ipAddr;
                 serverPort = port;
 
-                // Register the remotable client object as a listner 
-                retval = server.AddListener(Client);
+                retval = true;
             }
             catch (Exception ex)
             {
@@ -147,8 +155,10 @@ namespace NetworkBackgammon
         {
             if (IsConnected)
             {
+                // Remove the player from the game room
+                gameRoom.Leave(Player);
                 // UnRegister the remotable client object as a listner 
-                server.RemoveListener(Client);
+                gameRoom.RemoveListener(Player);
             }
 
             if (channel != null)
@@ -163,7 +173,7 @@ namespace NetworkBackgammon
                 ChannelServices.UnregisterChannel(channel);
             }
 
-            server = null;
+            gameRoom = null;
             channel = null;
         }
 

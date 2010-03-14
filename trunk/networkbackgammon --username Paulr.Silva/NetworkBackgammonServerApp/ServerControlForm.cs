@@ -24,7 +24,7 @@ namespace NetworkBackgammonServer
         // Channel the server is connected to
         private HttpChannel m_channel = null;
         // Local server object
-        private NetworkBackgammonRemoteServer m_server =null;// new NetworkBackgammonRemoteServer();
+        private NetworkBackgammonRemoteGameRoom m_server = null;
         // Local delegated listener object
         INetworkBackgammonListener m_localListener = new NetworkBackgammonListener();
         // Log Message Delegate
@@ -58,11 +58,11 @@ namespace NetworkBackgammonServer
                     }
 
                     ChannelServices.RegisterChannel(m_channel, false);
-                    RemotingConfiguration.RegisterWellKnownServiceType( typeof(NetworkBackgammonRemoteServer), "Server", WellKnownObjectMode.Singleton);
+                    RemotingConfiguration.RegisterWellKnownServiceType( typeof(NetworkBackgammonRemoteGameRoom), "GameRoom", WellKnownObjectMode.Singleton);
 
                     // Assign the instantiated remote server to the local server
-                    MarshalByRefObject obj = (MarshalByRefObject)RemotingServices.Connect(typeof(NetworkBackgammonRemoteServer), "http://127.0.0.1:" + m_portText.Text + "/Server");
-                    m_server = obj as NetworkBackgammonRemoteServer;
+                    MarshalByRefObject obj = (MarshalByRefObject)RemotingServices.Connect(typeof(NetworkBackgammonRemoteGameRoom), "http://127.0.0.1:" + m_portText.Text + "/GameRoom");
+                    m_server = obj as NetworkBackgammonRemoteGameRoom;
 
                     // Register delegated listener as a listener of the server object
                     m_server.AddListener(this);

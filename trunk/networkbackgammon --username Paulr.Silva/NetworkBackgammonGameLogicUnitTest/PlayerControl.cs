@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using NetworkBackgammonGameLogic;
 using NetworkBackgammonLib;
+using NetworkBackgammonRemotingLib;
 
 namespace NetworkBackgammonGameLogicUnitTest
 {
@@ -15,7 +16,7 @@ namespace NetworkBackgammonGameLogicUnitTest
     {
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
 
-        NetworkBackgammonGameRoom gameRoom = null;
+        NetworkBackgammonRemoteGameRoom gameRoom = null;
         NetworkBackgammonPlayer player = null;
 
         public PlayerControl()
@@ -28,7 +29,7 @@ namespace NetworkBackgammonGameLogicUnitTest
             player = null;
         }
 
-        public NetworkBackgammonGameRoom ConnectedGameRoom
+        public NetworkBackgammonRemoteGameRoom ConnectedGameRoom
         {
             set
             {
@@ -53,7 +54,13 @@ namespace NetworkBackgammonGameLogicUnitTest
                 {
                     if (gameRoom != null)
                     {
-                        player = gameRoom.Enter(textBoxPlayerName.Text.Trim());
+                        string playerName = textBoxPlayerName.Text.Trim();
+
+                        // Register (if not already)
+                        gameRoom.RegisterPlayer(playerName, "password");
+                        
+                        // Enter the game room
+                        player = gameRoom.Enter(playerName, "password");
 
                         if (player != null)
                         {
