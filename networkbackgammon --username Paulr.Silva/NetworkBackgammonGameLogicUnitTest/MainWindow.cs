@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using NetworkBackgammonGameLogic;
 using NetworkBackgammonLib;
+using NetworkBackgammonRemotingLib;
 
 namespace NetworkBackgammonGameLogicUnitTest
 {
@@ -15,7 +16,7 @@ namespace NetworkBackgammonGameLogicUnitTest
     {
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
 
-        NetworkBackgammonGameRoom gameRoom = new NetworkBackgammonGameRoom();
+        NetworkBackgammonRemoteGameRoom gameRoom = new NetworkBackgammonRemoteGameRoom();
 
         public MainWindow()
         {

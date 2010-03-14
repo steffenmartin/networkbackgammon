@@ -68,19 +68,15 @@ namespace NetworkBackgammon
             m_backGammonScoreBoardPlayer2.Hide();
         }
 
-        private void serverToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            NetworkBackgammonLoginForm backgammonLogin = new NetworkBackgammonLoginForm();
-            DialogResult res = backgammonLogin.ShowDialog();
-        }
-
         private void gameRoomToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            NetworkBackgammonGameRoomForm backgammonGameRoom = new NetworkBackgammonGameRoomForm();
-            DialogResult res = backgammonGameRoom.ShowDialog();
-
+            NetworkBackgammonLoginForm backgammonLogin = new NetworkBackgammonLoginForm();
+            //DialogResult res = backgammonLogin.ShowDialog();
+            backgammonLogin.MdiParent = this;
+            backgammonLogin.Show();
+            
             // Load the game on successful selection of a opponent
-            LoadGameBoard();
+            //LoadGameBoard();
         }
 
         private void NetworkBackGammonForm_FormClosing(object sender, FormClosingEventArgs e)
