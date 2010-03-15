@@ -9,13 +9,10 @@ namespace NetworkBackgammonLib
     public class NetworkBackgammonChallengeEvent : INetworkBackgammonEvent
     {
         NetworkBackgammonPlayer m_challengingPlayer = null;
-        NetworkBackgammonPlayer m_challengedPlayer = null;
 
-        public NetworkBackgammonChallengeEvent(NetworkBackgammonPlayer challengingPlayer,
-                                                NetworkBackgammonPlayer challengedPlayer)
+        public NetworkBackgammonChallengeEvent(NetworkBackgammonPlayer challengingPlayer)
         {
             m_challengingPlayer = challengingPlayer;
-            m_challengedPlayer = challengedPlayer;
         }
 
         public NetworkBackgammonPlayer ChallengingPlayer
@@ -23,14 +20,6 @@ namespace NetworkBackgammonLib
             get
             {
                 return m_challengingPlayer;
-            }
-        }
-
-        public NetworkBackgammonPlayer ChallengedPlayer
-        {
-            get
-            {
-                return m_challengedPlayer;
             }
         }
     }

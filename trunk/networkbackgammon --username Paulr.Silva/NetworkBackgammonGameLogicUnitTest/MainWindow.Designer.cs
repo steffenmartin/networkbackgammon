@@ -28,59 +28,39 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.playerControl1 = new NetworkBackgammonGameLogicUnitTest.PlayerControl();
             this.playerControl2 = new NetworkBackgammonGameLogicUnitTest.PlayerControl();
-            this.listBoxConnectedPlayers = new System.Windows.Forms.ListBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.playerControl1 = new NetworkBackgammonGameLogicUnitTest.PlayerControl();
             this.SuspendLayout();
+            // 
+            // playerControl2
+            // 
+            this.playerControl2.ConnectedGameRoom = null;
+            this.playerControl2.Location = new System.Drawing.Point(268, 12);
+            this.playerControl2.Name = "playerControl2";
+            this.playerControl2.Size = new System.Drawing.Size(250, 431);
+            this.playerControl2.TabIndex = 1;
             // 
             // playerControl1
             // 
             this.playerControl1.ConnectedGameRoom = null;
             this.playerControl1.Location = new System.Drawing.Point(12, 12);
             this.playerControl1.Name = "playerControl1";
-            this.playerControl1.Size = new System.Drawing.Size(352, 384);
+            this.playerControl1.Size = new System.Drawing.Size(250, 431);
             this.playerControl1.TabIndex = 0;
-            // 
-            // playerControl2
-            // 
-            this.playerControl2.ConnectedGameRoom = null;
-            this.playerControl2.Location = new System.Drawing.Point(378, 12);
-            this.playerControl2.Name = "playerControl2";
-            this.playerControl2.Size = new System.Drawing.Size(352, 384);
-            this.playerControl2.TabIndex = 1;
-            // 
-            // listBoxConnectedPlayers
-            // 
-            this.listBoxConnectedPlayers.FormattingEnabled = true;
-            this.listBoxConnectedPlayers.Location = new System.Drawing.Point(12, 415);
-            this.listBoxConnectedPlayers.Name = "listBoxConnectedPlayers";
-            this.listBoxConnectedPlayers.Size = new System.Drawing.Size(718, 108);
-            this.listBoxConnectedPlayers.TabIndex = 2;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 399);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(96, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Connected Players";
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(742, 537);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.listBoxConnectedPlayers);
+            this.ClientSize = new System.Drawing.Size(522, 442);
             this.Controls.Add(this.playerControl2);
             this.Controls.Add(this.playerControl1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "MainWindow";
             this.Text = "MainWindow";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -88,8 +68,6 @@
 
         private PlayerControl playerControl1;
         private PlayerControl playerControl2;
-        private System.Windows.Forms.ListBox listBoxConnectedPlayers;
-        private System.Windows.Forms.Label label1;
     }
 }
 

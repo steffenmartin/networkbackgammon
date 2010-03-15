@@ -11,11 +11,17 @@ namespace NetworkBackgammonLib
                                            INetworkBackgammonNotifier, 
                                            INetworkBackgammonListener
     {
+        #region Members
+
         INetworkBackgammonNotifier defaultNotifier = null;
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
         List<NetworkBackgammonChecker> checkers = new List<NetworkBackgammonChecker>();
         string strPlayerName = ""; 
         bool bActive = false;
+
+        #endregion
+
+        #region Methods
 
         public NetworkBackgammonPlayer(string _strPlayerName)
         {
@@ -53,6 +59,13 @@ namespace NetworkBackgammonLib
             checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
         }
 
+        public void RespondToChallenge(bool acceptChallenge)
+        {
+            Broadcast(new NetworkBackgammonChallengeResponseEvent(acceptChallenge));
+        }
+
+        #endregion
+
         #region Properties
 
         public string PlayerName
@@ -80,6 +93,10 @@ namespace NetworkBackgammonLib
                 return checkers;
             }
         }
+
+        #endregion
+
+        #region Overrides
 
         public override string ToString()
         {

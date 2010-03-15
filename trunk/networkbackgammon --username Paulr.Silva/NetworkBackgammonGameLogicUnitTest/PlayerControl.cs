@@ -25,7 +25,18 @@ namespace NetworkBackgammonGameLogicUnitTest
         }
         ~PlayerControl()
         {
+            if (gameRoom != null)
+            {
+                gameRoom.RemoveListener(this);
+            }
+
             gameRoom = null;
+
+            if (player != null)
+            {
+                player.RemoveListener(this);
+            }
+
             player = null;
         }
 
@@ -43,7 +54,13 @@ namespace NetworkBackgammonGameLogicUnitTest
 
         private void PlayerControl_Load(object sender, EventArgs e)
         {
+            groupBoxGameRoomControls.Enabled = false;
             groupBoxGameControls.Enabled = false;
+
+            if (gameRoom != null)
+            {
+                gameRoom.AddListener(this);
+            }
         }
 
         private void buttonConnect_Click(object sender, EventArgs e)
@@ -66,7 +83,7 @@ namespace NetworkBackgammonGameLogicUnitTest
                         {
                             buttonConnect.Text = "Disconnect";
                             textBoxPlayerName.Enabled = false;
-                            groupBoxGameControls.Enabled = true;
+                            groupBoxGameRoomControls.Enabled = true;
 
                             player.AddListener(this);
                         }
@@ -91,6 +108,7 @@ namespace NetworkBackgammonGameLogicUnitTest
                 {
                     gameRoom.Leave(player);
 
+                    gameRoom.RemoveListener(this);
                     player.RemoveListener(this);
 
                     player = null;
@@ -98,7 +116,7 @@ namespace NetworkBackgammonGameLogicUnitTest
 
                 buttonConnect.Text = "Connect";
                 textBoxPlayerName.Enabled = true;
-                groupBoxGameControls.Enabled = false;
+                groupBoxGameRoomControls.Enabled = false;
             }
         }
 
@@ -150,6 +168,20 @@ namespace NetworkBackgammonGameLogicUnitTest
             }
         }
 
+        private void UpdateConnectedPlayersList()
+        {
+            listBoxConnectedPlayers.Items.Clear();
+
+            foreach (NetworkBackgammonPlayer p in gameRoom.ConnectedPlayers)
+            {
+                // Don't add our own player to the list
+                if (p.PlayerName != textBoxPlayerName.Text.Trim())
+                {
+                    listBoxConnectedPlayers.Items.Add(p);
+                }
+            }
+        }
+
         public delegate void NotifyDelegate(INetworkBackgammonNotifier _notifier, INetworkBackgammonEvent _event);
 
         #region INetworkBackgammonListener Members
@@ -172,32 +204,38 @@ namespace NetworkBackgammonGameLogicUnitTest
             }
             else
             {
-                // Filter out broadcasts from our own player
-                if (sender != player)
+                if (sender is NetworkBackgammonRemoteGameRoom)
                 {
-                    listBoxCheckers.Items.Clear();
-
                     try
                     {
-                        NetworkBackgammonGameSession gameSession = (NetworkBackgammonGameSession)sender;
-
-                        if (player.Active)
+                        if (e is NetworkBackgammonGameRoomEvent)
                         {
-                            listBoxLog.Items.Add("I'm the active player, expected to make the next move ...");
+                            NetworkBackgammonGameRoomEvent gameRoomEvent = (NetworkBackgammonGameRoomEvent)e;
+
+                            switch (gameRoomEvent.EventType)
+                            {
+                                case NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerConnected:
+                                    UpdateConnectedPlayersList();
+                                    break;
+                                case NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected:
+                                    UpdateConnectedPlayersList();
+                                    break;
+                            }
                         }
-
-                        string strDice = "";
-
-                        foreach (NetworkBackgammonDice d in gameSession.CurrentDice)
+                        else if (e is NetworkBackgammonChallengeEvent)
                         {
-                            strDice += " " + d.CurrentValue;
-                        }
+                            NetworkBackgammonChallengeEvent challengeEvent = (NetworkBackgammonChallengeEvent)e;
 
-                        listBoxLog.Items.Add("Dice: " + strDice);
+                            bool challengeResponse = MessageBox.Show(
+                                "Accept game challenge from " + challengeEvent.ChallengingPlayer.PlayerName + "?",
+                                "Game Challenge",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Question,
+                                MessageBoxDefaultButton.Button1) == DialogResult.Yes;
+                            
+                            player.RespondToChallenge(challengeResponse);
 
-                        foreach (NetworkBackgammonChecker checker in player.Checkers)
-                        {
-                            listBoxCheckers.Items.Add(checker);
+                            groupBoxGameControls.Enabled = challengeResponse;
                         }
                     }
                     catch (Exception ex)
@@ -205,9 +243,73 @@ namespace NetworkBackgammonGameLogicUnitTest
                         listBoxLog.Items.Add(ex.Message);
                     }
                 }
+                else if (sender is NetworkBackgammonGameSession)
+                {
+                    // Filter out broadcasts from our own player
+                    if (sender != player)
+                    {
+                        listBoxCheckers.Items.Clear();
+
+                        try
+                        {
+                            NetworkBackgammonGameSession gameSession = (NetworkBackgammonGameSession)sender;
+
+                            if (player.Active)
+                            {
+                                listBoxLog.Items.Add("I'm the active player, expected to make the next move ...");
+
+                                groupBoxGameControls.BackColor = Color.DarkGreen;
+                            }
+                            else
+                            {
+                                groupBoxGameControls.BackColor = Color.DarkRed;
+                            }
+
+                            string strDice = "";
+
+                            foreach (NetworkBackgammonDice d in gameSession.CurrentDice)
+                            {
+                                strDice += " " + d.CurrentValue;
+                            }
+
+                            listBoxLog.Items.Add("Dice: " + strDice);
+
+                            foreach (NetworkBackgammonChecker checker in player.Checkers)
+                            {
+                                listBoxCheckers.Items.Add(checker);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            listBoxLog.Items.Add(ex.Message);
+                        }
+                    }
+                }
             }
         }
 
         #endregion
+
+        private void contextMenuStripConnectedPlayers_Opening(object sender, CancelEventArgs e)
+        {
+            contextMenuStripConnectedPlayers.Enabled = listBoxConnectedPlayers.SelectedItem != null;
+        }
+
+        private void challengeToolStripMenuItemChallenge_Click(object sender, EventArgs e)
+        {
+            if (gameRoom != null &&
+                player != null &&
+                listBoxConnectedPlayers.SelectedItem != null)
+            {
+                if (gameRoom.Challenge(player, (NetworkBackgammonPlayer)listBoxConnectedPlayers.SelectedItem))
+                {
+                    groupBoxGameControls.Enabled = true;
+                }
+                else
+                {
+                    listBoxLog.Items.Add("Challenge failed (selected opponent rejected or timeout waiting for challenge response)!");
+                }
+            }
+        }
     }
 }
