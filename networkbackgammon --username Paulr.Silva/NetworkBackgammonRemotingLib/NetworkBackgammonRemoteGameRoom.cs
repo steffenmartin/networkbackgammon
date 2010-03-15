@@ -4,19 +4,107 @@ using System.Linq;
 using System.Text;
 using NetworkBackgammonLib;
 using NetworkBackgammonGameLogic;
+using System.Threading;
 
 namespace NetworkBackgammonRemotingLib
 {
     public class NetworkBackgammonRemoteGameRoom : MarshalByRefObject, 
-                                                   INetworkBackgammonNotifier
+                                                   INetworkBackgammonNotifier,
+                                                   INetworkBackgammonListener       /* Needs to be a listener for events like
+                                                                                     * two players challenging each other */
     {
+        #region Declarations
+
+        /// <summary>
+        /// Container with data required for game challenges
+        /// </summary>
+        private class NetworkBackgammonChallengeDataContainer
+        {
+
+            #region Members
+
+            /// <summary>
+            /// Semaphore for asynchronous game challenge
+            /// </summary>
+            private Semaphore challengeSemaphore = null;
+
+            /// <summary>
+            /// Result (response) to a game challenge
+            /// </summary>
+            private bool challengeAccepted = false;
+
+            #endregion
+
+            #region Methods
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="_semaphore"></param>
+            public NetworkBackgammonChallengeDataContainer(Semaphore _semaphore)
+            {
+                challengeSemaphore = _semaphore;
+            }
+
+            #endregion
+
+            #region Properties
+
+            public Semaphore ChallengeSemaphore
+            {
+                get
+                {
+                    return challengeSemaphore;
+                }
+            }
+
+            public bool ChallengeAccepted
+            {
+                get
+                {
+                    return challengeAccepted;
+                }
+                set
+                {
+                    challengeAccepted = value;
+                }
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Members
+
         INetworkBackgammonNotifier defaultNotifier = null;
+        /// <summary>
+        /// Default listener
+        /// </summary>
+        INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
         List<NetworkBackgammonPlayer> connectedPlayers = new List<NetworkBackgammonPlayer>();
         List<NetworkBackgammonGameSession> gameSessions = new List<NetworkBackgammonGameSession>();
         Dictionary<NetworkBackgammonPlayer, NetworkBackgammonPlayer> challengeList = new Dictionary<NetworkBackgammonPlayer, NetworkBackgammonPlayer>();
 
         // Hashtable with clients username and passwords
         Dictionary<string, string> clientUsernameList = new Dictionary<string, string>();
+        /// <summary>
+        /// Hashtable with data required for synchronizing game challenged (requests/responses)
+        /// </summary>
+        /// <remarks>
+        /// Hashtable with (challenged) player associated semaphores and challenge results (response)
+        /// to coordinate challenge request and response in an asynchronous fashion
+        /// </remarks>
+        Dictionary<NetworkBackgammonPlayer, NetworkBackgammonChallengeDataContainer> challengeSyncList = 
+            new Dictionary<NetworkBackgammonPlayer, NetworkBackgammonChallengeDataContainer>();
+        /// <summary>
+        /// Timeout for challenge request
+        /// </summary>
+        int challengeRequestTimeoutMs = 5000;
+
+        #endregion
+
+        #region Methods
 
         public NetworkBackgammonRemoteGameRoom()
         {
@@ -64,6 +152,9 @@ namespace NetworkBackgammonRemotingLib
                 // Add new player object to the game room list
                 connectedPlayers.Add(newPlayer);
 
+                // Start listening to this player
+                newPlayer.AddListener(this);
+
                 // Broadcast the player connected event to all registered listeners
                 Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerConnected));
             }
@@ -80,6 +171,9 @@ namespace NetworkBackgammonRemotingLib
         {
             if (connectedPlayers.Contains(_player))
             {
+                // Stop listening to this player
+                _player.RemoveListener(this);
+
                 connectedPlayers.Remove(_player);
 
                 // Broadcast the player disconnected event to all registered listeners
@@ -92,56 +186,43 @@ namespace NetworkBackgammonRemotingLib
         {
             bool retval = false;
 
-            // Check if the players are in the available playe game room list
+            // Check if the players are in the available player game room list
             if (connectedPlayers.Contains(_challengingPlayer) && connectedPlayers.Contains(_challengedPlayer))
             {
                 // Check if players are currently free to participate in a game session
                 if (!IsPlayerInGameSession(_challengingPlayer) && !IsPlayerInGameSession(_challengedPlayer))
                 {
-                    // Add players to challenge list
-                    challengeList.Add(_challengedPlayer, _challengingPlayer);
-                    // Broadcast a challenge event to the "challeged player"
-                    Broadcast(new NetworkBackgammonChallengeEvent(_challengingPlayer, _challengedPlayer));
-          
-                    retval = true;
+                    Semaphore challengeSemaphore = new Semaphore(0, 1);
+
+                    // Add game challenge data container instance to be used for the (asynchronous) challenge procedure
+                    challengeSyncList.Add(_challengedPlayer, new NetworkBackgammonChallengeDataContainer(challengeSemaphore));
+
+                    // Broadcast a challenge event to the "challenged player"
+                    ((INetworkBackgammonListener)_challengedPlayer).OnEventNotification(this, new NetworkBackgammonChallengeEvent(_challengingPlayer));
+
+                    // Wait for response from challenged player (or timeout)
+                    if (challengeSemaphore.WaitOne(challengeRequestTimeoutMs))
+                    {
+                        retval = challengeSyncList[_challengedPlayer].ChallengeAccepted;
+
+                        // Create and start game session if challenge has been accepted by challenged player
+                        if (retval)
+                        {
+                            NetworkBackgammonGameSession gameSession = new NetworkBackgammonGameSession(_challengingPlayer, _challengedPlayer);
+
+                            gameSessions.Add(gameSession);
+
+                            gameSession.Start();
+                        }
+                    }
+                    else
+                    {
+                        retval = false;
+                    }
+
+                    challengeSyncList.Remove(_challengedPlayer);
                 }
             }
-
-            return retval;
-        }
-
-        // Revoke a challenge (the player no longer wants to challenge the player)
-        public bool RevokeChallenge(NetworkBackgammonPlayer _challengingPlayer)
-        {
-            bool retval = true;
-
-            // Search for challenging player(key) in the challenge list 
-
-            return retval;
-        }
-
-        // Accept a challenge 
-        public bool AcceptChallenge(NetworkBackgammonPlayer _challengedPlayer)
-        {
-            bool retval = false;
-
-            if( challengeList.ContainsKey(_challengedPlayer) )
-            {
-                // and broadcast challenge accepted event
-                Broadcast(new NetworkBackgammonAcceptChallengeEvent(challengeList[_challengedPlayer], _challengedPlayer));
-                // remove challenger from the list...
-                challengeList.Remove(_challengedPlayer);
-            }
-
-            return retval;
-        }
-
-        // Deny a challenge 
-        public bool DenyChallenge(NetworkBackgammonPlayer _challengedPlayer)
-        {
-            bool retval = true;
-
-            // Search for challenged player in the challenge list 
 
             return retval;
         }
@@ -203,6 +284,8 @@ namespace NetworkBackgammonRemotingLib
             return retval;
         }
 
+        #endregion
+
         #region Properties
 
         // List of connected players
@@ -236,6 +319,41 @@ namespace NetworkBackgammonRemotingLib
         public void Broadcast(INetworkBackgammonEvent notificationEvent, INetworkBackgammonNotifier notifier)
         {
             defaultNotifier.Broadcast(notificationEvent, notifier);
+        }
+
+        #endregion
+
+        #region INetworkBackgammonListener Members
+
+        public bool AddNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return defaultListener != null ? defaultListener.AddNotifier(notifier) : false;
+        }
+
+        public bool RemoveNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return defaultListener != null ? defaultListener.RemoveNotifier(notifier) : false;
+        }
+
+        public void OnEventNotification(INetworkBackgammonNotifier sender, INetworkBackgammonEvent e)
+        {
+            if (sender is NetworkBackgammonPlayer)
+            {
+                NetworkBackgammonPlayer player = (NetworkBackgammonPlayer) sender;
+
+                if (e is NetworkBackgammonChallengeResponseEvent)
+                {
+                    NetworkBackgammonChallengeResponseEvent challengeResponseEvent = (NetworkBackgammonChallengeResponseEvent)e;
+                    if (challengeSyncList.Keys.Contains(player))
+                    {
+                        if (challengeSyncList[player] != null)
+                        {
+                            challengeSyncList[player].ChallengeAccepted = challengeResponseEvent.ChallengeAccepted;
+                            challengeSyncList[player].ChallengeSemaphore.Release();
+                        }
+                    }
+                }
+            }
         }
 
         #endregion

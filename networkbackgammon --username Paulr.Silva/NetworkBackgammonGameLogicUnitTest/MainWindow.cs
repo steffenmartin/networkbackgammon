@@ -12,10 +12,8 @@ using NetworkBackgammonRemotingLib;
 
 namespace NetworkBackgammonGameLogicUnitTest
 {
-    public partial class MainWindow : Form, INetworkBackgammonListener
+    public partial class MainWindow : Form
     {
-        INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
-
         NetworkBackgammonRemoteGameRoom gameRoom = new NetworkBackgammonRemoteGameRoom();
 
         public MainWindow()
@@ -25,54 +23,7 @@ namespace NetworkBackgammonGameLogicUnitTest
             // Simulate the connection to a game room
             playerControl1.ConnectedGameRoom = gameRoom;
             playerControl2.ConnectedGameRoom = gameRoom;
-
-            ((INetworkBackgammonNotifier)gameRoom).AddListener(this);
         }
-
-        public void UpdateGUI()
-        {
-            listBoxConnectedPlayers.Items.Clear();
-
-            foreach (NetworkBackgammonPlayer player in gameRoom.ConnectedPlayers)
-            {
-                listBoxConnectedPlayers.Items.Add(player);
-            }
-        }
-
-        #region INetworkBackgammonListener Members
-
-        public bool AddNotifier(INetworkBackgammonNotifier notifier)
-        {
-            return defaultListener.AddNotifier(notifier);
-        }
-
-        public bool RemoveNotifier(INetworkBackgammonNotifier notifier)
-        {
-            return defaultListener.RemoveNotifier(notifier);
-        }
-
-        public void OnEventNotification(INetworkBackgammonNotifier sender, INetworkBackgammonEvent e)
-        {
-            try
-            {
-                NetworkBackgammonGameRoomEvent _event = (NetworkBackgammonGameRoomEvent)e;
-
-                switch (_event.EventType)
-                {
-                    case NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerConnected:
-                        UpdateGUI();
-                        break;
-                    case NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected:
-                        UpdateGUI();
-                        break;
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        #endregion
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {

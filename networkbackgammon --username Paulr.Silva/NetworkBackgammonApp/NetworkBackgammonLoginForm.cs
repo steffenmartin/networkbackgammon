@@ -114,7 +114,7 @@ namespace NetworkBackgammon
                         QueryChallenge(tPlayer);
                     }   
                 }
-                else if (e is NetworkBackgammonAcceptChallengeEvent)
+                else if (e is NetworkBackgammonChallengeResponseEvent)
                 {
 
                 }
@@ -149,6 +149,8 @@ namespace NetworkBackgammon
                 NetworkBackgammonClient.Instance.GameRoom.AddListener(NetworkBackgammonClient.Instance.Player);
                 // Register the remotable client object as a listner 
                 NetworkBackgammonClient.Instance.GameRoom.AddListener(this);
+                // Register the remotable client object as a listener
+                NetworkBackgammonClient.Instance.Player.AddListener(this);
 
                 if (NetworkBackgammonClient.Instance.Player == null)
                 {
@@ -185,11 +187,11 @@ namespace NetworkBackgammon
         {
             if (MessageBox.Show("Hello", "Challenge from " + cPlayer.PlayerName, MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
             {
-                NetworkBackgammonClient.Instance.GameRoom.AcceptChallenge(NetworkBackgammonClient.Instance.Player);
+                NetworkBackgammonClient.Instance.Player.RespondToChallenge(true);
             }
             else
             {
-                NetworkBackgammonClient.Instance.GameRoom.DenyChallenge(NetworkBackgammonClient.Instance.Player);
+                NetworkBackgammonClient.Instance.Player.RespondToChallenge(true);
             }
         }
 

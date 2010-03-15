@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{D43DCC49-2262-47CD-8355-A215BEC431BA}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -45,8 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NetworkBackgammonAcceptChallengeEvent.cs" />
     <Compile Include="NetworkBackgammonChallengeEvent.cs" />
+    <Compile Include="NetworkBackgammonChallengeResponseEvent.cs" />
     <Compile Include="NetworkBackgammonChecker.cs" />
     <Compile Include="NetworkBackgammonDice.cs" />
     <Compile Include="GameSessionMoveSelectedEvent.cs" />
