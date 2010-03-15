@@ -185,6 +185,7 @@
             this.m_gameRoomPlayersListBox.Name = "m_gameRoomPlayersListBox";
             this.m_gameRoomPlayersListBox.Size = new System.Drawing.Size(365, 134);
             this.m_gameRoomPlayersListBox.TabIndex = 2;
+            this.m_gameRoomPlayersListBox.SelectedIndexChanged += new System.EventHandler(this.m_gameRoomPlayersListBox_SelectedIndexChanged);
             // 
             // groupBox1
             // 

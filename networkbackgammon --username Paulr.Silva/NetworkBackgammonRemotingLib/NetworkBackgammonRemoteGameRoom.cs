@@ -13,6 +13,8 @@ namespace NetworkBackgammonRemotingLib
         INetworkBackgammonNotifier defaultNotifier = null;
         List<NetworkBackgammonPlayer> connectedPlayers = new List<NetworkBackgammonPlayer>();
         List<NetworkBackgammonGameSession> gameSessions = new List<NetworkBackgammonGameSession>();
+        Dictionary<NetworkBackgammonPlayer, NetworkBackgammonPlayer> challengeList = new Dictionary<NetworkBackgammonPlayer, NetworkBackgammonPlayer>();
+
         // Hashtable with clients username and passwords
         Dictionary<string, string> clientUsernameList = new Dictionary<string, string>();
 
@@ -94,10 +96,13 @@ namespace NetworkBackgammonRemotingLib
             if (connectedPlayers.Contains(_challengingPlayer) && connectedPlayers.Contains(_challengedPlayer))
             {
                 // Check if players are currently free to participate in a game session
-                if (!IsPlayerInGameRoom(_challengingPlayer) && !IsPlayerInGameRoom(_challengedPlayer))
+                if (!IsPlayerInGameSession(_challengingPlayer) && !IsPlayerInGameSession(_challengedPlayer))
                 {
+                    // Add players to challenge list
+                    challengeList.Add(_challengedPlayer, _challengingPlayer);
                     // Broadcast a challenge event to the "challeged player"
-                    //NetworkBackgammonChaallengeEvent
+                    Broadcast(new NetworkBackgammonChallengeEvent(_challengingPlayer, _challengedPlayer));
+          
                     retval = true;
                 }
             }
@@ -110,13 +115,33 @@ namespace NetworkBackgammonRemotingLib
         {
             bool retval = true;
 
+            // Search for challenging player(key) in the challenge list 
+
             return retval;
         }
 
         // Accept a challenge 
         public bool AcceptChallenge(NetworkBackgammonPlayer _challengedPlayer)
         {
+            bool retval = false;
+
+            if( challengeList.ContainsKey(_challengedPlayer) )
+            {
+                // and broadcast challenge accepted event
+                Broadcast(new NetworkBackgammonAcceptChallengeEvent(challengeList[_challengedPlayer], _challengedPlayer));
+                // remove challenger from the list...
+                challengeList.Remove(_challengedPlayer);
+            }
+
+            return retval;
+        }
+
+        // Deny a challenge 
+        public bool DenyChallenge(NetworkBackgammonPlayer _challengedPlayer)
+        {
             bool retval = true;
+
+            // Search for challenged player in the challenge list 
 
             return retval;
         }
@@ -130,7 +155,7 @@ namespace NetworkBackgammonRemotingLib
             if (connectedPlayers.Contains(_challengingPlayer) && connectedPlayers.Contains(_challengedPlayer))
             {
                 // Check if players are currently free to participate in a game session
-                if (!IsPlayerInGameRoom(_challengingPlayer) && !IsPlayerInGameRoom(_challengedPlayer))
+                if (!IsPlayerInGameSession(_challengingPlayer) && !IsPlayerInGameSession(_challengedPlayer))
                 {
                     // Create new game session with the consenting players
                     NetworkBackgammonGameSession newSession = new NetworkBackgammonGameSession(_challengingPlayer, _challengedPlayer);
@@ -161,7 +186,7 @@ namespace NetworkBackgammonRemotingLib
         }
 
         // Determine whether or not player is participating in a game session
-        public bool IsPlayerInGameRoom(NetworkBackgammonPlayer player)
+        public bool IsPlayerInGameSession(NetworkBackgammonPlayer player)
         {
             bool retval = false;
 
