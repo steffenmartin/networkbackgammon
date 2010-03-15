@@ -15,7 +15,9 @@ namespace NetworkBackgammon
     public partial class NetworkBackgammonLoginForm : Form, INetworkBackgammonListener
     {
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
-        private delegate void OnNotificationDelegate();
+        NetworkBackgammonWaitDialog waitDlg = null;
+        delegate void OnNotificationDelegate();
+        delegate void OnQueryChallengeDelegate( NetworkBackgammonPlayer cPlayer );
 
         public NetworkBackgammonLoginForm()
         {
@@ -38,6 +40,18 @@ namespace NetworkBackgammon
             {
                 // Add self as a listener to game toom events
                 NetworkBackgammonClient.Instance.GameRoom.AddListener(this);
+
+                // Enable the player room list based on whether or not we are in a room
+                if (NetworkBackgammonClient.Instance.Player != null)
+                {
+                    m_gameRoomPlayersListBox.Enabled = true;
+                    m_playButton.Enabled = (m_gameRoomPlayersListBox.Items.Count > 0 ? true : false);
+                }
+                else
+                {
+                    m_gameRoomPlayersListBox.Enabled = false;
+                    m_playButton.Enabled = false;
+                }
             }
         }
 
@@ -86,6 +100,24 @@ namespace NetworkBackgammon
                             break;
                     }
                 }
+                else if (e is NetworkBackgammonChallengeEvent)
+                {
+                    NetworkBackgammonPlayer tPlayer = ((NetworkBackgammonChallengeEvent)e).ChallengingPlayer;
+
+                    if (InvokeRequired)
+                    {
+                        // In case the caller has called this routine on a different thread
+                        BeginInvoke(new OnQueryChallengeDelegate(QueryChallenge), tPlayer);
+                    }
+                    else
+                    {
+                        QueryChallenge(tPlayer);
+                    }   
+                }
+                else if (e is NetworkBackgammonAcceptChallengeEvent)
+                {
+
+                }
             }
         }
 
@@ -115,15 +147,20 @@ namespace NetworkBackgammon
 
                 // Register the remotable client object as a listner 
                 NetworkBackgammonClient.Instance.GameRoom.AddListener(NetworkBackgammonClient.Instance.Player);
+                // Register the remotable client object as a listner 
+                NetworkBackgammonClient.Instance.GameRoom.AddListener(this);
 
                 if (NetworkBackgammonClient.Instance.Player == null)
                 {
                     MessageBox.Show("Could not login: " + m_usernameTextBox.Text);
+
+                    m_gameRoomPlayersListBox.Enabled = false;
+                    m_playButton.Enabled = false;
                 }
                 else
                 {
-                    this.DialogResult = DialogResult.OK;
-                    Close();
+                    m_gameRoomPlayersListBox.Enabled = true;
+                    m_playButton.Enabled = true;
                 }
             }
         }
@@ -140,6 +177,19 @@ namespace NetworkBackgammon
                 {
                     m_gameRoomPlayersListBox.Items.Add(NetworkBackgammonClient.Instance.GameRoom.ConnectedPlayers.ElementAt(i));
                 }
+            }
+        }
+
+        // Update list box with players in the game room
+        private void QueryChallenge(NetworkBackgammonPlayer cPlayer)
+        {
+            if (MessageBox.Show("Hello", "Challenge from " + cPlayer.PlayerName, MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+            {
+                NetworkBackgammonClient.Instance.GameRoom.AcceptChallenge(NetworkBackgammonClient.Instance.Player);
+            }
+            else
+            {
+                NetworkBackgammonClient.Instance.GameRoom.DenyChallenge(NetworkBackgammonClient.Instance.Player);
             }
         }
 
@@ -170,7 +220,33 @@ namespace NetworkBackgammon
 
         private void m_playButton_Click(object sender, EventArgs e)
         {
+            int curIndex = m_gameRoomPlayersListBox.SelectedIndex;
+            NetworkBackgammonPlayer challengingPlayer = NetworkBackgammonClient.Instance.Player;
+            NetworkBackgammonPlayer challengedPlayer = (NetworkBackgammonPlayer)m_gameRoomPlayersListBox.Items[curIndex];
 
+            // Challenge the selected player
+            NetworkBackgammonClient.Instance.GameRoom.Challenge(challengingPlayer, challengedPlayer);
+
+            // Start up the wait dialog
+            waitDlg = new NetworkBackgammonWaitDialog(null);
+            Label tLabel = new Label();
+            tLabel.Text = "Waiting for response from " + challengedPlayer.PlayerName;
+            waitDlg.WaitDialogLabel = tLabel;
+            waitDlg.ShowDialog();
+
+            this.DialogResult = DialogResult.OK;
+            Close();
+        }
+
+        private void m_gameRoomPlayersListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int curIndex = m_gameRoomPlayersListBox.SelectedIndex;
+
+            if( NetworkBackgammonClient.Instance.Player != null )
+            {
+                bool samePlayer = (m_gameRoomPlayersListBox.Items[curIndex] != NetworkBackgammonClient.Instance.Player);
+                m_playButton.Enabled = (((m_gameRoomPlayersListBox.Items.Count > 0) && !samePlayer) ? true : false);
+            }
         }
     }
 }
