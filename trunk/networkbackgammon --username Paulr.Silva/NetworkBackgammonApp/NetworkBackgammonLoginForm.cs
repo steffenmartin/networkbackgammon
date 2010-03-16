@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Collections;
+using System.Threading;
 using NetworkBackgammonLib;
 using NetworkBackgammonRemotingLib;
 
@@ -16,9 +17,48 @@ namespace NetworkBackgammon
     {
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
         NetworkBackgammonWaitDialog waitDlg = null;
+        NetworkBackgammonPlayer threadAccessibleChallengedPlayer = null;
+        Thread challengeThread = null;
         delegate void OnNotificationDelegate();
         delegate bool OnChallengeDelegate(NetworkBackgammonPlayer _challengingPlayer, NetworkBackgammonPlayer _challengedPlayer);
         delegate void OnChallengeResponseDelegate(bool challengeResponse);
+
+        // Update list box with players in the game room
+        private void UpdateGameRoomList()
+        {
+            m_gameRoomPlayersListBox.Items.Clear();
+
+            if (NetworkBackgammonClient.Instance.IsConnected)
+            {
+                // Get all current players in the game room
+                for (int i = 0; i < NetworkBackgammonClient.Instance.GameRoom.ConnectedPlayers.Count(); i++)
+                {
+                    m_gameRoomPlayersListBox.Items.Add(NetworkBackgammonClient.Instance.GameRoom.ConnectedPlayers.ElementAt(i));
+                }
+            }
+        }
+
+        // Handle the challenge response from the challenged player
+        private void ChallengeResponse(bool challengeResponse)
+        {
+            if (waitDlg.Visible) waitDlg.Close();
+
+            if (challengeResponse)
+            {
+                this.DialogResult = DialogResult.OK;
+                Hide();
+            }
+            else
+            {
+                MessageBox.Show(this, "Challenge Rejected");
+            }
+        }
+
+        // Call the challenge routine on a seperate thread than the GUI thread to prevent blocking
+        private void ChallengeThread()
+        {
+            NetworkBackgammonClient.Instance.GameRoom.Challenge(NetworkBackgammonClient.Instance.Player, threadAccessibleChallengedPlayer);
+        }
 
         public NetworkBackgammonLoginForm()
         {
@@ -184,36 +224,6 @@ namespace NetworkBackgammon
             }
         }
 
-        // Update list box with players in the game room
-        private void UpdateGameRoomList()
-        {
-            m_gameRoomPlayersListBox.Items.Clear();
-
-            if (NetworkBackgammonClient.Instance.IsConnected)
-            {
-                // Get all current players in the game room
-                for (int i = 0; i < NetworkBackgammonClient.Instance.GameRoom.ConnectedPlayers.Count(); i++)
-                {
-                    m_gameRoomPlayersListBox.Items.Add(NetworkBackgammonClient.Instance.GameRoom.ConnectedPlayers.ElementAt(i));
-                }
-            }
-        }
-
-        // Handle the challenge response from the challenged player
-        private void ChallengeResponse(bool challengeResponse)
-        {
-           if (waitDlg.Visible && challengeResponse)
-            {
-                waitDlg.Close();
-                this.DialogResult = DialogResult.OK;
-                Hide();
-            }
-            else
-            {
-                MessageBox.Show(this, "Challenge Rejected");
-            }
-        }
-
         // Connect to the server button handler
         private void m_connectButton_Click(object sender, EventArgs e)
         {
@@ -252,11 +262,15 @@ namespace NetworkBackgammon
                 waitDlg = new NetworkBackgammonWaitDialog(null);
                 waitDlg.WaitDialogLabel.Text = "Waiting for response from " + challengedPlayer.PlayerName;
 
-                // Challenge the selected player (asynchronously)
-                BeginInvoke(new OnChallengeDelegate(NetworkBackgammonClient.Instance.GameRoom.Challenge), challengingPlayer, challengedPlayer);
+                // Store challenged player for thread access
+                threadAccessibleChallengedPlayer = challengedPlayer;
+                // Create the challenge thread
+                challengeThread = new Thread(new ThreadStart(ChallengeThread));
+                // Start the thread
+                challengeThread.Start();
 
                 // Start up the wait dialog
-                waitDlg.ShowDialog();
+                waitDlg.ShowDialog(this);
             }
         }
 
