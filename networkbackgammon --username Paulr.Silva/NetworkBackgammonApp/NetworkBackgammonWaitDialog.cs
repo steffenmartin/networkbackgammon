@@ -49,6 +49,7 @@ namespace NetworkBackgammon
                 }
             }
 
+            this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
     }

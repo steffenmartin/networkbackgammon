@@ -52,13 +52,13 @@
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             // 
             // optionsToolStripMenuItem
@@ -66,13 +66,13 @@
             this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.gameRoomToolStripMenuItem});
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.optionsToolStripMenuItem.Text = "Options";
             // 
             // gameRoomToolStripMenuItem
             // 
             this.gameRoomToolStripMenuItem.Name = "gameRoomToolStripMenuItem";
-            this.gameRoomToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.gameRoomToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.gameRoomToolStripMenuItem.Text = "Game Room";
             this.gameRoomToolStripMenuItem.Click += new System.EventHandler(this.gameRoomToolStripMenuItem_Click);
             // 
@@ -83,7 +83,6 @@
             this.ClientSize = new System.Drawing.Size(719, 609);
             this.Controls.Add(this.mainMenu);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.IsMdiContainer = true;
             this.MainMenuStrip = this.mainMenu;
             this.Name = "NetworkBackGammonForm";
             this.Text = "NetworkBackGammonForm";
