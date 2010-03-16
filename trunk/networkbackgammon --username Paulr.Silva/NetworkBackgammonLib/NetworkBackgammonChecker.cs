@@ -5,6 +5,7 @@ using System.Text;
 
 namespace NetworkBackgammonLib
 {
+    [Serializable]
     public class NetworkBackgammonChecker
     {
         NetworkBackgammonPosition currentPosition;

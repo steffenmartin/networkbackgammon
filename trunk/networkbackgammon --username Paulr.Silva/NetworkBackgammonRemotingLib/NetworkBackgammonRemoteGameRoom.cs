@@ -84,8 +84,6 @@ namespace NetworkBackgammonRemotingLib
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
         List<NetworkBackgammonPlayer> connectedPlayers = new List<NetworkBackgammonPlayer>();
         List<NetworkBackgammonGameSession> gameSessions = new List<NetworkBackgammonGameSession>();
-        Dictionary<NetworkBackgammonPlayer, NetworkBackgammonPlayer> challengeList = new Dictionary<NetworkBackgammonPlayer, NetworkBackgammonPlayer>();
-
         // Hashtable with clients username and passwords
         Dictionary<string, string> clientUsernameList = new Dictionary<string, string>();
         /// <summary>
@@ -98,9 +96,9 @@ namespace NetworkBackgammonRemotingLib
         Dictionary<NetworkBackgammonPlayer, NetworkBackgammonChallengeDataContainer> challengeSyncList = 
             new Dictionary<NetworkBackgammonPlayer, NetworkBackgammonChallengeDataContainer>();
         /// <summary>
-        /// Timeout for challenge request
+        /// Timeout for challenge request (ms)
         /// </summary>
-        int challengeRequestTimeoutMs = 5000;
+        int challengeRequestTimeoutMs = 10000;
 
         #endregion
 
@@ -204,6 +202,9 @@ namespace NetworkBackgammonRemotingLib
                     if (challengeSemaphore.WaitOne(challengeRequestTimeoutMs))
                     {
                         retval = challengeSyncList[_challengedPlayer].ChallengeAccepted;
+
+                        // Give the challenging player the challenge response 
+                        _challengingPlayer.OnEventNotification(_challengedPlayer, new NetworkBackgammonChallengeResponseEvent(retval));
 
                         // Create and start game session if challenge has been accepted by challenged player
                         if (retval)

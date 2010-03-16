@@ -153,7 +153,7 @@ namespace NetworkBackgammon
         // Disconnect as from the server and remove client as listener
         public void DisconnectServer()
         {
-            if (IsConnected)
+            if (IsConnected && (Player != null))
             {
                 // Remove the player from the game room
                 gameRoom.Leave(Player);

@@ -7,6 +7,7 @@ using NetworkBackgammonLib;
 
 namespace NetworkBackgammonGameLogic
 {
+    [Serializable]
     public class NetworkBackgammonGameSession : INetworkBackgammonNotifier, INetworkBackgammonListener
     {
         INetworkBackgammonNotifier defaultNotifier = null;
@@ -14,12 +15,14 @@ namespace NetworkBackgammonGameLogic
         NetworkBackgammonPlayer player1 = null;
         NetworkBackgammonPlayer player2 = null;
         // Thread which runs the event based state machine
+        [NonSerialized]
         Thread threadStateMachine = null;
         // Semaphore to signal events to the state machine (wake-up calls)
         Semaphore semStateMachine = new Semaphore(1, 1);
         // Flag to allow shutting down of state machine
         bool bStateMachineKeepRunning = true;
 
+        [Serializable]
         public class EventQueueElement
         {
             INetworkBackgammonEvent gameSessionEvent;
