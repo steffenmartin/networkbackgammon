@@ -181,9 +181,11 @@ namespace NetworkBackgammon
         // Ask the use if they would like to accept a challenge
         private void QueryChallenge(NetworkBackgammonPlayer cPlayer)
         {
-            if (MessageBox.Show("Challenge from " + cPlayer.PlayerName + ". Do you accept?", "Challenge", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+            if (MessageBox.Show(this, "Challenge from " + cPlayer.PlayerName + ". Do you accept?", "Challenge", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
             {
                 NetworkBackgammonClient.Instance.Player.RespondToChallenge(true);
+
+                // TODO: What happens here when the other player have cancel his decision to challenge?
 
                 // Do not show the login dialog
                 m_backgammonLogin.Hide();
