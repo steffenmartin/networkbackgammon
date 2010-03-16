@@ -10,30 +10,48 @@ namespace NetworkBackgammonGameLogic
     [Serializable]
     public class NetworkBackgammonGameSession : INetworkBackgammonNotifier, INetworkBackgammonListener
     {
-        INetworkBackgammonNotifier defaultNotifier = null;
-        INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
-        NetworkBackgammonPlayer player1 = null;
-        NetworkBackgammonPlayer player2 = null;
-        // Thread which runs the event based state machine
-        [NonSerialized]
-        Thread threadStateMachine = null;
-        // Semaphore to signal events to the state machine (wake-up calls)
-        Semaphore semStateMachine = new Semaphore(1, 1);
-        // Flag to allow shutting down of state machine
-        bool bStateMachineKeepRunning = true;
+        #region Declarations
 
+        /// <summary>
+        /// Container for collecting data posted via events (asynchronous)
+        /// </summary>
         [Serializable]
         public class EventQueueElement
         {
+            #region Members
+
+            /// <summary>
+            /// Event that has been posted
+            /// </summary>
             INetworkBackgammonEvent gameSessionEvent;
+
+            /// <summary>
+            /// Notifier (sender) who posted the event
+            /// </summary>
             INetworkBackgammonNotifier gameSessionNotifier;
 
+            #endregion
+
+            #region Methods
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="_event">Event that has been posted</param>
+            /// <param name="_notifier">Notifier (sender) who posted the event</param>
             public EventQueueElement(INetworkBackgammonEvent _event, INetworkBackgammonNotifier _notifier)
             {
                 gameSessionEvent = _event;
                 gameSessionNotifier = _notifier;
             }
 
+            #endregion
+
+            #region Properties
+
+            /// <summary>
+            /// Gets the event that has been posted
+            /// </summary>
             public INetworkBackgammonEvent Event
             {
                 get
@@ -42,6 +60,9 @@ namespace NetworkBackgammonGameLogic
                 }
             }
 
+            /// <summary>
+            /// Gets the notifier (sender) who posted the event
+            /// </summary>
             public INetworkBackgammonNotifier Notifier
             {
                 get
@@ -49,21 +70,13 @@ namespace NetworkBackgammonGameLogic
                     return gameSessionNotifier;
                 }
             }
+
+            #endregion
         }
 
-        Queue<EventQueueElement> eventQueue = new Queue<EventQueueElement>();
-
-        // The dice for this Game Session
-        NetworkBackgammonDice[] dice = new NetworkBackgammonDice[] { new NetworkBackgammonDice(1), new NetworkBackgammonDice(2) };
-
-        public NetworkBackgammonDice[] CurrentDice
-        {
-            get
-            {
-                return dice;
-            }
-        }
-
+        /// <summary>
+        /// Enumeration of (possible) states of the game session state machine
+        /// </summary>
         enum GameSessionState
         {
             InitialDiceRoll,
@@ -71,6 +84,75 @@ namespace NetworkBackgammonGameLogic
             GameWon
         };
 
+        #endregion
+
+        #region Members
+
+        /// <summary>
+        /// Instance of the default notifier implementation
+        /// </summary>
+        /// <remarks>
+        /// Created and set during construction time. Used for delegating function
+        /// calls on this class' notifier interface implementation.
+        /// </remarks>
+        INetworkBackgammonNotifier defaultNotifier = null;
+
+        /// <summary>
+        /// Instance of the default listener implementation
+        /// </summary>
+        /// <remarks>
+        /// Used for delegating function calls on this class' listener interface implementation.
+        /// </remarks>
+        INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
+
+        /// <summary>
+        /// Backgammon player 1
+        /// </summary>
+        NetworkBackgammonPlayer player1 = null;
+
+        /// <summary>
+        /// Backgammon player 2
+        /// </summary>
+        NetworkBackgammonPlayer player2 = null;
+
+        /// <summary>
+        /// Thread, which runs the event based state machine
+        /// </summary>
+        [NonSerialized]
+        Thread threadStateMachine = null;
+
+        /// <summary>
+        /// Semaphore to signal events to the state machine (wake-up calls)
+        /// </summary>
+        /// <remarks>
+        /// Starts with an initial count of 1 for performing the initial dice roll.
+        /// </remarks>
+        Semaphore semStateMachine = new Semaphore(1, 1);
+
+        /// <summary>
+        /// Flag to allow shutting down of state machine
+        /// </summary>
+        bool bStateMachineKeepRunning = true;
+
+        /// <summary>
+        /// Queue for collection events and associated data to be processed by the game session state machine
+        /// </summary>
+        Queue<EventQueueElement> eventQueue = new Queue<EventQueueElement>();
+
+        /// <summary>
+        /// The dice for this game session
+        /// </summary>
+        NetworkBackgammonDice[] dice = new NetworkBackgammonDice[] { new NetworkBackgammonDice(1), new NetworkBackgammonDice(2) };
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="_player1">Network backgammon player 1 to be part of this game session</param>
+        /// <param name="_player2">Network backgammon player 2 to be part of this game session</param>
         public NetworkBackgammonGameSession(NetworkBackgammonPlayer _player1, NetworkBackgammonPlayer _player2)
         {
             defaultNotifier = new NetworkBackgammonNotifier(this);
@@ -88,11 +170,20 @@ namespace NetworkBackgammonGameLogic
             AddListener(player2);
         }
 
+        /// <summary>
+        /// Destructor
+        /// </summary>
+        /// <remarks>
+        /// Stops the current game session state machine.
+        /// </remarks>
         ~NetworkBackgammonGameSession()
         {
             Stop();
         }
 
+        /// <summary>
+        /// Rolls the dice of this game session
+        /// </summary>
         private void RollDice()
         {
             foreach (NetworkBackgammonDice d in dice)
@@ -113,6 +204,9 @@ namespace NetworkBackgammonGameLogic
             threadStateMachine.Start();
         }
 
+        /// <summary>
+        /// Stops the game session state machine (thread)
+        /// </summary>
         public void Stop()
         {
             if (threadStateMachine != null)
@@ -138,7 +232,7 @@ namespace NetworkBackgammonGameLogic
         }
 
         /// <summary>
-        /// State Machine (worker thread)
+        /// Game session state machine (worker thread)
         /// </summary>
         private void Run()
         {
@@ -264,11 +358,34 @@ namespace NetworkBackgammonGameLogic
             }
         }
 
+        /// <summary>
+        /// Determines whether a backgammon player is part of this game session
+        /// </summary>
+        /// <param name="player">Backgammon player to be checked</param>
+        /// <returns>"True" is backgammon player is part of this game session, otherwise "false"</returns>
         public bool ContainsPlayer( NetworkBackgammonPlayer player )
         {
             return ((player == player1) || (player == player2));
         }
 
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the dice of the game session
+        /// </summary>
+        public NetworkBackgammonDice[] CurrentDice
+        {
+            get
+            {
+                return dice;
+            }
+        }
+
+        /// <summary>
+        /// Gets backgammon player 1 of this game session
+        /// </summary>
         public NetworkBackgammonPlayer Player1
         {
             get
@@ -276,6 +393,10 @@ namespace NetworkBackgammonGameLogic
                 return player1;
             }
         }
+
+        /// <summary>
+        /// /// Gets backgammon player 2 of this game session
+        /// </summary>
         public NetworkBackgammonPlayer Player2
         {
             get
@@ -283,6 +404,8 @@ namespace NetworkBackgammonGameLogic
                 return player2;
             }
         }
+
+        #endregion
 
         #region INetworkBackgammonNotifier Members
 

@@ -50,6 +50,9 @@ namespace NetworkBackgammonRemotingLib
 
             #region Properties
 
+            /// <summary>
+            /// Gets the semaphore for synchronizing this challenge
+            /// </summary>
             public Semaphore ChallengeSemaphore
             {
                 get
@@ -58,6 +61,9 @@ namespace NetworkBackgammonRemotingLib
                 }
             }
 
+            /// <summary>
+            /// Gets the result (response) to a game challenge
+            /// </summary>
             public bool ChallengeAccepted
             {
                 get
@@ -77,15 +83,38 @@ namespace NetworkBackgammonRemotingLib
 
         #region Members
 
-        INetworkBackgammonNotifier defaultNotifier = null;
         /// <summary>
-        /// Default listener
+        /// Instance of the default notifier implementation
         /// </summary>
+        /// <remarks>
+        /// Created and set during construction time. Used for delegating function
+        /// calls on this class' notifier interface implementation.
+        /// </remarks>
+        INetworkBackgammonNotifier defaultNotifier = null;
+
+        /// <summary>
+        /// Instance of the default listener implementation
+        /// </summary>
+        /// <remarks>
+        /// Used for delegating function calls on this class' listener interface implementation.
+        /// </remarks>
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
+
+        /// <summary>
+        /// List of backgammon players connected to this game room
+        /// </summary>
         List<NetworkBackgammonPlayer> connectedPlayers = new List<NetworkBackgammonPlayer>();
+
+        /// <summary>
+        /// List of currently active game sessions in this game room
+        /// </summary>
         List<NetworkBackgammonGameSession> gameSessions = new List<NetworkBackgammonGameSession>();
-        // Hashtable with clients username and passwords
+
+        /// <summary>
+        /// Hashtable with clients username and passwords
+        /// </summary>
         Dictionary<string, string> clientUsernameList = new Dictionary<string, string>();
+
         /// <summary>
         /// Hashtable with data required for synchronizing game challenged (requests/responses)
         /// </summary>
@@ -95,6 +124,7 @@ namespace NetworkBackgammonRemotingLib
         /// </remarks>
         Dictionary<NetworkBackgammonPlayer, NetworkBackgammonChallengeDataContainer> challengeSyncList = 
             new Dictionary<NetworkBackgammonPlayer, NetworkBackgammonChallengeDataContainer>();
+
         /// <summary>
         /// Timeout for challenge request (ms)
         /// </summary>
@@ -104,15 +134,20 @@ namespace NetworkBackgammonRemotingLib
 
         #region Methods
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public NetworkBackgammonRemoteGameRoom()
         {
             defaultNotifier = new NetworkBackgammonNotifier(this);
         }
 
+        /// <summary>
+        /// Destructor
+        /// </summary>
         ~NetworkBackgammonRemoteGameRoom()
         {
-            gameSessions.Clear();
-            connectedPlayers.Clear();
+            Shutdown();
         }
 
         /**
@@ -164,7 +199,10 @@ namespace NetworkBackgammonRemotingLib
             return newPlayer;
         }
 
-        // Exit the game room by player
+        /// <summary>
+        /// Exit the game room by player
+        /// </summary>
+        /// <param name="_player">Backgammon player who wants to leave the game room</param>
         public void Leave(NetworkBackgammonPlayer _player)
         {
             if (connectedPlayers.Contains(_player))
@@ -179,7 +217,12 @@ namespace NetworkBackgammonRemotingLib
             }
         }
 
-        // Challenge an opponent to a game
+        /// <summary>
+        /// Challenge an opponent to a game
+        /// </summary>
+        /// <param name="_challengingPlayer">Challenging backgammon player</param>
+        /// <param name="_challengedPlayer">Challenged backgammon player</param>
+        /// <returns></returns>
         public bool Challenge(NetworkBackgammonPlayer _challengingPlayer, NetworkBackgammonPlayer _challengedPlayer)
         {
             bool retval = false;
@@ -228,7 +271,12 @@ namespace NetworkBackgammonRemotingLib
             return retval;
         }
 
-        // Start the game session with two consenting players
+        /// <summary>
+        /// Start the game session with two consenting players
+        /// </summary>
+        /// <param name="_challengingPlayer">Challenging backgammon player</param>
+        /// <param name="_challengedPlayer">Challenged backgammon player</param>
+        /// <returns></returns>
         public bool StartGame(NetworkBackgammonPlayer _challengingPlayer, NetworkBackgammonPlayer _challengedPlayer)
         {
             bool retval = false;
@@ -255,7 +303,9 @@ namespace NetworkBackgammonRemotingLib
             return retval;
         }
 
-        // Shutdown the game room - stop all sessions
+        /// <summary>
+        /// Shutdown the game room - stop all sessions
+        /// </summary>
         public void Shutdown()
         {
             foreach (NetworkBackgammonGameSession session in gameSessions)
@@ -267,7 +317,11 @@ namespace NetworkBackgammonRemotingLib
             connectedPlayers.Clear();
         }
 
-        // Determine whether or not player is participating in a game session
+        /// <summary>
+        /// Determine whether or not player is participating in a game session
+        /// </summary>
+        /// <param name="player">Backgammon player to be checked</param>
+        /// <returns>"True" if backgammon player in question is in a game session, otherwise "false"</returns>
         public bool IsPlayerInGameSession(NetworkBackgammonPlayer player)
         {
             bool retval = false;
@@ -289,7 +343,9 @@ namespace NetworkBackgammonRemotingLib
 
         #region Properties
 
-        // List of connected players
+        /// <summary>
+        /// Gets the list of connected players
+        /// </summary>
         public List<NetworkBackgammonPlayer> ConnectedPlayers
         {
             get

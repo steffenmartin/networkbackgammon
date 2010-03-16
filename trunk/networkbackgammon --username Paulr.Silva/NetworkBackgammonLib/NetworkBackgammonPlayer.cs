@@ -13,16 +13,46 @@ namespace NetworkBackgammonLib
     {
         #region Members
 
+        /// <summary>
+        /// Instance of the default notifier implementation
+        /// </summary>
+        /// <remarks>
+        /// Created and set during construction time. Used for delegating function
+        /// calls on this class' notifier interface implementation.
+        /// </remarks>
         INetworkBackgammonNotifier defaultNotifier = null;
+        
+        /// <summary>
+        /// Instance of the default listener implementation
+        /// </summary>
+        /// <remarks>
+        /// Used for delegating function calls on this class' listener interface implementation.
+        /// </remarks>
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
+
+        /// <summary>
+        /// List of checkers of this player
+        /// </summary>
         List<NetworkBackgammonChecker> checkers = new List<NetworkBackgammonChecker>();
+
+        /// <summary>
+        /// Name of this player
+        /// </summary>
         string strPlayerName = ""; 
+
+        /// <summary>
+        /// Status of this player
+        /// </summary>
         bool bActive = false;
 
         #endregion
 
         #region Methods
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="_strPlayerName">Name of this player</param>
         public NetworkBackgammonPlayer(string _strPlayerName)
         {
             defaultNotifier = new NetworkBackgammonNotifier(this);
@@ -32,7 +62,9 @@ namespace NetworkBackgammonLib
             InitCheckers();
         }
 
-        // Initialize list of checkers in their initial positions.
+        /// <summary>
+        /// Initializes list of checkers in their initial positions.
+        /// </summary>
         private void InitCheckers()
         {
             // 2 checkers on 1
@@ -59,6 +91,10 @@ namespace NetworkBackgammonLib
             checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
         }
 
+        /// <summary>
+        /// Respond to a game challenge
+        /// </summary>
+        /// <param name="acceptChallenge">"True" if challenge has been accepted, "false" if challenge is rejected</param>
         public void RespondToChallenge(bool acceptChallenge)
         {
             Broadcast(new NetworkBackgammonChallengeResponseEvent(acceptChallenge));
@@ -68,6 +104,9 @@ namespace NetworkBackgammonLib
 
         #region Properties
 
+        /// <summary>
+        /// Gets this player's name
+        /// </summary>
         public string PlayerName
         {
             get
@@ -75,6 +114,10 @@ namespace NetworkBackgammonLib
                 return strPlayerName;
             }
         }
+
+        /// <summary>
+        /// Gets this player's status
+        /// </summary>
         public bool Active
         {
             get
@@ -86,6 +129,10 @@ namespace NetworkBackgammonLib
                 bActive = value;
             }
         }
+
+        /// <summary>
+        /// Gets list of checkers of this player
+        /// </summary>
         public List<NetworkBackgammonChecker> Checkers
         {
             get

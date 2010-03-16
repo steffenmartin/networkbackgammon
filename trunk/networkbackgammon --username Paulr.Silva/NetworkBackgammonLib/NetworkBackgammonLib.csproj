@@ -50,7 +50,6 @@
     <Compile Include="NetworkBackgammonChecker.cs" />
     <Compile Include="NetworkBackgammonDice.cs" />
     <Compile Include="GameSessionMoveSelectedEvent.cs" />
-    <Compile Include="NetworkBackgammonMove.cs" />
     <Compile Include="NetworkBackgammonGameRoomEvent.cs" />
     <Compile Include="NetworkBackgammonGameSessionEvent.cs" />
     <Compile Include="INetworkBackgammonEvent.cs" />
