@@ -30,8 +30,6 @@
         {
             this.playerControl2 = new NetworkBackgammonGameLogicUnitTest.PlayerControl();
             this.playerControl1 = new NetworkBackgammonGameLogicUnitTest.PlayerControl();
-            this.performanceCounter1 = new System.Diagnostics.PerformanceCounter();
-            ((System.ComponentModel.ISupportInitialize)(this.performanceCounter1)).BeginInit();
             this.SuspendLayout();
             // 
             // playerControl2
@@ -62,7 +60,6 @@
             this.Name = "MainWindow";
             this.Text = "MainWindow";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
-            ((System.ComponentModel.ISupportInitialize)(this.performanceCounter1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -71,7 +68,6 @@
 
         private PlayerControl playerControl1;
         private PlayerControl playerControl2;
-        private System.Diagnostics.PerformanceCounter performanceCounter1;
     }
 }
 
