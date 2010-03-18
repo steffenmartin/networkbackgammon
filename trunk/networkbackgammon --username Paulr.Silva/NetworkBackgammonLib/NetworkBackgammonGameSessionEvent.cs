@@ -12,10 +12,12 @@ namespace NetworkBackgammonLib
         {
             PlayerResigned,
             GameFinished,
-            DiceRolled,
+            InitialDiceRolled,
+            InitialDiceRolledAcknowledged,
             CheckerUpdated,
             MoveSelected,
-            Error
+            Error,
+            Invalid
         };
 
         protected GameSessionEventType type;
