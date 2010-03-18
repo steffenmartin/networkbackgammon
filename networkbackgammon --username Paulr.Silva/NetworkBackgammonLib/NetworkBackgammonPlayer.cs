@@ -45,6 +45,11 @@ namespace NetworkBackgammonLib
         /// </summary>
         bool bActive = false;
 
+        /// <summary>
+        /// Initial dice for this player
+        /// </summary>
+        NetworkBackgammonDice initialDice = null;
+
         #endregion
 
         #region Methods
@@ -138,6 +143,21 @@ namespace NetworkBackgammonLib
             get
             {
                 return checkers;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets initial dice for this player
+        /// </summary>
+        public NetworkBackgammonDice InitialDice
+        {
+            get
+            {
+                return initialDice;
+            }
+            set
+            {
+                initialDice = value;
             }
         }
 

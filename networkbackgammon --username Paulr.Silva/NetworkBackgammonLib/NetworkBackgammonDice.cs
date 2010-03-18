@@ -43,6 +43,12 @@ namespace NetworkBackgammonLib
         /// </summary>
         Random rand = null;
 
+        /// <summary>
+        /// Flag to indicate whether or not the dice has been used
+        /// (played)
+        /// </summary>
+        bool flagUsed = false;
+
         #endregion
 
         #region Methods
@@ -71,7 +77,9 @@ namespace NetworkBackgammonLib
         public DiceValue Roll()
         {
             currentValue = (DiceValue) Enum.Parse(typeof(DiceValue), rand.Next(Convert.ToInt32(DiceValue.MIN), Convert.ToInt32(DiceValue.MAX)).ToString());
-            
+
+            flagUsed = false;
+
             return currentValue;
         }
 
@@ -107,6 +115,21 @@ namespace NetworkBackgammonLib
             get
             {
                 return Convert.ToUInt32(currentValue);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the flag indicating whether dice has been used
+        /// </summary>
+        public bool FlagUsed
+        {
+            get
+            {
+                return flagUsed;
+            }
+            set
+            {
+                flagUsed = value;
             }
         }
 

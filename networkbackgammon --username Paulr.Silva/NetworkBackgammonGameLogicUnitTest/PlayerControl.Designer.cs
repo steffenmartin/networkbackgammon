@@ -37,7 +37,7 @@
             this.listBoxCheckers = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.buttonMove = new System.Windows.Forms.Button();
+            this.buttonAction = new System.Windows.Forms.Button();
             this.listBoxLog = new System.Windows.Forms.ListBox();
             this.groupBoxGameRoomControls = new System.Windows.Forms.GroupBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -82,7 +82,7 @@
             this.groupBoxGameControls.Controls.Add(this.listBoxCheckers);
             this.groupBoxGameControls.Controls.Add(this.label3);
             this.groupBoxGameControls.Controls.Add(this.label2);
-            this.groupBoxGameControls.Controls.Add(this.buttonMove);
+            this.groupBoxGameControls.Controls.Add(this.buttonAction);
             this.groupBoxGameControls.Location = new System.Drawing.Point(3, 170);
             this.groupBoxGameControls.Name = "groupBoxGameControls";
             this.groupBoxGameControls.Size = new System.Drawing.Size(242, 166);
@@ -125,15 +125,15 @@
             this.label2.TabIndex = 1;
             this.label2.Text = "Checkers";
             // 
-            // buttonMove
+            // buttonAction
             // 
-            this.buttonMove.Location = new System.Drawing.Point(9, 133);
-            this.buttonMove.Name = "buttonMove";
-            this.buttonMove.Size = new System.Drawing.Size(222, 23);
-            this.buttonMove.TabIndex = 0;
-            this.buttonMove.Text = "Move";
-            this.buttonMove.UseVisualStyleBackColor = true;
-            this.buttonMove.Click += new System.EventHandler(this.buttonMove_Click);
+            this.buttonAction.Location = new System.Drawing.Point(9, 133);
+            this.buttonAction.Name = "buttonAction";
+            this.buttonAction.Size = new System.Drawing.Size(222, 23);
+            this.buttonAction.TabIndex = 0;
+            this.buttonAction.Text = "[No Action]";
+            this.buttonAction.UseVisualStyleBackColor = true;
+            this.buttonAction.Click += new System.EventHandler(this.buttonAction_Click);
             // 
             // listBoxLog
             // 
@@ -219,7 +219,7 @@
         private System.Windows.Forms.GroupBox groupBoxGameControls;
         private System.Windows.Forms.ListBox listBoxCheckers;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button buttonMove;
+        private System.Windows.Forms.Button buttonAction;
         private System.Windows.Forms.ListBox listBoxMoves;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListBox listBoxLog;
