@@ -26,11 +26,6 @@ namespace NetworkBackgammonGameLogicUnitTest
         }
         ~PlayerControl()
         {
-            if (gameRoom != null)
-            {
-                gameRoom.RemoveListener(this);
-            }
-
             gameRoom = null;
 
             if (player != null)
@@ -57,11 +52,6 @@ namespace NetworkBackgammonGameLogicUnitTest
         {
             groupBoxGameRoomControls.Enabled = false;
             groupBoxGameControls.Enabled = false;
-
-            if (gameRoom != null)
-            {
-                gameRoom.AddListener(this);
-            }
         }
 
         private void buttonConnect_Click(object sender, EventArgs e)
@@ -87,6 +77,8 @@ namespace NetworkBackgammonGameLogicUnitTest
                             groupBoxGameRoomControls.Enabled = true;
 
                             player.AddListener(this);
+
+                            UpdateConnectedPlayersList();
                         }
                         else
                         {
@@ -248,16 +240,23 @@ namespace NetworkBackgammonGameLogicUnitTest
                         {
                             NetworkBackgammonChallengeEvent challengeEvent = (NetworkBackgammonChallengeEvent)e;
 
-                            bool challengeResponse = MessageBox.Show(
+                            string challengingPlayer = challengeEvent.ChallengingPlayer;
+                            string challengedPlayer = challengeEvent.ChallengedPlayer;
+
+                            if (challengingPlayer.CompareTo(player.PlayerName) != 0 &&
+                                challengedPlayer.CompareTo(player.PlayerName) == 0)
+                            {
+                                bool challengeResponse = MessageBox.Show(
                                 "Accept game challenge from " + challengeEvent.ChallengingPlayer + "?",
                                 "Game Challenge",
                                 MessageBoxButtons.YesNo,
                                 MessageBoxIcon.Question,
                                 MessageBoxDefaultButton.Button1) == DialogResult.Yes;
 
-                            player.RespondToChallenge(challengeResponse, challengeEvent.ChallengingPlayer);
+                                player.RespondToChallenge(challengeResponse, challengeEvent.ChallengingPlayer);
 
-                            groupBoxGameControls.Enabled = challengeResponse;
+                                groupBoxGameControls.Enabled = challengeResponse;
+                            }
                         }
                     }
                     catch (Exception ex)
