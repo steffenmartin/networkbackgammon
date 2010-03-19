@@ -498,9 +498,19 @@ namespace NetworkBackgammonGameLogic
             // Filter out our own broadcasts
             if (sender != this)
             {
-                eventQueue.Enqueue(new EventQueueElement(e, sender));
+                if (e is NetworkBackgammonGameSessionEvent)
+                {
+                    eventQueue.Enqueue(new EventQueueElement(e, sender));
 
-                semStateMachine.Release();
+                    try
+                    {
+                        semStateMachine.Release();
+                    }
+                    catch (SemaphoreFullException ex)
+                    {
+                        // TODO: If this exception occurs calling Release too many times...
+                    }
+                }
             }
         }
 

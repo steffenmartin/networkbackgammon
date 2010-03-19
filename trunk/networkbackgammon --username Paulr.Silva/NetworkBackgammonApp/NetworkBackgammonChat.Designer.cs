@@ -28,22 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.msgTextBox = new System.Windows.Forms.TextBox();
             this.textMsgSendBox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.msgTextBox = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
-            // 
-            // msgTextBox
-            // 
-            this.msgTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.msgTextBox.Location = new System.Drawing.Point(2, 4);
-            this.msgTextBox.Multiline = true;
-            this.msgTextBox.Name = "msgTextBox";
-            this.msgTextBox.ReadOnly = true;
-            this.msgTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.msgTextBox.Size = new System.Drawing.Size(363, 117);
-            this.msgTextBox.TabIndex = 0;
             // 
             // textMsgSendBox
             // 
@@ -66,19 +54,32 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // msgTextBox
+            // 
+            this.msgTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.msgTextBox.Location = new System.Drawing.Point(2, 1);
+            this.msgTextBox.Name = "msgTextBox";
+            this.msgTextBox.ReadOnly = true;
+            this.msgTextBox.Size = new System.Drawing.Size(363, 116);
+            this.msgTextBox.TabIndex = 3;
+            this.msgTextBox.Text = "";
+            // 
             // NetworkBackgammonChat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(368, 178);
+            this.Controls.Add(this.msgTextBox);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.textMsgSendBox);
-            this.Controls.Add(this.msgTextBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "NetworkBackgammonChat";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "NetworkBackgammonChat";
+            this.VisibleChanged += new System.EventHandler(this.NetworkBackgammonChat_VisibleChanged);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NetworkBackgammonChat_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -86,9 +87,9 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox msgTextBox;
         private System.Windows.Forms.TextBox textMsgSendBox;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.RichTextBox msgTextBox;
 
     }
 }

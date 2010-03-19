@@ -15,6 +15,8 @@ namespace NetworkBackgammonLib
         List<INetworkBackgammonListener> m_listeners = new List<INetworkBackgammonListener>();
         // The actual notifier (sender)
         INetworkBackgammonNotifier sender = null;
+        // Lock to make the singleton thread sage
+        static readonly object padlock = new object();
 
         // Constructor sets the actual notifier
         public NetworkBackgammonNotifier(INetworkBackgammonNotifier _sender)
@@ -35,12 +37,15 @@ namespace NetworkBackgammonLib
         {
             bool retval = false;
 
-            if (!m_listeners.Contains(listener))
+            lock (padlock)
             {
-                listener.AddNotifier(this);
-                m_listeners.Add(listener);
+                if (!m_listeners.Contains(listener))
+                {
+                    listener.AddNotifier(this);
+                    m_listeners.Add(listener);
 
-                retval = true;
+                    retval = true;
+                }
             }
 
             return retval;
@@ -49,31 +54,43 @@ namespace NetworkBackgammonLib
         // Remove listener - fails if not found
         public bool RemoveListener(INetworkBackgammonListener listener)
         {
-            bool retval = m_listeners.Contains(listener);
+            bool retval = false;
 
-            if (retval)
+            lock (padlock)
             {
-                //listener.RemoveNotifier(this);
-                m_listeners.Remove(listener);
+                retval = m_listeners.Contains(listener);
+
+                if (retval)
+                {
+                    //listener.RemoveNotifier(this);
+                    m_listeners.Remove(listener);
+                }
             }
+
             return retval;
         }
 
         // Broadcast notification to listeners
         public void Broadcast(INetworkBackgammonEvent notificationEvent)
         {
-            foreach (INetworkBackgammonListener listner in m_listeners)
+            lock (padlock)
             {
-                listner.OnEventNotification(sender, notificationEvent);
+                foreach (INetworkBackgammonListener listner in m_listeners)
+                {
+                    listner.OnEventNotification(sender, notificationEvent);
+                }
             }
         }
 
         // Broadcast notification to listeners on behalt of a sender
         public void Broadcast(INetworkBackgammonEvent notificationEvent, INetworkBackgammonNotifier notifier)
         {
-           foreach (INetworkBackgammonListener listner in m_listeners)
+            lock (padlock)
             {
-                listner.OnEventNotification(notifier, notificationEvent);
+                foreach (INetworkBackgammonListener listner in m_listeners)
+                {
+                    listner.OnEventNotification(notifier, notificationEvent);
+                }
             }
         }
 
