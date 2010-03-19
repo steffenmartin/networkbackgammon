@@ -97,6 +97,20 @@ namespace NetworkBackgammon
             }
         }
 
+        // Send a message to the listeners of Player
+        public void SendMsg(string msg)
+        {
+            if( IsConnected )
+            {
+                NetworkBackgammonPlayer recpPlayer = GameRoom.GetOpposingPlayer(Player);
+
+                if( recpPlayer != null )
+                {
+                    Player.Broadcast( new NetworkBackgammonChatEvent(Player.PlayerName, recpPlayer.PlayerName, msg) );
+                }
+            }
+        }
+
         // Connect to a remote server (remoting) via an ip address and port
         public bool ConnectServer(string ipAddr, string port)
         {

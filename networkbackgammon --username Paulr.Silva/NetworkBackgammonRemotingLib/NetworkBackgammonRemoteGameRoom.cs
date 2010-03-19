@@ -274,16 +274,13 @@ namespace NetworkBackgammonRemotingLib
                     // Add game challenge data container instance to be used for the (asynchronous) challenge procedure
                     challengeSyncList.Add(_challengedPlayer, new NetworkBackgammonChallengeDataContainer(challengeSemaphore));
 
-                    // Broadcast the player connected event to all registered listeners
+                    // Broadcast the player challenge event
                     Broadcast(new NetworkBackgammonChallengeEvent(_challengingPlayerName, _challengedPlayerName));
 
                     // Wait for response from challenged player (or timeout)
                     if (challengeSemaphore.WaitOne(challengeRequestTimeoutMs))
                     {
                         retval = challengeSyncList[_challengedPlayer].ChallengeAccepted;
-
-                        // Give the challenging player the challenge response 
-                        Broadcast(new NetworkBackgammonChallengeResponseEvent(retval, _challengedPlayerName, _challengingPlayerName));
 
                         // Create and start game session if challenge has been accepted by challenged player
                         if (retval)
@@ -303,6 +300,9 @@ namespace NetworkBackgammonRemotingLib
                             // Start the game...
                             gameSession.Start();
                         }
+
+                        // Give the challenging player the challenge response 
+                        Broadcast(new NetworkBackgammonChallengeResponseEvent(retval, _challengedPlayerName, _challengingPlayerName));
                     }
                     else
                     {
@@ -519,6 +519,11 @@ namespace NetworkBackgammonRemotingLib
                             challengeSyncList[player].ChallengeSemaphore.Release();
                         }
                     }
+                }
+                else if (e is NetworkBackgammonChatEvent)
+                {
+                    // Pass the message through to the listeners
+                    Broadcast((NetworkBackgammonChatEvent)e);
                 }
             }
         }

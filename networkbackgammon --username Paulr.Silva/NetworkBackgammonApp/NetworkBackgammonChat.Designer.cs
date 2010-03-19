@@ -28,32 +28,32 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.msgTextBox = new System.Windows.Forms.TextBox();
+            this.textMsgSendBox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // textBox1
+            // msgTextBox
             // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.msgTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(2, 4);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(363, 117);
-            this.textBox1.TabIndex = 0;
+            this.msgTextBox.Location = new System.Drawing.Point(2, 4);
+            this.msgTextBox.Multiline = true;
+            this.msgTextBox.Name = "msgTextBox";
+            this.msgTextBox.ReadOnly = true;
+            this.msgTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.msgTextBox.Size = new System.Drawing.Size(363, 117);
+            this.msgTextBox.TabIndex = 0;
             // 
-            // textBox2
+            // textMsgSendBox
             // 
-            this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.Location = new System.Drawing.Point(2, 123);
-            this.textBox2.Multiline = true;
-            this.textBox2.Name = "textBox2";
-            this.textBox2.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox2.Size = new System.Drawing.Size(277, 53);
-            this.textBox2.TabIndex = 1;
+            this.textMsgSendBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.textMsgSendBox.Location = new System.Drawing.Point(2, 123);
+            this.textMsgSendBox.Multiline = true;
+            this.textMsgSendBox.Name = "textMsgSendBox";
+            this.textMsgSendBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textMsgSendBox.Size = new System.Drawing.Size(277, 53);
+            this.textMsgSendBox.TabIndex = 1;
             // 
             // button1
             // 
@@ -64,6 +64,7 @@
             this.button1.TabIndex = 2;
             this.button1.Text = "Send";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // NetworkBackgammonChat
             // 
@@ -72,8 +73,8 @@
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(368, 178);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.textMsgSendBox);
+            this.Controls.Add(this.msgTextBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "NetworkBackgammonChat";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
@@ -85,8 +86,8 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox msgTextBox;
+        private System.Windows.Forms.TextBox textMsgSendBox;
         private System.Windows.Forms.Button button1;
 
     }
