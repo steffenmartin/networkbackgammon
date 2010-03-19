@@ -188,6 +188,9 @@ namespace NetworkBackgammonRemotingLib
                 // Start listening to this player
                 newPlayer.AddListener(this);
 
+                // Have the player start listening to this game room
+                AddListener(newPlayer);
+
                 // Broadcast the player connected event to all registered listeners
                 Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerConnected));
             }
@@ -207,13 +210,41 @@ namespace NetworkBackgammonRemotingLib
         {
             if (connectedPlayers.Contains(_player))
             {
+                // The disconnected player should no longer be listening...
+                RemoveListener(_player);
                 // Stop listening to this player
                 _player.RemoveListener(this);
 
+                // Check if player is associated with a game room and remove if necessary
+                NetworkBackgammonGameSession _playerGameSession = GetGameSession(_player);
+
+                if (_playerGameSession != null)
+                {
+                    // Disconnect the player from the game session
+                    _player.RemoveListener(_playerGameSession);
+                    // Disconnect the game session from the player
+                    _playerGameSession.RemoveListener(_player);
+
+                    // Get the opposing player
+                    NetworkBackgammonPlayer opposingPlayer = _playerGameSession.GetOpponent(_player);
+
+                    if (opposingPlayer != null)
+                    {
+                        // Disconnect the player from the game session
+                        opposingPlayer.RemoveListener(_playerGameSession);
+                        // Disconnect the game session from the player
+                        _playerGameSession.RemoveListener(opposingPlayer);
+                    }
+
+                    // Halt the game sesssion
+                    _playerGameSession.Stop();
+                }
+
+                // Remove player from connected player list
                 connectedPlayers.Remove(_player);
 
                 // Broadcast the player disconnected event to all registered listeners
-                ((INetworkBackgammonNotifier)this).Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected));
+                Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected));
             }
         }
 
@@ -223,12 +254,17 @@ namespace NetworkBackgammonRemotingLib
         /// <param name="_challengingPlayer">Challenging backgammon player</param>
         /// <param name="_challengedPlayer">Challenged backgammon player</param>
         /// <returns></returns>
-        public bool Challenge(NetworkBackgammonPlayer _challengingPlayer, NetworkBackgammonPlayer _challengedPlayer)
+        //public bool Challenge(NetworkBackgammonPlayer _challengingPlayer, NetworkBackgammonPlayer _challengedPlayer)
+        public bool Challenge(string _challengingPlayerName, string _challengedPlayerName)
         {
             bool retval = false;
 
+            NetworkBackgammonPlayer _challengingPlayer = GetPlayerByName(_challengingPlayerName);
+            NetworkBackgammonPlayer _challengedPlayer = GetPlayerByName(_challengedPlayerName);
+
             // Check if the players are in the available player game room list
-            if (connectedPlayers.Contains(_challengingPlayer) && connectedPlayers.Contains(_challengedPlayer))
+            //if (connectedPlayers.Contains(_challengingPlayer) && connectedPlayers.Contains(_challengedPlayer))
+            if (_challengingPlayer != null && _challengedPlayer != null)
             {
                 // Check if players are currently free to participate in a game session
                 if (!IsPlayerInGameSession(_challengingPlayer) && !IsPlayerInGameSession(_challengedPlayer))
@@ -238,8 +274,8 @@ namespace NetworkBackgammonRemotingLib
                     // Add game challenge data container instance to be used for the (asynchronous) challenge procedure
                     challengeSyncList.Add(_challengedPlayer, new NetworkBackgammonChallengeDataContainer(challengeSemaphore));
 
-                    // Broadcast a challenge event to the "challenged player"
-                    ((INetworkBackgammonListener)_challengedPlayer).OnEventNotification(this, new NetworkBackgammonChallengeEvent(_challengingPlayer));
+                    // Broadcast the player connected event to all registered listeners
+                    Broadcast(new NetworkBackgammonChallengeEvent(_challengingPlayerName, _challengedPlayerName));
 
                     // Wait for response from challenged player (or timeout)
                     if (challengeSemaphore.WaitOne(challengeRequestTimeoutMs))
@@ -247,15 +283,24 @@ namespace NetworkBackgammonRemotingLib
                         retval = challengeSyncList[_challengedPlayer].ChallengeAccepted;
 
                         // Give the challenging player the challenge response 
-                        _challengingPlayer.OnEventNotification(_challengedPlayer, new NetworkBackgammonChallengeResponseEvent(retval));
+                        Broadcast(new NetworkBackgammonChallengeResponseEvent(retval, _challengedPlayerName, _challengingPlayerName));
 
                         // Create and start game session if challenge has been accepted by challenged player
                         if (retval)
                         {
                             NetworkBackgammonGameSession gameSession = new NetworkBackgammonGameSession(_challengingPlayer, _challengedPlayer);
 
+                            // Game Session is listening for events from Player 1
+                            _challengingPlayer.AddListener(gameSession);
+                            // Player 1 is listening for events from Game Session
+                            gameSession.AddListener(_challengingPlayer);
+                            // Game Session is listening for events form Player 2
+                            _challengedPlayer.AddListener(gameSession);
+                            // Player 2 is listening for events from Game Session
+                            gameSession.AddListener(_challengedPlayer);
+                            // Append to list of game sessions...
                             gameSessions.Add(gameSession);
-
+                            // Start the game...
                             gameSession.Start();
                         }
                     }
@@ -339,6 +384,71 @@ namespace NetworkBackgammonRemotingLib
             return retval;
         }
 
+        /// <summary>
+        /// Get the game session the the "player" is currently apart of
+        /// </summary>
+        /// <param name="player">Backgammon player to be checked</param>
+        /// <returns>null if player is not part of a game session</returns>
+        public NetworkBackgammonGameSession GetGameSession(NetworkBackgammonPlayer player)
+        {
+            NetworkBackgammonGameSession retval = null;
+
+            // Look through the list of game sessions and make sure the player is not already playing in another room
+            foreach (NetworkBackgammonGameSession session in gameSessions)
+            {
+                if (session.ContainsPlayer(player))
+                {
+                    retval = session;
+                    break;
+                }
+            }
+
+            return retval;
+        }
+
+        /// <summary>
+        /// Get the player's opponent
+        /// </summary>
+        /// <param name="player">Backgammon player to be checked</param>
+        /// <returns>null if player is not part of a game session</returns>
+        public NetworkBackgammonPlayer GetOpposingPlayer(NetworkBackgammonPlayer player)
+        {
+            NetworkBackgammonPlayer retval = null;
+
+            // Get the game session associated with this player
+            NetworkBackgammonGameSession gameSession = GetGameSession(player);
+
+            if (gameSession != null)
+            {
+                retval = gameSession.GetOpponent(player);
+            }
+
+            return retval;
+        }
+
+        /// <summary>
+        /// Determine whether or not player is participating in a game session
+        /// </summary>
+        /// <param name="player">Backgammon player to be checked</param>
+        /// <returns>null NetworkBackgammonPlayer object if name not found</returns>
+        public NetworkBackgammonPlayer GetPlayerByName(string playerName)
+        {
+            NetworkBackgammonPlayer retval = null;
+
+            // Look through the list of game sessions and make sure the player is not already playing in another room
+            foreach (NetworkBackgammonPlayer player in connectedPlayers)
+            {
+                if (player.PlayerName.CompareTo(playerName) == 0)
+                {
+                    retval = player;
+                    break;
+                }
+            }
+
+            return retval;
+        }
+
+        
         #endregion
 
         #region Properties

@@ -157,8 +157,6 @@ namespace NetworkBackgammon
             {
                 // Remove the player from the game room
                 gameRoom.Leave(Player);
-                // UnRegister the remotable client object as a listner 
-                gameRoom.RemoveListener(Player);
             }
 
             if (channel != null)
@@ -174,6 +172,7 @@ namespace NetworkBackgammon
             }
 
             gameRoom = null;
+            Player = null;
             channel = null;
         }
 

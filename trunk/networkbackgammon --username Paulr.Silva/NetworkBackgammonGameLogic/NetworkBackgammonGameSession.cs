@@ -159,16 +159,7 @@ namespace NetworkBackgammonGameLogic
             defaultNotifier = new NetworkBackgammonNotifier(this);
 
             player1 = _player1;
-            // Game Session is listening for events from Player 1
-            player1.AddListener(this);
-            // Player 1 is listening for events from Game Session
-            AddListener(player1);
-
             player2 = _player2;
-            // Game Session is listening for events form Player 2
-            player2.AddListener(this);
-            // Player 2 is listening for events from Game Session
-            AddListener(player2);
         }
 
         /// <summary>
@@ -227,7 +218,7 @@ namespace NetworkBackgammonGameLogic
             }
 
             eventQueue.Clear();
-
+           
             player1 = null;
             player2 = null;
         }
@@ -249,6 +240,9 @@ namespace NetworkBackgammonGameLogic
             {
                 // Wait for another event
                 semStateMachine.WaitOne();
+
+                // HACK: Add function here to deal with the big switch statement 
+                if (!bStateMachineKeepRunning) break;
 
                 // Read the event element queue to get information on the next event to be processed
                 if (eventQueue.Count > 0)
@@ -405,6 +399,23 @@ namespace NetworkBackgammonGameLogic
         public bool ContainsPlayer( NetworkBackgammonPlayer player )
         {
             return ((player == player1) || (player == player2));
+        }
+
+        /// <summary>
+        /// Get a players opponent
+        /// </summary>
+        /// <param name="player">Backgammon player to be checked</param>
+        /// <returns>null if player does not exist</returns>
+        public NetworkBackgammonPlayer GetOpponent(NetworkBackgammonPlayer player)
+        {
+            NetworkBackgammonPlayer opp = null;
+
+            if (ContainsPlayer(player))
+            {
+                opp = (player == player1 ? player2 : player1);
+            }
+
+            return opp;
         }
 
         #endregion

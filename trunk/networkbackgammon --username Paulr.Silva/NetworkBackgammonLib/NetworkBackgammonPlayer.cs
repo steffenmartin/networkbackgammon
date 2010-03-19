@@ -100,9 +100,9 @@ namespace NetworkBackgammonLib
         /// Respond to a game challenge
         /// </summary>
         /// <param name="acceptChallenge">"True" if challenge has been accepted, "false" if challenge is rejected</param>
-        public void RespondToChallenge(bool acceptChallenge)
+        public void RespondToChallenge(bool acceptChallenge, string challengingPlayerName)
         {
-            Broadcast(new NetworkBackgammonChallengeResponseEvent(acceptChallenge));
+            Broadcast(new NetworkBackgammonChallengeResponseEvent(acceptChallenge, PlayerName, challengingPlayerName));
         }
 
         #endregion

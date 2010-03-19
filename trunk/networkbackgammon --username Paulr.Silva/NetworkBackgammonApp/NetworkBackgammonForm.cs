@@ -19,8 +19,10 @@ namespace NetworkBackgammon
         NetworkBackgammonScoreBoard m_backGammonScoreBoardPlayer1 = new NetworkBackgammonScoreBoard();
         NetworkBackgammonScoreBoard m_backGammonScoreBoardPlayer2 = new NetworkBackgammonScoreBoard();
         NetworkBackgammonLoginForm m_backgammonLogin = new NetworkBackgammonLoginForm();
-        delegate void OnQueryChallengeDelegate(NetworkBackgammonPlayer cPlayer);
+        delegate void OnQueryChallengeDelegate(string cPlayer);
         delegate void OnChallengeResponseDelegate(bool challengeResponse);
+        delegate void OnShowBoardDelegate(bool show);
+        delegate void OnGameRoomDelegate(bool show);
 
         public NetworkBackGammonForm()
         {
@@ -33,53 +35,65 @@ namespace NetworkBackgammon
             ShowGameRoomScreen(true);
         }
 
-        private void LoadGameBoard()
+        // Show the game board display
+        private void ShowBoard(bool show)
         {
-            m_backgammonBoard.TopLevel = false;
-            // Set the Parent Form of the Child window.
-            m_backgammonBoard.Parent = this;
-            m_backgammonBoard.Top = SystemInformation.CaptionHeight;
-            // Display the new form.
-            m_backgammonBoard.Show();
+            if (show)
+            {
+                m_backgammonBoard.TopLevel = false;
+                // Set the Parent Form of the Child window.
+                m_backgammonBoard.Parent = this;
+                m_backgammonBoard.Top = SystemInformation.CaptionHeight;
+                // Display the new form.
+                m_backgammonBoard.Show();
 
-            m_backGammonChat.TopLevel = false;
-            // Set the Parent Form of the Child window.
-            m_backGammonChat.Parent = this;
-            m_backGammonChat.Left = m_backgammonBoard.Left;
-            m_backGammonChat.Top = m_backgammonBoard.Bottom;
-            m_backGammonChat.Width = this.Width - 10;
-            // Display the new form.
-            m_backGammonChat.Show();
+                m_backGammonChat.TopLevel = false;
+                // Set the Parent Form of the Child window.
+                m_backGammonChat.Parent = this;
+                m_backGammonChat.Left = m_backgammonBoard.Left;
+                m_backGammonChat.Top = m_backgammonBoard.Bottom;
+                m_backGammonChat.Width = this.Width - 10;
+                // Display the new form.
+                m_backGammonChat.Show();
 
-            m_backGammonScoreBoardPlayer1.TopLevel = false;
-            // Set the Parent Form of the Child window.
-            m_backGammonScoreBoardPlayer1.Parent =this;
-            m_backGammonScoreBoardPlayer1.Left = m_backgammonBoard.Right;
-            m_backGammonScoreBoardPlayer1.Top = m_backgammonBoard.Top;
-            m_backGammonScoreBoardPlayer1.Width = 137;
-            m_backGammonScoreBoardPlayer1.Height = m_backgammonBoard.Height / 2;
-            // Display the new form.
-            m_backGammonScoreBoardPlayer1.Show();
+                m_backGammonScoreBoardPlayer1.TopLevel = false;
+                // Set the Parent Form of the Child window.
+                m_backGammonScoreBoardPlayer1.Parent = this;
+                m_backGammonScoreBoardPlayer1.Left = m_backgammonBoard.Right;
+                m_backGammonScoreBoardPlayer1.Top = m_backgammonBoard.Top;
+                m_backGammonScoreBoardPlayer1.Width = 137;
+                m_backGammonScoreBoardPlayer1.Height = m_backgammonBoard.Height / 2;
+                // Set the title for the scoreboard
+                m_backGammonScoreBoardPlayer1.Title = (NetworkBackgammonClient.Instance.Player != null ? NetworkBackgammonClient.Instance.Player.PlayerName : "?");
+                // Display the new form.
+                m_backGammonScoreBoardPlayer1.Show();
 
-            m_backGammonScoreBoardPlayer2.TopLevel = false;
-            // Set the Parent Form of the Child window.
-            m_backGammonScoreBoardPlayer2.Parent = this;
-            m_backGammonScoreBoardPlayer2.Left = m_backgammonBoard.Right;
-            m_backGammonScoreBoardPlayer2.Top = m_backGammonScoreBoardPlayer1.Bottom;
-            m_backGammonScoreBoardPlayer2.Width = 137;
-            m_backGammonScoreBoardPlayer2.Height = m_backgammonBoard.Height / 2;
-            // Display the new form.
-            m_backGammonScoreBoardPlayer2.Show();
+                m_backGammonScoreBoardPlayer2.TopLevel = false;
+                // Set the Parent Form of the Child window.
+                m_backGammonScoreBoardPlayer2.Parent = this;
+                m_backGammonScoreBoardPlayer2.Left = m_backgammonBoard.Right;
+                m_backGammonScoreBoardPlayer2.Top = m_backGammonScoreBoardPlayer1.Bottom;
+                m_backGammonScoreBoardPlayer2.Width = 137;
+                m_backGammonScoreBoardPlayer2.Height = m_backgammonBoard.Height / 2;
+                
+                // Get the game session this player is associated with
+                NetworkBackgammonPlayer oppPlayer = NetworkBackgammonClient.Instance.GameRoom.GetOpposingPlayer(NetworkBackgammonClient.Instance.Player);
+
+                // Set the title for the scoreboard
+                m_backGammonScoreBoardPlayer2.Title = (oppPlayer != null ? oppPlayer.PlayerName : "?");
+                // Display the new form.
+                m_backGammonScoreBoardPlayer2.Show();
+            }
+            else
+            {
+                m_backgammonBoard.Hide();
+                m_backGammonChat.Hide();
+                m_backGammonScoreBoardPlayer1.Hide();
+                m_backGammonScoreBoardPlayer2.Hide();
+            }
         }
 
-        private void UnloadGameBoard()
-        {
-            m_backgammonBoard.Hide();
-            m_backGammonChat.Hide();
-            m_backGammonScoreBoardPlayer1.Hide();
-            m_backGammonScoreBoardPlayer2.Hide();
-        }
-
+        // Display the game room display
         private void ShowGameRoomScreen(bool show)
         {
             if (show)
@@ -124,53 +138,64 @@ namespace NetworkBackgammon
 
         public void OnEventNotification(INetworkBackgammonNotifier sender, INetworkBackgammonEvent e)
         {
-            if (sender is NetworkBackgammonRemoteGameRoom)
+            // Challegne event
+            if (e is NetworkBackgammonChallengeResponseEvent)
             {
-                if (e is NetworkBackgammonGameRoomEvent)
-                {
-                    switch (((NetworkBackgammonGameRoomEvent)e).EventType)
-                    {
-                        case NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected:
-                        {
-                            // Check if player that disconnected was the opposing player
-                        }
-                        break;
-                    }
-                }
-                else if (e is NetworkBackgammonChallengeEvent)
-                {
-                    NetworkBackgammonPlayer tPlayer = ((NetworkBackgammonChallengeEvent)e).ChallengingPlayer;
+                NetworkBackgammonChallengeResponseEvent challengeRespEvent = ((NetworkBackgammonChallengeResponseEvent)e);
 
-                    if (tPlayer != NetworkBackgammonClient.Instance.Player)
+                bool challengeAccepted = challengeRespEvent.ChallengeAccepted;
+
+                if ( (NetworkBackgammonClient.Instance.Player.PlayerName.CompareTo(challengeRespEvent.ChallengingPlayer) == 0) ||
+                     (NetworkBackgammonClient.Instance.Player.PlayerName.CompareTo(challengeRespEvent.ChallengedPlayer) == 0)  )
+                {
+                    if (InvokeRequired)
                     {
-                        if (InvokeRequired)
-                        {
-                            // In case the caller has called this routine on a different thread
-                            BeginInvoke(new OnQueryChallengeDelegate(QueryChallenge), tPlayer);
-                        }
-                        else
-                        {
-                            QueryChallenge(tPlayer);
-                        }
+                        BeginInvoke(new OnChallengeResponseDelegate(ChallengeResponse), challengeAccepted);
+                    }
+                    else
+                    {
+                        ChallengeResponse(challengeAccepted);
                     }
                 }
             }
-            else if (sender is NetworkBackgammonPlayer)
+            else if (e is NetworkBackgammonGameRoomEvent)
             {
-                if (((NetworkBackgammonPlayer)sender) != NetworkBackgammonClient.Instance.Player)
+                switch (((NetworkBackgammonGameRoomEvent)e).EventType)
                 {
-                    if (e is NetworkBackgammonChallengeResponseEvent)
+                    case NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected:
                     {
-                        bool challengeAccepted = ((NetworkBackgammonChallengeResponseEvent)e).ChallengeAccepted;
+                        // TODO: Check if player that disconnected was the opposing player
 
                         if (InvokeRequired)
                         {
-                            BeginInvoke(new OnChallengeResponseDelegate(ChallengeResponse), challengeAccepted);
+                            BeginInvoke( new OnGameRoomDelegate(ShowGameRoomScreen), true);
+                            BeginInvoke(new OnShowBoardDelegate(ShowBoard), false);
                         }
                         else
                         {
-                            ChallengeResponse(challengeAccepted);
+                            ShowGameRoomScreen(true);
+                            ShowBoard(false);
                         }
+                    }
+                    break;
+                }
+            }
+            else if (e is NetworkBackgammonChallengeEvent)
+            {
+                string challengingPlayer = ((NetworkBackgammonChallengeEvent)e).ChallengingPlayer;
+                string challengedPlayer = ((NetworkBackgammonChallengeEvent)e).ChallengedPlayer;
+
+                if (challengingPlayer.CompareTo(NetworkBackgammonClient.Instance.Player.PlayerName) != 0 &&
+                    challengedPlayer.CompareTo(NetworkBackgammonClient.Instance.Player.PlayerName) == 0) 
+                {
+                    if (InvokeRequired)
+                    {
+                        // In case the caller has called this routine on a different thread
+                        BeginInvoke(new OnQueryChallengeDelegate(QueryChallenge), challengingPlayer);
+                    }
+                    else
+                    {
+                        QueryChallenge(challengingPlayer);
                     }
                 }
             }
@@ -179,22 +204,23 @@ namespace NetworkBackgammon
         #endregion
 
         // Ask the use if they would like to accept a challenge
-        private void QueryChallenge(NetworkBackgammonPlayer cPlayer)
+        private void QueryChallenge(string challengingPlayerName)
         {
-            if (MessageBox.Show(this, "Challenge from " + cPlayer.PlayerName + ". Do you accept?", "Challenge", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+            if (MessageBox.Show(this, "Challenge from " + challengingPlayerName + ". Do you accept?", 
+                "Challenge", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
             {
-                NetworkBackgammonClient.Instance.Player.RespondToChallenge(true);
+                NetworkBackgammonClient.Instance.Player.RespondToChallenge(true, challengingPlayerName);
 
                 // TODO: What happens here when the other player have cancel his decision to challenge?
 
                 // Do not show the login dialog
-                m_backgammonLogin.Hide();
+               // m_backgammonLogin.Hide();
                 // Show the board
-                LoadGameBoard();
+              //  ShowBoard(true);
             }
             else
             {
-                NetworkBackgammonClient.Instance.Player.RespondToChallenge(false);
+                NetworkBackgammonClient.Instance.Player.RespondToChallenge(false, challengingPlayerName);
             }
         }
 
@@ -206,7 +232,7 @@ namespace NetworkBackgammon
                 // Close the login window 
                 m_backgammonLogin.Hide();
                 // Show the board
-                LoadGameBoard();
+                ShowBoard(true);
             }
         }
     }
