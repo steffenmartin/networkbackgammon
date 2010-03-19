@@ -30,6 +30,7 @@
         {
             this.ServerControlTab = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.m_serverLogListBox = new System.Windows.Forms.ListBox();
             this.m_activateServer = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -40,7 +41,6 @@
             this.activity = new System.Windows.Forms.ColumnHeader();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.listView1 = new System.Windows.Forms.ListView();
-            this.m_serverLogListBox = new System.Windows.Forms.ListBox();
             this.ServerControlTab.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -71,6 +71,14 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Setup";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // m_serverLogListBox
+            // 
+            this.m_serverLogListBox.FormattingEnabled = true;
+            this.m_serverLogListBox.Location = new System.Drawing.Point(6, 106);
+            this.m_serverLogListBox.Name = "m_serverLogListBox";
+            this.m_serverLogListBox.Size = new System.Drawing.Size(498, 199);
+            this.m_serverLogListBox.TabIndex = 2;
             // 
             // m_activateServer
             // 
@@ -152,14 +160,6 @@
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
-            // m_serverLogListBox
-            // 
-            this.m_serverLogListBox.FormattingEnabled = true;
-            this.m_serverLogListBox.Location = new System.Drawing.Point(6, 106);
-            this.m_serverLogListBox.Name = "m_serverLogListBox";
-            this.m_serverLogListBox.Size = new System.Drawing.Size(498, 199);
-            this.m_serverLogListBox.TabIndex = 2;
-            // 
             // ServerControlForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -168,6 +168,7 @@
             this.Controls.Add(this.ServerControlTab);
             this.Name = "ServerControlForm";
             this.Text = "NetworkBackgammon Server Control";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ServerControlForm_FormClosing);
             this.ServerControlTab.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);

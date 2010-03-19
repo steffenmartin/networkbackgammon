@@ -38,11 +38,13 @@ namespace NetworkBackgammonServer
         /**
         *   Activate/Deactivate server
         */
-        private void m_activateServer_Click(object sender, EventArgs e)
+        private bool ActivateServer(bool activate)
         {
+            bool retval = false;
+
             try
             {
-                if (m_activateServer.Text == "Start Server")
+                if (activate)
                 {
                     if (m_channel == null)
                     {
@@ -65,7 +67,7 @@ namespace NetworkBackgammonServer
                     m_server = obj as NetworkBackgammonRemoteGameRoom;
 
                     // Register delegated listener as a listener of the server object
-                    m_server.AddListener(this);
+                    retval = m_server.AddListener(this);
             
                     m_activateServer.Text = "Stop Server";
                     m_portText.Enabled = false;
@@ -90,12 +92,21 @@ namespace NetworkBackgammonServer
 
                     // Log status message 
                     Log("Server Stopped...");
+
+                    retval = true;
                 }
             }
             catch (Exception ex)
             {
                 Log(ex.Message);
             }
+
+            return retval;
+        }
+
+        private void m_activateServer_Click(object sender, EventArgs e)
+        {
+            ActivateServer( (m_activateServer.Text == "Start Server" ? true : false) );
         }
 
         // Log a local message
@@ -136,6 +147,11 @@ namespace NetworkBackgammonServer
         }
 
         #endregion
+
+        private void ServerControlForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            ActivateServer(false);
+        }
 
     }
 }
