@@ -211,12 +211,7 @@ namespace NetworkBackgammon
             {
                 NetworkBackgammonClient.Instance.Player.RespondToChallenge(true, challengingPlayerName);
 
-                // TODO: What happens here when the other player have cancel his decision to challenge?
-
-                // Do not show the login dialog
-               // m_backgammonLogin.Hide();
-                // Show the board
-              //  ShowBoard(true);
+                // TODO: What happens here when the other player cancels his decision to challenge?
             }
             else
             {

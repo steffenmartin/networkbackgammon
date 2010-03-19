@@ -9,11 +9,16 @@ using System.Windows.Forms;
 using System.Reflection;
 using System.Resources;
 using System.IO;
+using NetworkBackgammonLib;
+using NetworkBackgammonRemotingLib;
 
 namespace NetworkBackgammon
 {
-    public partial class NetworkBackgammonBoard : Form
+    public partial class NetworkBackgammonBoard : Form, INetworkBackgammonListener
     {
+        // Handles listening to NetworkBackgammon events
+        INetworkBackgammonListener m_defaultListener = new NetworkBackgammonListener();
+    
         // Initial point for player 1 first piece
         static Point m_startPoint1 = new Point(484, 12);
         // Initial point for player 2 first piece
@@ -38,6 +43,8 @@ namespace NetworkBackgammon
         int m_maxNumChips = 15;
         // Player needs to roll the dice
         bool m_playerRollDice = true;
+        // Initial dice roll flag
+        bool m_initDiceRoll = true;
         // Dice are currently being rolled
         bool m_diceRolling = false;
         // Button rolling dice
@@ -54,6 +61,12 @@ namespace NetworkBackgammon
         {
             InitializeComponent();
 
+            // Become a listener of the player 
+            if (NetworkBackgammonClient.Instance.Player != null)
+            {
+                NetworkBackgammonClient.Instance.Player.AddListener(this);
+            }
+
             // Create the board piece positions (just ID)
             for(int col = 0; col < m_maxCols; col++)
             {
@@ -61,13 +74,6 @@ namespace NetworkBackgammon
                 {
                     m_boardPositionList.Add(new NetworkBackgammonBoardPosition(new Point(col, row)));
                 }
-            }
-
-            // Get all the chips into the array
-            for (int i = 0; i < m_maxNumChips; i++)
-            {
-                m_playerChipList.Add(new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_1));
-                m_opponentChipList.Add(new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_2));
             }
 
             // Create icon image list
@@ -80,6 +86,25 @@ namespace NetworkBackgammon
                 m_diceIconList.Add( diceImage );
             }
         }
+
+        #region INetworkBackgammonListener Members
+
+        public bool AddNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return m_defaultListener.AddNotifier(notifier);
+        }
+
+        public bool RemoveNotifier(INetworkBackgammonNotifier notifier)
+        {
+            return m_defaultListener.RemoveNotifier(notifier);
+        }
+
+        public void OnEventNotification(INetworkBackgammonNotifier notifier, INetworkBackgammonEvent e)
+        {
+            // TODO: Add game session events here...
+        }
+
+        #endregion
 
         // Get the board position object based on col row identifier
         public NetworkBackgammonBoardPosition GetBoardPosition(int col, int row)
@@ -102,8 +127,9 @@ namespace NetworkBackgammon
         // Map board position objects to pixel locations on the board
         private void MapBoardPositions()
         {
-            int chipWidth = ((NetworkBackgammonChip)m_playerChipList[0]).ChipSize.Width;
-            int chipHeight = ((NetworkBackgammonChip)m_playerChipList[0]).ChipSize.Height;
+            NetworkBackgammonChip tempChip = new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_1);
+            int chipWidth = tempChip.ChipSize.Width;
+            int chipHeight = tempChip.ChipSize.Height;
             int col = 0, row = 0;
 
             // Build all the board positions based on chip and board properties
@@ -136,85 +162,72 @@ namespace NetworkBackgammon
             }
         }
 
-        // Just for debugging purposes - this routine sets up the chips (player & opponent) in their
-        // initial game positions
-        private void TestGameStartPosition()
+        // Get both players check positions and draw them tot he screen 
+        private void DrawPlayerPositions()
         {
             NetworkBackgammonChip boardChip;
+            
+            // Current player
+            NetworkBackgammonPlayer curPlayer = NetworkBackgammonClient.Instance.Player;
 
-            ///////////////////////////////////////////////////////
-            // Player
-            ///////////////////////////////////////////////////////
-            boardChip = (NetworkBackgammonChip)m_playerChipList[0];
-            boardChip.ChipBoardPosition = GetBoardPosition(0, 0);
-            boardChip = (NetworkBackgammonChip)m_playerChipList[1];
-            boardChip.ChipBoardPosition = GetBoardPosition(0, 1);
-        
-            boardChip = (NetworkBackgammonChip)m_playerChipList[2];
-            boardChip.ChipBoardPosition = GetBoardPosition(11, 0);
-            boardChip = (NetworkBackgammonChip)m_playerChipList[3];
-            boardChip.ChipBoardPosition = GetBoardPosition(11, 1);
-            boardChip = (NetworkBackgammonChip)m_playerChipList[4];
-            boardChip.ChipBoardPosition = GetBoardPosition(11, 2);
-            boardChip = (NetworkBackgammonChip)m_playerChipList[5];
-            boardChip.ChipBoardPosition = GetBoardPosition(11, 3);
-            boardChip = (NetworkBackgammonChip)m_playerChipList[6];
-            boardChip.ChipBoardPosition = GetBoardPosition(11, 4);
+            // Remove old list
+            m_playerChipList.Clear();
 
-            boardChip = (NetworkBackgammonChip)m_playerChipList[7];
-            boardChip.ChipBoardPosition = GetBoardPosition(16, 0);
-            boardChip = (NetworkBackgammonChip)m_playerChipList[8];
-            boardChip.ChipBoardPosition = GetBoardPosition(16, 1);
-            boardChip = (NetworkBackgammonChip)m_playerChipList[9];
-            boardChip.ChipBoardPosition = GetBoardPosition(16, 2);
+            if (curPlayer != null)
+            {
+                foreach (NetworkBackgammonChecker checkerAP in curPlayer.Checkers)
+                {
+                    boardChip =  new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_1);
 
-            boardChip = (NetworkBackgammonChip)m_playerChipList[10];
-            boardChip.ChipBoardPosition = GetBoardPosition(18, 0);
-            boardChip = (NetworkBackgammonChip)m_playerChipList[11];
-            boardChip.ChipBoardPosition = GetBoardPosition(18, 1);
-            boardChip = (NetworkBackgammonChip)m_playerChipList[12];
-            boardChip.ChipBoardPosition = GetBoardPosition(18, 2);
-            boardChip = (NetworkBackgammonChip)m_playerChipList[13];
-            boardChip.ChipBoardPosition = GetBoardPosition(18, 3);
-            boardChip = (NetworkBackgammonChip)m_playerChipList[14];
-            boardChip.ChipBoardPosition = GetBoardPosition(18, 4);
+                    Int32 newColPos = Convert.ToInt32(checkerAP.CurrentPosition.CurrentPosition) - 1;
+                    Int32 newRowPos = 0;
 
-            ///////////////////////////////////////////////////////
-            // Opponent
-            ///////////////////////////////////////////////////////
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[0];
-            boardChip.ChipBoardPosition = GetBoardPosition(23, 0);
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[1];
-            boardChip.ChipBoardPosition = GetBoardPosition(23, 1);
+                    // Search board chip list and determine the row
+                    foreach (NetworkBackgammonChip chip in m_playerChipList)
+                    {
+                        if (chip.ChipBoardPosition.PositionID.X == newColPos)
+                        {
+                            newRowPos++;
+                        }
+                    }
 
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[2];
-            boardChip.ChipBoardPosition = GetBoardPosition(12, 0);
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[3];
-            boardChip.ChipBoardPosition = GetBoardPosition(12, 1);
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[4];
-            boardChip.ChipBoardPosition = GetBoardPosition(12, 2);
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[5];
-            boardChip.ChipBoardPosition = GetBoardPosition(12, 3);
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[6];
-            boardChip.ChipBoardPosition = GetBoardPosition(12, 4);
+                    boardChip.ChipBoardPosition = GetBoardPosition(newColPos, newRowPos);
 
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[7];
-            boardChip.ChipBoardPosition = GetBoardPosition(7, 0);
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[8];
-            boardChip.ChipBoardPosition = GetBoardPosition(7, 1);
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[9];
-            boardChip.ChipBoardPosition = GetBoardPosition(7, 2);
+                    m_playerChipList.Add(boardChip);
 
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[10];
-            boardChip.ChipBoardPosition = GetBoardPosition(5, 0);
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[11];
-            boardChip.ChipBoardPosition = GetBoardPosition(5, 1);
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[12];
-            boardChip.ChipBoardPosition = GetBoardPosition(5, 2);
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[13];
-            boardChip.ChipBoardPosition = GetBoardPosition(5, 3);
-            boardChip = (NetworkBackgammonChip)m_opponentChipList[14];
-            boardChip.ChipBoardPosition = GetBoardPosition(5, 4);
+                }
+            }
+
+            // Draw oppising players checkers too...
+         
+            NetworkBackgammonPlayer oppPlayer = NetworkBackgammonClient.Instance.GameRoom.GetOpposingPlayer(curPlayer);
+
+            // Remove old list
+            m_opponentChipList.Clear();
+
+            if (oppPlayer != null)
+            {
+                foreach (NetworkBackgammonChecker checkerAP in oppPlayer.Checkers)
+                {
+                    boardChip = new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_2);
+
+                    Int32 newColPos = Convert.ToInt32(checkerAP.CurrentPosition.GetOppositePosition().CurrentPosition) - 1;
+                    Int32 newRowPos = 0;
+
+                    // Search board chip list and determine the row
+                    foreach (NetworkBackgammonChip chip in m_opponentChipList)
+                    {
+                        if (chip.ChipBoardPosition.PositionID.X == newColPos)
+                        {
+                            newRowPos++;
+                        }
+                    }
+
+                    boardChip.ChipBoardPosition = GetBoardPosition(newColPos, newRowPos);
+
+                    m_opponentChipList.Add(boardChip);
+                }
+            }
         }
 
         // Overriden load function of the form
@@ -226,10 +239,8 @@ namespace NetworkBackgammon
             // Map each board position coordinate to a specific pixel coordinate location 
             MapBoardPositions();
 
-            //////////////////////////////////////////////////////////////////////////////////////
-            // TEST
-            TestGameStartPosition();
-            //////////////////////////////////////////////////////////////////////////////////////
+            // Draw the current player positions
+            DrawPlayerPositions();
         }
 
         private void NetworkBackgammonBoard_Paint(object sender, PaintEventArgs e)
@@ -296,19 +307,28 @@ namespace NetworkBackgammon
 
             // TODO: Get ride of hard coded numbers
 
+            // Get the player chip count - anything outside of this count will be draw in the tray
+            int chipListSize = m_playerChipList.Count;
+
             // Draw players tray  
             for (int i = 0; i < m_maxNumChips; i++)
             {
                 Rectangle rectPlayer = new Rectangle(531, 13 + 8 * (i), 32, 8); // 124
                 e.Graphics.DrawRectangle(trayOutlinePen, rectPlayer);
 
-                // Load the bitmap directly from the manifest resource
-                Icon trayIcon = new Icon(this.GetType(), "Resources.Player1TrayChip.ico");
-                // Set the chip bitmap
-                Bitmap trayImage = new Bitmap(trayIcon.ToBitmap());
-                // Draw the back ground image
-                e.Graphics.DrawImage(trayImage, 531, 13 + 8 * (i));
+                if (i > chipListSize)
+                {
+                    // Load the bitmap directly from the manifest resource
+                    Icon trayIcon = new Icon(this.GetType(), "Resources.Player1TrayChip.ico");
+                    // Set the chip bitmap
+                    Bitmap trayImage = new Bitmap(trayIcon.ToBitmap());
+                    // Draw the back ground image
+                    e.Graphics.DrawImage(trayImage, 531, 13 + 8 * (i));
+                }
             }
+
+            // Get the player chip count - anything outside of this count will be draw in the tray
+            int oppListSize = m_opponentChipList.Count;
 
             // Draw opponents tray
             for (int i = 0; i < m_maxNumChips; i++)
@@ -316,7 +336,7 @@ namespace NetworkBackgammon
                 Rectangle rectOpponent = new Rectangle(531, 269 + 8 * (i), 32, 8);
                 e.Graphics.DrawRectangle(trayOutlinePen, rectOpponent);
 
-                if (i < 5)
+                if (i > oppListSize)
                 {
                     // Load the bitmap directly from the manifest resource
                     Icon trayIcon = new Icon(this.GetType(), "Resources.Player2TrayChip.ico");
@@ -335,7 +355,11 @@ namespace NetworkBackgammon
             {
                // Draw the back ground image
                e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
-               e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
+
+               if (!m_initDiceRoll)
+               {
+                   e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
+               }
             }
             else // Check here if its the current players turn
             {
@@ -343,7 +367,11 @@ namespace NetworkBackgammon
                 {
                     // Draw the back ground image
                     e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
-                    e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
+
+                    if (!m_initDiceRoll)
+                    {
+                        e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
+                    }
                 }
             }
         }
@@ -497,13 +525,29 @@ namespace NetworkBackgammon
                     Random random = new Random();
 
                     m_playerDiceIndex[0] = random.Next(0, 5);
-                    m_playerDiceIndex[1] = random.Next(0, 5);
+                    
+                    // Check if the this is the initial dice roll (only need one dice)
+                    if (!m_initDiceRoll)
+                    {
+                        m_playerDiceIndex[1] = random.Next(0, 5);
+                    }
                 }
                 else
                 {
+                    if( m_initDiceRoll )
+                    {
+                        m_playerDiceIndex[0] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
+                    }
+                    else
+                    {
+                       // m_playerDiceIndex[0] = NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
+                       // m_playerDiceIndex[1] = NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
+                    }
+
                     m_diceRolling = false;
                 }
 
+                // Redraw the screen
                 Refresh();
             }
         }
@@ -513,6 +557,12 @@ namespace NetworkBackgammon
         {
             // Stop the timer loop
             timerRollDice.Stop();
+
+            // Stop listening to the player 
+            if (NetworkBackgammonClient.Instance.Player != null)
+            {
+                NetworkBackgammonClient.Instance.Player.RemoveListener(this);
+            }
         }
     }
 }
