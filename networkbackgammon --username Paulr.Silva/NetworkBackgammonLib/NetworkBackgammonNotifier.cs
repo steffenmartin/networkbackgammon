@@ -12,38 +12,20 @@ namespace NetworkBackgammonLib
     [Serializable]
     public class NetworkBackgammonNotifier : INetworkBackgammonNotifier
     {
-        // Named emaphore to lock network notifier across process boundaries
-        //private static Semaphore _semLock;
-        // List of registered listeners
         List<INetworkBackgammonListener> m_listeners = new List<INetworkBackgammonListener>();
         // The actual notifier (sender)
         INetworkBackgammonNotifier sender = null;
-        // Semaphore lock timeout (ms)
-        int semLockTimeout = 1000;
 
         // Constructor sets the actual notifier
         public NetworkBackgammonNotifier(INetworkBackgammonNotifier _sender)
         {
-            //_semLock = new Semaphore(0, 1);// "NetworkBackgammonSemLock");
-
             sender = _sender;
         }
 
         // Destructor clears all listeners
         ~NetworkBackgammonNotifier()
         {
-            // Wait for semaphore to become avaiable
-            //if (_semLock.WaitOne(semLockTimeout))
-            {
-                foreach (INetworkBackgammonListener listner in m_listeners)
-                {
-                   listner.RemoveNotifier(this);
-                }
-
-                m_listeners.Clear();
-
-                //_semLock.Release();
-            }
+            m_listeners.Clear();
         }
 
         #region INetworkBackgammonNotifier Members
@@ -53,18 +35,12 @@ namespace NetworkBackgammonLib
         {
             bool retval = false;
 
-             // Wait for semaphore to become avaiable
-            //if (_semLock.WaitOne(semLockTimeout))
+            if (!m_listeners.Contains(listener))
             {
-                if (!m_listeners.Contains(listener))
-                {
-                    listener.AddNotifier(this);
-                    m_listeners.Add(listener);
+                listener.AddNotifier(this);
+                m_listeners.Add(listener);
 
-                    retval = true;
-                }
-
-                //_semLock.Release();
+                retval = true;
             }
 
             return retval;
@@ -73,52 +49,31 @@ namespace NetworkBackgammonLib
         // Remove listener - fails if not found
         public bool RemoveListener(INetworkBackgammonListener listener)
         {
-            bool retval = false;
+            bool retval = m_listeners.Contains(listener);
 
-            // Wait for semaphore to become avaiable
-            //if (_semLock.WaitOne(semLockTimeout))
+            if (retval)
             {
-                retval = m_listeners.Contains(listener);
-
-                if (retval)
-                {
-                    listener.RemoveNotifier(this);
-                    m_listeners.Remove(listener);
-                }
-
-                //_semLock.Release();
+                //listener.RemoveNotifier(this);
+                m_listeners.Remove(listener);
             }
-
             return retval;
         }
 
         // Broadcast notification to listeners
         public void Broadcast(INetworkBackgammonEvent notificationEvent)
         {
-            // Wait for semaphore to become avaiable
-            //if (_semLock.WaitOne(semLockTimeout))
+            foreach (INetworkBackgammonListener listner in m_listeners)
             {
-                foreach (INetworkBackgammonListener listner in m_listeners)
-                {
-                    listner.OnEventNotification(sender, notificationEvent);
-                }
-
-                //_semLock.Release();
+                listner.OnEventNotification(sender, notificationEvent);
             }
         }
 
         // Broadcast notification to listeners on behalt of a sender
         public void Broadcast(INetworkBackgammonEvent notificationEvent, INetworkBackgammonNotifier notifier)
         {
-             // Wait for semaphore to become avaiable
-            //if (_semLock.WaitOne(semLockTimeout))
+           foreach (INetworkBackgammonListener listner in m_listeners)
             {
-                foreach (INetworkBackgammonListener listner in m_listeners)
-                {
-                    listner.OnEventNotification(notifier, notificationEvent);
-                }
-
-                //_semLock.Release();
+                listner.OnEventNotification(notifier, notificationEvent);
             }
         }
 

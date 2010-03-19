@@ -97,6 +97,7 @@
             this.Name = "NetworkBackgammonScoreBoard";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "NetworkBackgammonScoreBoard";
+            this.Load += new System.EventHandler(this.NetworkBackgammonScoreBoard_Load);
             this.groupPlayerScoreBoard.ResumeLayout(false);
             this.groupPlayerScoreBoard.PerformLayout();
             this.ResumeLayout(false);

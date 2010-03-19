@@ -249,13 +249,13 @@ namespace NetworkBackgammonGameLogicUnitTest
                             NetworkBackgammonChallengeEvent challengeEvent = (NetworkBackgammonChallengeEvent)e;
 
                             bool challengeResponse = MessageBox.Show(
-                                "Accept game challenge from " + challengeEvent.ChallengingPlayer.PlayerName + "?",
+                                "Accept game challenge from " + challengeEvent.ChallengingPlayer + "?",
                                 "Game Challenge",
                                 MessageBoxButtons.YesNo,
                                 MessageBoxIcon.Question,
                                 MessageBoxDefaultButton.Button1) == DialogResult.Yes;
-                            
-                            player.RespondToChallenge(challengeResponse);
+
+                            player.RespondToChallenge(challengeResponse, challengeEvent.ChallengingPlayer);
 
                             groupBoxGameControls.Enabled = challengeResponse;
                         }
@@ -367,7 +367,9 @@ namespace NetworkBackgammonGameLogicUnitTest
                 player != null &&
                 listBoxConnectedPlayers.SelectedItem != null)
             {
-                if (gameRoom.Challenge(player, (NetworkBackgammonPlayer)listBoxConnectedPlayers.SelectedItem))
+                NetworkBackgammonPlayer challengedPlayer = (NetworkBackgammonPlayer)listBoxConnectedPlayers.SelectedItem;
+
+                if (gameRoom.Challenge(player.PlayerName, challengedPlayer.PlayerName))
                 {
                     groupBoxGameControls.Enabled = true;
                 }
