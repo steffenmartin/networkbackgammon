@@ -76,7 +76,7 @@ namespace NetworkBackgammon
             }
         }
 
-
+        // Handler for receiving message and displaying new message
         private void RecvMessage(string sender, string msg)
         {
             msgTextBox.AppendText(("\r\n" + sender + ": " + msg));
@@ -84,6 +84,7 @@ namespace NetworkBackgammon
             msgTextBox.Refresh();
         }
 
+        // Send a message out...
         private void SendMessage()
         {
             string sendString = String.Copy(textMsgSendBox.Text);
