@@ -301,15 +301,17 @@ namespace NetworkBackgammonRemotingLib
                             gameSession.Start();
                         }
 
+                        challengeSyncList.Remove(_challengedPlayer);
+
                         // Give the challenging player the challenge response 
                         Broadcast(new NetworkBackgammonChallengeResponseEvent(retval, _challengedPlayerName, _challengingPlayerName));
                     }
                     else
                     {
+                        challengeSyncList.Remove(_challengedPlayer);
+
                         retval = false;
                     }
-
-                    challengeSyncList.Remove(_challengedPlayer);
                 }
             }
 
@@ -511,12 +513,21 @@ namespace NetworkBackgammonRemotingLib
                 if (e is NetworkBackgammonChallengeResponseEvent)
                 {
                     NetworkBackgammonChallengeResponseEvent challengeResponseEvent = (NetworkBackgammonChallengeResponseEvent)e;
+                    
                     if (challengeSyncList.Keys.Contains(player))
                     {
                         if (challengeSyncList[player] != null)
                         {
                             challengeSyncList[player].ChallengeAccepted = challengeResponseEvent.ChallengeAccepted;
-                            challengeSyncList[player].ChallengeSemaphore.Release();
+
+                            try
+                            {
+                                challengeSyncList[player].ChallengeSemaphore.Release();
+                            }
+                            catch (SemaphoreFullException ex)
+                            {
+                                // TODO: If this exception occurs calling Release too many times...
+                            }
                         }
                     }
                 }

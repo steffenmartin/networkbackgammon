@@ -15,10 +15,13 @@ namespace NetworkBackgammon
     {
         INetworkBackgammonListener m_defaultListener = new NetworkBackgammonListener();
         delegate void OnRecvMessage(string sender, string msg);
+        delegate void OnSendMessage();
 
         public NetworkBackgammonChat()
         {
             InitializeComponent();
+
+            textMsgSendBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(CheckKeys);
         }
 
         #region INetworkBackgammonListener Members
@@ -60,14 +63,81 @@ namespace NetworkBackgammon
             
         #endregion
 
+        // Check if the enter key was pressed in the text box
+        private void CheckKeys(object sender, System.Windows.Forms.KeyPressEventArgs e)              
+        {
+            if (e.KeyChar == (char)13)
+            {
+                if (sender == textMsgSendBox)
+                {
+                    // Then Enter key was pressed...send message
+                    BeginInvoke( new OnSendMessage(SendMessage));
+                }
+            }
+        }
+
+
         private void RecvMessage(string sender, string msg)
         {
-            msgTextBox.Text += ("\n" + sender + ": " + msg);
+            msgTextBox.AppendText(("\r\n" + sender + ": " + msg));
+            msgTextBox.ScrollToCaret();
+            msgTextBox.Refresh();
+        }
+
+        private void SendMessage()
+        {
+            string sendString = String.Copy(textMsgSendBox.Text);
+
+            if (!String.IsNullOrEmpty(sendString))
+            {
+                msgTextBox.AppendText(("\r\n" + NetworkBackgammonClient.Instance.Player.PlayerName + ": " + sendString));
+                msgTextBox.ScrollToCaret();
+                msgTextBox.Refresh();
+
+                // Send out them message...
+                NetworkBackgammonClient.Instance.SendMsg(sendString);
+            }
+
+            // Set the curor back to the beginning
+            textMsgSendBox.SelectionStart = 0;
+            textMsgSendBox.SelectionLength = 0;
+            textMsgSendBox.Refresh();
+            textMsgSendBox.Text = "";
+
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            NetworkBackgammonClient.Instance.SendMsg(textMsgSendBox.Text);
+            SendMessage();
+        }
+
+        private void NetworkBackgammonChat_VisibleChanged(object sender, EventArgs e)
+        {
+            if (Visible)
+            {
+                // Become a listener of the player 
+                if (NetworkBackgammonClient.Instance.Player != null)
+                {
+                    NetworkBackgammonClient.Instance.Player.AddListener(this);
+                }
+            }
+            else
+            {
+                // Remove self as a listener of player
+                if (NetworkBackgammonClient.Instance.Player != null)
+                {
+                    NetworkBackgammonClient.Instance.Player.RemoveListener(this);
+                }
+            }
+        }
+
+        private void NetworkBackgammonChat_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Remove self as a listener of player
+            if (NetworkBackgammonClient.Instance.Player != null)
+            {
+                NetworkBackgammonClient.Instance.Player.RemoveListener(this);
+            }
         }
     }
 }
