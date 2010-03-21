@@ -143,7 +143,7 @@ namespace NetworkBackgammonGameLogic
         /// <summary>
         /// The dice for this game session
         /// </summary>
-        NetworkBackgammonDice[] dice = new NetworkBackgammonDice[] { new NetworkBackgammonDice(1), new NetworkBackgammonDice(2) };
+        NetworkBackgammonDice[] dice = null;
 
         #endregion
 
@@ -160,6 +160,19 @@ namespace NetworkBackgammonGameLogic
 
             player1 = _player1;
             player2 = _player2;
+
+            NetworkBackgammonDice dice1 = new NetworkBackgammonDice();
+            NetworkBackgammonDice dice2 = new NetworkBackgammonDice();
+
+            // Make sure the seeds used for the (pseudo) random generator instances are different
+            // (otherwise, both dice will always roll the same values)
+            while (dice1.Seed == dice2.Seed)
+            {
+                Thread.Sleep(1);
+                dice2 = new NetworkBackgammonDice();
+            }
+
+            dice = new NetworkBackgammonDice[] { dice1, dice2 };
         }
 
         /// <summary>

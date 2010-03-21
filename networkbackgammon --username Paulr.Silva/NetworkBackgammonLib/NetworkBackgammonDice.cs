@@ -49,6 +49,11 @@ namespace NetworkBackgammonLib
         /// </summary>
         bool flagUsed = false;
 
+        /// <summary>
+        /// The seed used to create the (pseudo) random generator instance
+        /// </summary>
+        Int32 seed = 0;
+
         #endregion
 
         #region Methods
@@ -58,7 +63,9 @@ namespace NetworkBackgammonLib
         /// </summary>
         public NetworkBackgammonDice()
         {
-            rand = new Random();
+            seed = DateTime.Now.Millisecond;
+
+            rand = new Random(seed);
         }
 
         /// <summary>
@@ -130,6 +137,17 @@ namespace NetworkBackgammonLib
             set
             {
                 flagUsed = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the seed used to create the (pseudo) random generator instance
+        /// </summary>
+        public Int32 Seed
+        {
+            get
+            {
+                return seed;
             }
         }
 
