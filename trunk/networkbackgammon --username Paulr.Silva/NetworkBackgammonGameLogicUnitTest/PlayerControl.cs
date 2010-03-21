@@ -126,13 +126,13 @@ namespace NetworkBackgammonGameLogicUnitTest
                                 if (listBoxCheckers.SelectedItem != null &&
                                     listBoxMoves.SelectedItem != null)
                                 {
-                                    player.Broadcast(new GameSessionMoveSelectedEvent((NetworkBackgammonChecker)listBoxCheckers.SelectedItem, (NetworkBackgammonDice)listBoxMoves.SelectedItem));
+                                    player.MakeMove((NetworkBackgammonChecker)listBoxCheckers.SelectedItem, (NetworkBackgammonDice)listBoxMoves.SelectedItem);
                                 }
                             }
                             break;
                         case NetworkBackgammonGameSessionEvent.GameSessionEventType.InitialDiceRolled:
                             {
-                                player.Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.InitialDiceRolledAcknowledged));
+                                player.AcknowledgeInitialDiceRoll();
                             }
                             break;
                     }

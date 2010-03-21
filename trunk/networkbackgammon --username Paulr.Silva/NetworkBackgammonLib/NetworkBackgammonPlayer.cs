@@ -105,6 +105,24 @@ namespace NetworkBackgammonLib
             Broadcast(new NetworkBackgammonChallengeResponseEvent(acceptChallenge, PlayerName, challengingPlayerName));
         }
 
+        /// <summary>
+        /// Acknowledge the initial dice roll
+        /// </summary>
+        public void AcknowledgeInitialDiceRoll()
+        {
+            Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.InitialDiceRolledAcknowledged));
+        }
+
+        /// <summary>
+        /// Make a move
+        /// </summary>
+        /// <param name="_checkerSelected">(Selected) checker to be a move performed with</param>
+        /// <param name="_moveSelected">(Selected) move to be performed</param>
+        public void MakeMove(NetworkBackgammonChecker _checkerSelected, NetworkBackgammonDice _moveSelected)
+        {
+            Broadcast(new GameSessionMoveSelectedEvent(_checkerSelected, _moveSelected));
+        }
+
         #endregion
 
         #region Properties
