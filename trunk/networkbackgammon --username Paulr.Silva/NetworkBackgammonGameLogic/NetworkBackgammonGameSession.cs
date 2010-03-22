@@ -257,6 +257,11 @@ namespace NetworkBackgammonGameLogic
 
                     case GameSessionState.InitialDiceRoll:
                         {
+                            // Initialize both players checkers to their intial configuration
+                            // (start positions)
+                            player1.InitCheckers();
+                            player2.InitCheckers();
+
                             // Use random number generator to figure out which player starts
                             RollDice();
 
