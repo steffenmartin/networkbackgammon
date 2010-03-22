@@ -312,9 +312,6 @@ namespace NetworkBackgammonGameLogic
                                         else
                                             player2.Active = true;
 
-                                        // Roll dice for the first move of active player
-                                        RollDice();
-
                                         // Calculate number of moves left for active player (based on dice values)
                                         activePlayerMoveDoubles = dice[0].CurrentValue == dice[1].CurrentValue;
                                         activePlayerMovesLeft = (UInt32)(activePlayerMoveDoubles ? 4 : 2);
