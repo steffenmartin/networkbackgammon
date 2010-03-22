@@ -63,15 +63,15 @@ namespace NetworkBackgammonLib
             defaultNotifier = new NetworkBackgammonNotifier(this);
 
             strPlayerName = _strPlayerName;
-
-            InitCheckers();
         }
 
         /// <summary>
         /// Initializes list of checkers in their initial positions.
         /// </summary>
-        private void InitCheckers()
+        public void InitCheckers()
         {
+            checkers.Clear();
+
             // 2 checkers on 1
             checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.ONE)));
             checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.ONE)));
