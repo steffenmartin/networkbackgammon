@@ -115,6 +115,8 @@ namespace NetworkBackgammonGameLogicUnitTest
 
         private void buttonAction_Click(object sender, EventArgs e)
         {
+            bool actionPerformed = false;
+
             try
             {
                 if (player != null)
@@ -127,12 +129,16 @@ namespace NetworkBackgammonGameLogicUnitTest
                                     listBoxMoves.SelectedItem != null)
                                 {
                                     player.MakeMove((NetworkBackgammonChecker)listBoxCheckers.SelectedItem, (NetworkBackgammonDice)listBoxMoves.SelectedItem);
+
+                                    actionPerformed = true;
                                 }
                             }
                             break;
                         case NetworkBackgammonGameSessionEvent.GameSessionEventType.InitialDiceRolled:
                             {
                                 player.AcknowledgeInitialDiceRoll();
+
+                                actionPerformed = true;
                             }
                             break;
                     }
@@ -146,9 +152,27 @@ namespace NetworkBackgammonGameLogicUnitTest
             }
             finally
             {
-                buttonAction.Enabled = false;
-                buttonAction.Text = "[No Action]";
-                lastGameSessionEventType = NetworkBackgammonGameSessionEvent.GameSessionEventType.Invalid;
+                if (actionPerformed)
+                {
+                    buttonAction.Enabled = false;
+                    buttonAction.Text = "[No Action]";
+                    lastGameSessionEventType = NetworkBackgammonGameSessionEvent.GameSessionEventType.Invalid;
+                }
+            }
+        }
+
+        private void buttonResign_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (player != null)
+                {
+                    player.ResignFromGame();
+                }
+            }
+            catch (Exception ex)
+            {
+                listBoxLog.Items.Add(ex.Message);
             }
         }
 
@@ -218,6 +242,11 @@ namespace NetworkBackgammonGameLogicUnitTest
                 buttonAction.Enabled = false;
                 buttonAction.Text = "[No Action]";
 
+                listBoxCheckers.Items.Clear();
+                listBoxMoves.Items.Clear();
+
+                #region Sender: Game Room
+
                 if (sender is NetworkBackgammonRemoteGameRoom)
                 {
                     try
@@ -264,6 +293,11 @@ namespace NetworkBackgammonGameLogicUnitTest
                         listBoxLog.Items.Add(ex.Message);
                     }
                 }
+
+                #endregion
+
+                #region Sender: Game Session
+
                 else if (sender is NetworkBackgammonGameSession)
                 {
                     // Filter out broadcasts from our own player
@@ -290,6 +324,8 @@ namespace NetworkBackgammonGameLogicUnitTest
 
                                 switch (gameSessionEvent.EventType)
                                 {
+                                    #region Actions for initial dice roll
+
                                     case NetworkBackgammonGameSessionEvent.GameSessionEventType.InitialDiceRolled:
                                         {
                                             if (player.InitialDice != null)
@@ -307,10 +343,12 @@ namespace NetworkBackgammonGameLogicUnitTest
                                         }
                                         break;
 
+                                    #endregion
+
+                                    #region Actions for checker update
+
                                     case NetworkBackgammonGameSessionEvent.GameSessionEventType.CheckerUpdated:
                                         {
-                                            listBoxCheckers.Items.Clear();
-
                                             if (player.Active)
                                             {
                                                 listBoxLog.Items.Add("I'm the active player, expected to make the next move ...");
@@ -341,6 +379,30 @@ namespace NetworkBackgammonGameLogicUnitTest
                                             }
                                         }
                                         break;
+
+                                    #endregion
+
+                                    #region Actions for player resignation
+
+                                    case NetworkBackgammonGameSessionEvent.GameSessionEventType.PlayerResigned:
+                                        {
+                                            listBoxLog.Items.Add("Player has resigned from current game");
+
+                                            listBoxCheckers.Items.Clear();
+
+                                            groupBoxGameControls.BackColor = SystemColors.Control;
+
+                                            groupBoxGameControls.Enabled = false;
+                                        }
+                                        break;
+
+                                    case NetworkBackgammonGameSessionEvent.GameSessionEventType.GameFinished:
+                                        {
+                                            listBoxLog.Items.Add("Game finished");
+                                        }
+                                        break;
+
+                                    #endregion
                                 }
                             }
                         }
@@ -350,6 +412,8 @@ namespace NetworkBackgammonGameLogicUnitTest
                         }
                     }
                 }
+
+                #endregion
             }
         }
 
@@ -377,6 +441,11 @@ namespace NetworkBackgammonGameLogicUnitTest
                     listBoxLog.Items.Add("Challenge failed (selected opponent rejected or timeout waiting for challenge response)!");
                 }
             }
+        }
+
+        private void clearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            listBoxLog.Items.Clear();
         }
     }
 }
