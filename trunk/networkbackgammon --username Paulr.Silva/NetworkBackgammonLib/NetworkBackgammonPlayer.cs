@@ -123,6 +123,14 @@ namespace NetworkBackgammonLib
             Broadcast(new GameSessionMoveSelectedEvent(_checkerSelected, _moveSelected));
         }
 
+        /// <summary>
+        /// Resign from the current game (forfeit)
+        /// </summary>
+        public void ResignFromGame()
+        {
+            Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.PlayerResigned));
+        }
+
         #endregion
 
         #region Properties

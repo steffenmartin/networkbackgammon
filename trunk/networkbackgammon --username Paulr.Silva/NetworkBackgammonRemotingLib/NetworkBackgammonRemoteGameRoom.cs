@@ -130,6 +130,30 @@ namespace NetworkBackgammonRemotingLib
         /// </summary>
         int challengeRequestTimeoutMs = 10000;
 
+        /// <summary>
+        /// Thread to monitor ongoing game sessions
+        /// </summary>
+        /// <remarks>
+        /// Amongst other things, it allows to asynchronously stop (thread join) a game session (i.e. through a message
+        /// sent from the game session, which is supposed/about to be stopped)
+        /// </remarks>
+        Thread gameSessionsMonitor = null;
+
+        /// <summary>
+        /// Semaphore for synchronization with the game sessions thread (wake-up call)
+        /// </summary>
+        Semaphore gameSessionsSemaphore = new Semaphore(0, 1);
+
+        /// <summary>
+        /// Flag to stop game session monitor
+        /// </summary>
+        bool gameSessionsMonitorKeepRunning = false;
+
+        /// <summary>
+        /// Queue for collection events and associated data to be processed by the game session monitor
+        /// </summary>
+        Queue<NetworkBackgammonEventQueueElement> gameSessionsEventQueue = new Queue<NetworkBackgammonEventQueueElement>();
+
         #endregion
 
         #region Methods
@@ -254,7 +278,6 @@ namespace NetworkBackgammonRemotingLib
         /// <param name="_challengingPlayer">Challenging backgammon player</param>
         /// <param name="_challengedPlayer">Challenged backgammon player</param>
         /// <returns></returns>
-        //public bool Challenge(NetworkBackgammonPlayer _challengingPlayer, NetworkBackgammonPlayer _challengedPlayer)
         public bool Challenge(string _challengingPlayerName, string _challengedPlayerName)
         {
             bool retval = false;
@@ -285,16 +308,12 @@ namespace NetworkBackgammonRemotingLib
                         // Create and start game session if challenge has been accepted by challenged player
                         if (retval)
                         {
+                            // Create game session monitor if it doesn't exist yet
+                            StartGameSessionMonitor();
+
+                            // Create game session instance
                             NetworkBackgammonGameSession gameSession = new NetworkBackgammonGameSession(_challengingPlayer, _challengedPlayer);
 
-                            // Game Session is listening for events from Player 1
-                            _challengingPlayer.AddListener(gameSession);
-                            // Player 1 is listening for events from Game Session
-                            gameSession.AddListener(_challengingPlayer);
-                            // Game Session is listening for events form Player 2
-                            _challengedPlayer.AddListener(gameSession);
-                            // Player 2 is listening for events from Game Session
-                            gameSession.AddListener(_challengedPlayer);
                             // Append to list of game sessions...
                             gameSessions.Add(gameSession);
                             // Start the game...
@@ -319,38 +338,6 @@ namespace NetworkBackgammonRemotingLib
         }
 
         /// <summary>
-        /// Start the game session with two consenting players
-        /// </summary>
-        /// <param name="_challengingPlayer">Challenging backgammon player</param>
-        /// <param name="_challengedPlayer">Challenged backgammon player</param>
-        /// <returns></returns>
-        public bool StartGame(NetworkBackgammonPlayer _challengingPlayer, NetworkBackgammonPlayer _challengedPlayer)
-        {
-            bool retval = false;
-
-            // Check if the players are in the available playe game room list
-            if (connectedPlayers.Contains(_challengingPlayer) && connectedPlayers.Contains(_challengedPlayer))
-            {
-                // Check if players are currently free to participate in a game session
-                if (!IsPlayerInGameSession(_challengingPlayer) && !IsPlayerInGameSession(_challengedPlayer))
-                {
-                    // Create new game session with the consenting players
-                    NetworkBackgammonGameSession newSession = new NetworkBackgammonGameSession(_challengingPlayer, _challengedPlayer);
-
-                    // Add the game session to the game session list
-                    gameSessions.Add(newSession);
-
-                    // Startup the game...
-                    newSession.Start();
-
-                    retval = true;
-                }
-            }
-
-            return retval;
-        }
-
-        /// <summary>
         /// Shutdown the game room - stop all sessions
         /// </summary>
         public void Shutdown()
@@ -362,6 +349,8 @@ namespace NetworkBackgammonRemotingLib
 
             gameSessions.Clear();
             connectedPlayers.Clear();
+
+            StopGameSessionMonitor();
         }
 
         /// <summary>
@@ -450,6 +439,88 @@ namespace NetworkBackgammonRemotingLib
             return retval;
         }
 
+        /// <summary>
+        /// Start game session monitor (if it doesn't exit yet)
+        /// </summary>
+        private void StartGameSessionMonitor()
+        {
+            if (gameSessionsMonitor == null)
+            {
+                gameSessionsMonitor = new Thread(new ThreadStart(GameSessionsMonitorThreadFunc));
+
+                gameSessionsMonitorKeepRunning = true;
+
+                gameSessionsMonitor.Start();
+            }
+        }
+
+        /// <summary>
+        /// Stop game session monitor
+        /// </summary>
+        private void StopGameSessionMonitor()
+        {
+            if (gameSessionsMonitor != null)
+            {
+                // Set flag to stop game session monitor
+                gameSessionsMonitorKeepRunning = false;
+
+                // Wakeup game session monitor
+                gameSessionsSemaphore.Release();
+
+                // Wait for game sessions monitor to finish (force abort
+                // if necessary)
+                if (!gameSessionsMonitor.Join(100))
+                {
+                    gameSessionsMonitor.Abort();
+                }
+
+                gameSessionsMonitor = null;
+            }
+        }
+
+        /// <summary>
+        /// Game session monitor (worker thread)
+        /// </summary>
+        public void GameSessionsMonitorThreadFunc()
+        {
+            NetworkBackgammonEventQueueElement queueElement = null;
+
+            while (gameSessionsMonitorKeepRunning)
+            {
+                gameSessionsSemaphore.WaitOne();
+
+                lock (gameSessionsEventQueue)
+                {
+                    if (gameSessionsEventQueue.Count > 0)
+                    {
+                        queueElement = gameSessionsEventQueue.Dequeue();
+                    }
+                }
+
+                if (queueElement != null)
+                {
+                    if (queueElement.Notifier is NetworkBackgammonGameSession &&
+                        queueElement.Event is NetworkBackgammonGameSessionEvent)
+                    {
+                        NetworkBackgammonGameSession gameSession = (NetworkBackgammonGameSession)queueElement.Notifier;
+                        NetworkBackgammonGameSessionEvent gameSessionEvent = (NetworkBackgammonGameSessionEvent)queueElement.Event;
+
+                        if (gameSessionEvent.EventType == NetworkBackgammonGameSessionEvent.GameSessionEventType.GameFinished)
+                        {
+                            gameSession.Stop();
+
+                            gameSessions.Remove(gameSession);
+
+                            gameSession = null;
+
+                            GC.Collect();
+                        }
+                    }
+                }
+
+                queueElement = null;
+            }
+        }
         
         #endregion
 
@@ -535,6 +606,48 @@ namespace NetworkBackgammonRemotingLib
                 {
                     // Pass the message through to the listeners
                     Broadcast((NetworkBackgammonChatEvent)e);
+                }
+            }
+            else if (sender is NetworkBackgammonGameSession)
+            {
+                NetworkBackgammonGameSession gameSession = (NetworkBackgammonGameSession)sender;
+
+                if (e is NetworkBackgammonGameSessionEvent)
+                {
+                    NetworkBackgammonGameSessionEvent gameSessionEvent = (NetworkBackgammonGameSessionEvent)e;
+
+                    if (gameSessionEvent.EventType == NetworkBackgammonGameSessionEvent.GameSessionEventType.GameFinished)
+                    {
+                        bool newQueueItemAdd = true;
+
+                        NetworkBackgammonEventQueueElement newQueueItem = new NetworkBackgammonEventQueueElement(e, sender);
+
+                        lock (newQueueItem)
+                        {
+                            /*
+                            if (gameSessionsEventQueue.Count > 0)
+                            {
+                                NetworkBackgammonEventQueueElement lastQueueItem = gameSessionsEventQueue.Last();
+                                // Avoid adding the same event (from the same sender) twice
+                                // Reason: Game Room listens to events from all players, i.e. also
+                                // both players that are in one Game Session. Thus, all events broadcasted
+                                // by the Game Session arrive here (at the Game Room) twice
+                                if (gameSessionsEventQueue.Last().Notifier == sender &&
+                                    gameSessionsEventQueue.Last().Event == e)
+                                {
+                                    newQueueItemAdd = false;
+                                }
+                            }
+                            */
+
+                            if (newQueueItemAdd)
+                            {
+                                gameSessionsEventQueue.Enqueue(new NetworkBackgammonEventQueueElement(e, sender));
+
+                                gameSessionsSemaphore.Release();
+                            }
+                        }
+                    }
                 }
             }
         }

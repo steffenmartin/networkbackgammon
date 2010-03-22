@@ -37,6 +37,7 @@
             this.listBoxCheckers = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.buttonForfeit = new System.Windows.Forms.Button();
             this.buttonAction = new System.Windows.Forms.Button();
             this.listBoxLog = new System.Windows.Forms.ListBox();
             this.groupBoxGameRoomControls = new System.Windows.Forms.GroupBox();
@@ -44,9 +45,12 @@
             this.listBoxConnectedPlayers = new System.Windows.Forms.ListBox();
             this.contextMenuStripConnectedPlayers = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.challengeToolStripMenuItemChallenge = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStripLog = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBoxGameControls.SuspendLayout();
             this.groupBoxGameRoomControls.SuspendLayout();
             this.contextMenuStripConnectedPlayers.SuspendLayout();
+            this.contextMenuStripLog.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBoxPlayerName
@@ -82,6 +86,7 @@
             this.groupBoxGameControls.Controls.Add(this.listBoxCheckers);
             this.groupBoxGameControls.Controls.Add(this.label3);
             this.groupBoxGameControls.Controls.Add(this.label2);
+            this.groupBoxGameControls.Controls.Add(this.buttonForfeit);
             this.groupBoxGameControls.Controls.Add(this.buttonAction);
             this.groupBoxGameControls.Location = new System.Drawing.Point(3, 170);
             this.groupBoxGameControls.Name = "groupBoxGameControls";
@@ -125,11 +130,21 @@
             this.label2.TabIndex = 1;
             this.label2.Text = "Checkers";
             // 
+            // buttonForfeit
+            // 
+            this.buttonForfeit.Location = new System.Drawing.Point(9, 137);
+            this.buttonForfeit.Name = "buttonForfeit";
+            this.buttonForfeit.Size = new System.Drawing.Size(108, 23);
+            this.buttonForfeit.TabIndex = 0;
+            this.buttonForfeit.Text = "Resign";
+            this.buttonForfeit.UseVisualStyleBackColor = true;
+            this.buttonForfeit.Click += new System.EventHandler(this.buttonResign_Click);
+            // 
             // buttonAction
             // 
-            this.buttonAction.Location = new System.Drawing.Point(9, 133);
+            this.buttonAction.Location = new System.Drawing.Point(123, 137);
             this.buttonAction.Name = "buttonAction";
-            this.buttonAction.Size = new System.Drawing.Size(222, 23);
+            this.buttonAction.Size = new System.Drawing.Size(108, 23);
             this.buttonAction.TabIndex = 0;
             this.buttonAction.Text = "[No Action]";
             this.buttonAction.UseVisualStyleBackColor = true;
@@ -137,6 +152,7 @@
             // 
             // listBoxLog
             // 
+            this.listBoxLog.ContextMenuStrip = this.contextMenuStripLog;
             this.listBoxLog.FormattingEnabled = true;
             this.listBoxLog.HorizontalScrollbar = true;
             this.listBoxLog.Location = new System.Drawing.Point(3, 341);
@@ -188,6 +204,20 @@
             this.challengeToolStripMenuItemChallenge.Text = "Challenge";
             this.challengeToolStripMenuItemChallenge.Click += new System.EventHandler(this.challengeToolStripMenuItemChallenge_Click);
             // 
+            // contextMenuStripLog
+            // 
+            this.contextMenuStripLog.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.clearToolStripMenuItem});
+            this.contextMenuStripLog.Name = "contextMenuStripLog";
+            this.contextMenuStripLog.Size = new System.Drawing.Size(102, 26);
+            // 
+            // clearToolStripMenuItem
+            // 
+            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.clearToolStripMenuItem.Text = "Clear";
+            this.clearToolStripMenuItem.Click += new System.EventHandler(this.clearToolStripMenuItem_Click);
+            // 
             // PlayerControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -206,6 +236,7 @@
             this.groupBoxGameRoomControls.ResumeLayout(false);
             this.groupBoxGameRoomControls.PerformLayout();
             this.contextMenuStripConnectedPlayers.ResumeLayout(false);
+            this.contextMenuStripLog.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -228,5 +259,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripConnectedPlayers;
         private System.Windows.Forms.ToolStripMenuItem challengeToolStripMenuItemChallenge;
+        private System.Windows.Forms.Button buttonForfeit;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripLog;
+        private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
     }
 }
