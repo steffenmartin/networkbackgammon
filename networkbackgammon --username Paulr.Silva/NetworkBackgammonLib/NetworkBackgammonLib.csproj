@@ -45,6 +45,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameSessionCheckerUpdatedEvent.cs" />
+    <Compile Include="GameSessionInitialDiceRollAcknowledgeEvent.cs" />
+    <Compile Include="GameSessionInitialDiceRollEvent.cs" />
+    <Compile Include="GameSessionPlayerResignationEvent.cs" />
     <Compile Include="NetworkBackgammonEventQueueElement.cs" />
     <Compile Include="NetworkBackgammonChallengeEvent.cs" />
     <Compile Include="NetworkBackgammonChallengeResponseEvent.cs" />

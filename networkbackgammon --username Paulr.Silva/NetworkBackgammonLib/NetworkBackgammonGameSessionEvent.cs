@@ -10,17 +10,17 @@ namespace NetworkBackgammonLib
     {
         public enum GameSessionEventType
         {
-            PlayerResigned,
             GameFinished,
-            InitialDiceRolled,
-            InitialDiceRolledAcknowledged,
-            CheckerUpdated,
-            MoveSelected,
             Error,
             Invalid
         };
 
         protected GameSessionEventType type;
+
+        public NetworkBackgammonGameSessionEvent()
+        {
+            type = GameSessionEventType.Invalid;
+        }
 
         public NetworkBackgammonGameSessionEvent(GameSessionEventType _type)
         {

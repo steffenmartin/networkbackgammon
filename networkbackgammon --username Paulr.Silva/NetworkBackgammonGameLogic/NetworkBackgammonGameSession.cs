@@ -233,16 +233,9 @@ namespace NetworkBackgammonGameLogic
                 // Handle special events that interfere with the regular game play (e.g. player resignation)
                 if (eventQueueElement != null)
                 {
-                    if (eventQueueElement.Event is NetworkBackgammonGameSessionEvent)
+                    if (eventQueueElement.Event is GameSessionPlayerResignationEvent)
                     {
-                        NetworkBackgammonGameSessionEvent gameSessionEvent = (NetworkBackgammonGameSessionEvent)eventQueueElement.Event;
-
-                        switch (gameSessionEvent.EventType)
-                        {
-                            case NetworkBackgammonGameSessionEvent.GameSessionEventType.PlayerResigned:
-                                currentState = GameSessionState.PlayerResigned;
-                                break;
-                        }
+                        currentState = GameSessionState.PlayerResigned;
                     }
                 }
 
@@ -277,7 +270,9 @@ namespace NetworkBackgammonGameLogic
                             player1.InitialDice = dice[0];
                             player2.InitialDice = dice[1];
 
-                            Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.InitialDiceRolled));
+                            Broadcast(new GameSessionInitialDiceRollEvent(
+                                player1.PlayerName, player1.InitialDice,
+                                player2.PlayerName, player2.InitialDice));
 
                             currentState = GameSessionState.InitialDiceRollAcknowledgeExpected;
                         }
@@ -293,36 +288,36 @@ namespace NetworkBackgammonGameLogic
                             {
                                 try
                                 {
-                                    NetworkBackgammonGameSessionEvent gameSessionEvent = (NetworkBackgammonGameSessionEvent)eventQueueElement.Event;
-
-                                    // Latch (flag) acknowledge of initial dice roll from respective player
-                                    if (gameSessionEvent.EventType == NetworkBackgammonGameSessionEvent.GameSessionEventType.InitialDiceRolledAcknowledged)
+                                    if (eventQueueElement.Event is GameSessionInitialDiceRollAcknowledgeEvent)
                                     {
+                                        GameSessionInitialDiceRollAcknowledgeEvent gameSessionEvent = (GameSessionInitialDiceRollAcknowledgeEvent)eventQueueElement.Event;
+
                                         NetworkBackgammonPlayer sendingPlayer = (NetworkBackgammonPlayer)eventQueueElement.Notifier;
 
+                                        // Latch (flag) acknowledge of initial dice roll from respective player
                                         sendingPlayer.InitialDice.FlagUsed = true;
-                                    }
 
-                                    // Check whether both players have acknowledged initial dice roll
-                                    if (player1.InitialDice.FlagUsed && player2.InitialDice.FlagUsed)
-                                    {
-                                        // Determine active player (the one who won the initial dice roll
-                                        if (dice[0].CurrentValueUInt32 > dice[1].CurrentValueUInt32)
-                                            player1.Active = true;
-                                        else
-                                            player2.Active = true;
+                                        // Check whether both players have acknowledged initial dice roll
+                                        if (player1.InitialDice.FlagUsed && player2.InitialDice.FlagUsed)
+                                        {
+                                            // Determine active player (the one who won the initial dice roll
+                                            if (dice[0].CurrentValueUInt32 > dice[1].CurrentValueUInt32)
+                                                player1.Active = true;
+                                            else
+                                                player2.Active = true;
 
-                                        // Calculate number of moves left for active player (based on dice values)
-                                        activePlayerMoveDoubles = dice[0].CurrentValue == dice[1].CurrentValue;
-                                        activePlayerMovesLeft = (UInt32)(activePlayerMoveDoubles ? 4 : 2);
+                                            // Calculate number of moves left for active player (based on dice values)
+                                            activePlayerMoveDoubles = dice[0].CurrentValue == dice[1].CurrentValue;
+                                            activePlayerMovesLeft = (UInt32)(activePlayerMoveDoubles ? 4 : 2);
 
-                                        // Calculate possible moves for active player
-                                        NetworkBackgammonGameEngine.CalculatePossibleMoves(ref player1, ref player2, activePlayerMoveDoubles ? new NetworkBackgammonDice[] { dice[0] } : dice);
-                                        // Send initial checkers with positions (and possible valid moves
-                                        // for the active player) to both players
-                                        Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.CheckerUpdated));
-                                        // Set next iteration's state
-                                        currentState = GameSessionState.MoveExpected;
+                                            // Calculate possible moves for active player
+                                            NetworkBackgammonGameEngine.CalculatePossibleMoves(ref player1, ref player2, activePlayerMoveDoubles ? new NetworkBackgammonDice[] { dice[0] } : dice);
+                                            // Send initial checkers with positions (and possible valid moves
+                                            // for the active player) to both players
+                                            Broadcast(new GameSessionCheckerUpdatedEvent(player1, player2, dice[0], dice[1]));
+                                            // Set next iteration's state
+                                            currentState = GameSessionState.MoveExpected;
+                                        }
                                     }
                                 }
                                 catch (Exception)
@@ -378,7 +373,7 @@ namespace NetworkBackgammonGameLogic
                                                     new NetworkBackgammonDice[] { dice[0] == moveSelectedEvent.MoveSelected ? dice[1] : dice[0] });
                                             // Send updated checkers with positions (and possible valid moves
                                             // for the active player) to both players
-                                            Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.CheckerUpdated));
+                                            Broadcast(new GameSessionCheckerUpdatedEvent(player1, player2, dice[0], dice[1]));
                                         }
                                         else
                                         {
@@ -410,7 +405,7 @@ namespace NetworkBackgammonGameLogic
                                 {
                                     NetworkBackgammonPlayer resignedPlayer = (NetworkBackgammonPlayer)eventQueueElement.Notifier;
 
-                                    Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.PlayerResigned));
+                                    Broadcast(new GameSessionPlayerResignationEvent(resignedPlayer.PlayerName));
 
                                     currentState = GameSessionState.GameFinished;
                                 }
