@@ -18,7 +18,7 @@ namespace NetworkBackgammonGameLogicUnitTest
 
         NetworkBackgammonRemoteGameRoom gameRoom = null;
         NetworkBackgammonPlayer player = null;
-        NetworkBackgammonGameSessionEvent.GameSessionEventType lastGameSessionEventType = NetworkBackgammonGameSessionEvent.GameSessionEventType.Invalid;
+        Type lastGameSessionEventType = null;
 
         public PlayerControl()
         {
@@ -121,26 +121,21 @@ namespace NetworkBackgammonGameLogicUnitTest
             {
                 if (player != null)
                 {
-                    switch (lastGameSessionEventType)
+                    if (lastGameSessionEventType == typeof(GameSessionInitialDiceRollEvent))
                     {
-                        case NetworkBackgammonGameSessionEvent.GameSessionEventType.CheckerUpdated:
-                            {
-                                if (listBoxCheckers.SelectedItem != null &&
-                                    listBoxMoves.SelectedItem != null)
-                                {
-                                    player.MakeMove((NetworkBackgammonChecker)listBoxCheckers.SelectedItem, (NetworkBackgammonDice)listBoxMoves.SelectedItem);
+                        player.AcknowledgeInitialDiceRoll();
 
-                                    actionPerformed = true;
-                                }
-                            }
-                            break;
-                        case NetworkBackgammonGameSessionEvent.GameSessionEventType.InitialDiceRolled:
-                            {
-                                player.AcknowledgeInitialDiceRoll();
+                        actionPerformed = true;
+                    }
+                    else if (lastGameSessionEventType == typeof(GameSessionCheckerUpdatedEvent))
+                    {
+                        if (listBoxCheckers.SelectedItem != null &&
+                            listBoxMoves.SelectedItem != null)
+                        {
+                            player.MakeMove((NetworkBackgammonChecker)listBoxCheckers.SelectedItem, (NetworkBackgammonDice)listBoxMoves.SelectedItem);
 
-                                actionPerformed = true;
-                            }
-                            break;
+                            actionPerformed = true;
+                        }
                     }
                 }
 
@@ -156,7 +151,7 @@ namespace NetworkBackgammonGameLogicUnitTest
                 {
                     buttonAction.Enabled = false;
                     buttonAction.Text = "[No Action]";
-                    lastGameSessionEventType = NetworkBackgammonGameSessionEvent.GameSessionEventType.Invalid;
+                    lastGameSessionEventType = null;
                 }
             }
         }
@@ -309,100 +304,110 @@ namespace NetworkBackgammonGameLogicUnitTest
 
                             if (e is NetworkBackgammonGameSessionEvent)
                             {
-                                NetworkBackgammonGameSessionEvent gameSessionEvent = (NetworkBackgammonGameSessionEvent)e;
-
                                 // Generate warning if last event has been overwritten
                                 // (Currently every event received is supposed to be responded too by means of an
                                 //  action (e.g. move, dice roll acknowledge, etc), which resets the last event type to invalid)
-                                if (lastGameSessionEventType != NetworkBackgammonGameSessionEvent.GameSessionEventType.Invalid)
+                                if (lastGameSessionEventType != null)
                                 {
-                                    listBoxLog.Items.Add("Warning: Overwriting last event (" + lastGameSessionEventType + ") with new event " + gameSessionEvent.EventType + " (i.e. last event hasn't been responded to by means of an action)");
+                                    listBoxLog.Items.Add("Warning: Overwriting last event (" + lastGameSessionEventType.ToString() + ") with new event " + e.GetType().ToString() + " (i.e. last event hasn't been responded to by means of an action)");
                                 }
 
                                 // Latch the event type
-                                lastGameSessionEventType = gameSessionEvent.EventType;
+                                lastGameSessionEventType = e.GetType();
+                            }
+
+                            #region Actions for initial dice roll
+
+                            if (e is GameSessionInitialDiceRollEvent)
+                            {
+                                GameSessionInitialDiceRollEvent gameSessionInitialDiceRollEvent = (GameSessionInitialDiceRollEvent)e;
+
+                                // if (player.InitialDice != null)
+                                if (gameSessionInitialDiceRollEvent.GetDiceForPlayer(player.PlayerName) != null)
+                                {
+                                    listBoxLog.Items.Add("Initial dice rolled: " + gameSessionInitialDiceRollEvent.GetDiceForPlayer(player.PlayerName).CurrentValue);
+
+                                    buttonAction.Enabled = true;
+
+                                    buttonAction.Text = "Confirm initial dice roll";
+                                }
+                                else
+                                {
+                                    listBoxLog.Items.Add("Warning: Event received is " + e.GetType().ToString() + " but dice values are missing");
+                                }
+                            }
+
+                            #endregion
+
+                            #region Actions for checker update
+
+                            else if (e is GameSessionCheckerUpdatedEvent)
+                            {
+                                GameSessionCheckerUpdatedEvent gameSessionCheckerUpdateEvent = (GameSessionCheckerUpdatedEvent)e;
+
+                                player = gameSessionCheckerUpdateEvent.GetPlayerByName(player.PlayerName);
+
+                                if (player.Active)
+                                {
+                                    listBoxLog.Items.Add("I'm the active player, expected to make the next move ...");
+
+                                    groupBoxGameControls.BackColor = Color.DarkGreen;
+
+                                    buttonAction.Enabled = true;
+
+                                    buttonAction.Text = "Make Move";
+                                }
+                                else
+                                {
+                                    groupBoxGameControls.BackColor = Color.DarkRed;
+                                }
+
+                                string strDice = "";
+
+                                foreach (NetworkBackgammonDice d in gameSessionCheckerUpdateEvent.DiceRolled)
+                                {
+                                    strDice += " " + d.CurrentValue;
+                                }
+
+                                listBoxLog.Items.Add("Dice: " + strDice);
+
+                                foreach (NetworkBackgammonChecker checker in player.Checkers)
+                                {
+                                    listBoxCheckers.Items.Add(checker);
+                                }
+                            }
+
+                            #endregion
+
+                            #region Actions for player resignation
+
+                            else if (e is GameSessionPlayerResignationEvent)
+                            {
+                                GameSessionPlayerResignationEvent gameSessionPlayerResignationEvent = (GameSessionPlayerResignationEvent)e;
+
+                                listBoxLog.Items.Add("Player " + gameSessionPlayerResignationEvent.ResigningPlayer + " has resigned from current game");
+
+                                listBoxCheckers.Items.Clear();
+
+                                groupBoxGameControls.BackColor = SystemColors.Control;
+
+                                groupBoxGameControls.Enabled = false;
+
+                            }
+
+                            #endregion
+
+                            else if (e is NetworkBackgammonGameSessionEvent)
+                            {
+                                NetworkBackgammonGameSessionEvent gameSessionEvent = (NetworkBackgammonGameSessionEvent)e;
 
                                 switch (gameSessionEvent.EventType)
                                 {
-                                    #region Actions for initial dice roll
-
-                                    case NetworkBackgammonGameSessionEvent.GameSessionEventType.InitialDiceRolled:
-                                        {
-                                            if (player.InitialDice != null)
-                                            {
-                                                listBoxLog.Items.Add("Initial dice rolled: " + player.InitialDice.CurrentValue);
-
-                                                buttonAction.Enabled = true;
-
-                                                buttonAction.Text = "Confirm initial dice roll";
-                                            }
-                                            else
-                                            {
-                                                listBoxLog.Items.Add("Warning: Event type received is " + gameSessionEvent.EventType + " but dice values are missing");
-                                            }
-                                        }
-                                        break;
-
-                                    #endregion
-
-                                    #region Actions for checker update
-
-                                    case NetworkBackgammonGameSessionEvent.GameSessionEventType.CheckerUpdated:
-                                        {
-                                            if (player.Active)
-                                            {
-                                                listBoxLog.Items.Add("I'm the active player, expected to make the next move ...");
-
-                                                groupBoxGameControls.BackColor = Color.DarkGreen;
-
-                                                buttonAction.Enabled = true;
-
-                                                buttonAction.Text = "Make Move";
-                                            }
-                                            else
-                                            {
-                                                groupBoxGameControls.BackColor = Color.DarkRed;
-                                            }
-
-                                            string strDice = "";
-
-                                            foreach (NetworkBackgammonDice d in gameSession.CurrentDice)
-                                            {
-                                                strDice += " " + d.CurrentValue;
-                                            }
-
-                                            listBoxLog.Items.Add("Dice: " + strDice);
-
-                                            foreach (NetworkBackgammonChecker checker in player.Checkers)
-                                            {
-                                                listBoxCheckers.Items.Add(checker);
-                                            }
-                                        }
-                                        break;
-
-                                    #endregion
-
-                                    #region Actions for player resignation
-
-                                    case NetworkBackgammonGameSessionEvent.GameSessionEventType.PlayerResigned:
-                                        {
-                                            listBoxLog.Items.Add("Player has resigned from current game");
-
-                                            listBoxCheckers.Items.Clear();
-
-                                            groupBoxGameControls.BackColor = SystemColors.Control;
-
-                                            groupBoxGameControls.Enabled = false;
-                                        }
-                                        break;
-
                                     case NetworkBackgammonGameSessionEvent.GameSessionEventType.GameFinished:
                                         {
                                             listBoxLog.Items.Add("Game finished");
                                         }
                                         break;
-
-                                    #endregion
                                 }
                             }
                         }

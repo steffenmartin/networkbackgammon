@@ -110,7 +110,7 @@ namespace NetworkBackgammonLib
         /// </summary>
         public void AcknowledgeInitialDiceRoll()
         {
-            Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.InitialDiceRolledAcknowledged));
+            Broadcast(new GameSessionInitialDiceRollAcknowledgeEvent(PlayerName));
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace NetworkBackgammonLib
         /// </summary>
         public void ResignFromGame()
         {
-            Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.PlayerResigned));
+            Broadcast(new GameSessionPlayerResignationEvent(PlayerName));
         }
 
         #endregion
