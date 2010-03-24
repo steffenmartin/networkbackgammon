@@ -48,6 +48,9 @@
     <Compile Include="GameSessionCheckerUpdatedEvent.cs" />
     <Compile Include="GameSessionInitialDiceRollAcknowledgeEvent.cs" />
     <Compile Include="GameSessionInitialDiceRollEvent.cs" />
+    <Compile Include="GameSessionMoveExpectedEvent.cs" />
+    <Compile Include="GameSessionNoPossibleMovesAcknowledgeEvent.cs" />
+    <Compile Include="GameSessionNoPossibleMovesEvent.cs" />
     <Compile Include="GameSessionPlayerResignationEvent.cs" />
     <Compile Include="NetworkBackgammonEventQueueElement.cs" />
     <Compile Include="NetworkBackgammonChallengeEvent.cs" />
