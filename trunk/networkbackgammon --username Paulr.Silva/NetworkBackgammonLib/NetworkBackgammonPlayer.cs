@@ -124,6 +124,14 @@ namespace NetworkBackgammonLib
         }
 
         /// <summary>
+        /// Acknowledges the fact that the player (even though active) has no (valid) moves
+        /// </summary>
+        public void AcknowledgeNoMoves()
+        {
+            Broadcast(new GameSessionNoPossibleMovesAcknowledgeEvent(PlayerName));
+        }
+
+        /// <summary>
         /// Resign from the current game (forfeit)
         /// </summary>
         public void ResignFromGame()

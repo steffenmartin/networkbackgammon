@@ -127,7 +127,7 @@ namespace NetworkBackgammonGameLogicUnitTest
 
                         actionPerformed = true;
                     }
-                    else if (lastGameSessionEventType == typeof(GameSessionCheckerUpdatedEvent))
+                    else if (lastGameSessionEventType == typeof(GameSessionMoveExpectedEvent))
                     {
                         if (listBoxCheckers.SelectedItem != null &&
                             listBoxMoves.SelectedItem != null)
@@ -136,6 +136,12 @@ namespace NetworkBackgammonGameLogicUnitTest
 
                             actionPerformed = true;
                         }
+                    }
+                    else if (lastGameSessionEventType == typeof(GameSessionNoPossibleMovesEvent))
+                    {
+                        player.AcknowledgeNoMoves();
+
+                        actionPerformed = true;
                     }
                 }
 
@@ -237,9 +243,6 @@ namespace NetworkBackgammonGameLogicUnitTest
                 buttonAction.Enabled = false;
                 buttonAction.Text = "[No Action]";
 
-                listBoxCheckers.Items.Clear();
-                listBoxMoves.Items.Clear();
-
                 #region Sender: Game Room
 
                 if (sender is NetworkBackgammonRemoteGameRoom)
@@ -320,6 +323,9 @@ namespace NetworkBackgammonGameLogicUnitTest
 
                             if (e is GameSessionInitialDiceRollEvent)
                             {
+                                listBoxCheckers.Items.Clear();
+                                listBoxMoves.Items.Clear();
+
                                 GameSessionInitialDiceRollEvent gameSessionInitialDiceRollEvent = (GameSessionInitialDiceRollEvent)e;
 
                                 // if (player.InitialDice != null)
@@ -343,24 +349,12 @@ namespace NetworkBackgammonGameLogicUnitTest
 
                             else if (e is GameSessionCheckerUpdatedEvent)
                             {
+                                listBoxCheckers.Items.Clear();
+                                listBoxMoves.Items.Clear();
+
                                 GameSessionCheckerUpdatedEvent gameSessionCheckerUpdateEvent = (GameSessionCheckerUpdatedEvent)e;
 
                                 player = gameSessionCheckerUpdateEvent.GetPlayerByName(player.PlayerName);
-
-                                if (player.Active)
-                                {
-                                    listBoxLog.Items.Add("I'm the active player, expected to make the next move ...");
-
-                                    groupBoxGameControls.BackColor = Color.DarkGreen;
-
-                                    buttonAction.Enabled = true;
-
-                                    buttonAction.Text = "Make Move";
-                                }
-                                else
-                                {
-                                    groupBoxGameControls.BackColor = Color.DarkRed;
-                                }
 
                                 string strDice = "";
 
@@ -379,10 +373,61 @@ namespace NetworkBackgammonGameLogicUnitTest
 
                             #endregion
 
+                            #region Actions for move expected
+
+                            else if (e is GameSessionMoveExpectedEvent)
+                            {
+                                GameSessionMoveExpectedEvent gameSessionMoveExpectedEvent = (GameSessionMoveExpectedEvent)e;
+
+                                if (player.PlayerName == gameSessionMoveExpectedEvent.ActivePlayer)
+                                {
+                                    listBoxLog.Items.Add("I'm the active player, expected to make the next move ...");
+
+                                    groupBoxGameControls.BackColor = Color.DarkGreen;
+
+                                    buttonAction.Enabled = true;
+
+                                    buttonAction.Text = "Make Move";
+                                }
+                                else
+                                {
+                                    groupBoxGameControls.BackColor = Color.DarkRed;
+                                }
+                            }
+
+                            #endregion
+
+                            #region Actions for no (valid) move
+
+                            else if (e is GameSessionNoPossibleMovesEvent)
+                            {
+                                GameSessionNoPossibleMovesEvent gameSessionNoPossibleMovesEvent = (GameSessionNoPossibleMovesEvent)e;
+
+                                if (player.PlayerName == gameSessionNoPossibleMovesEvent.PlayerName)
+                                {
+                                    listBoxLog.Items.Add("I'm the active player, but have no (valid) moves ...");
+
+                                    groupBoxGameControls.BackColor = Color.DarkGreen;
+
+                                    buttonAction.Enabled = true;
+
+                                    buttonAction.Text = "Confirm";
+                                }
+                                else
+                                {
+                                    groupBoxGameControls.BackColor = Color.DarkRed;
+                                }
+                            }
+
+                            #endregion
+
                             #region Actions for player resignation
 
                             else if (e is GameSessionPlayerResignationEvent)
                             {
+                                listBoxCheckers.Items.Clear();
+                                listBoxMoves.Items.Clear();
+
                                 GameSessionPlayerResignationEvent gameSessionPlayerResignationEvent = (GameSessionPlayerResignationEvent)e;
 
                                 listBoxLog.Items.Add("Player " + gameSessionPlayerResignationEvent.ResigningPlayer + " has resigned from current game");
@@ -399,6 +444,9 @@ namespace NetworkBackgammonGameLogicUnitTest
 
                             else if (e is NetworkBackgammonGameSessionEvent)
                             {
+                                listBoxCheckers.Items.Clear();
+                                listBoxMoves.Items.Clear();
+
                                 NetworkBackgammonGameSessionEvent gameSessionEvent = (NetworkBackgammonGameSessionEvent)e;
 
                                 switch (gameSessionEvent.EventType)
