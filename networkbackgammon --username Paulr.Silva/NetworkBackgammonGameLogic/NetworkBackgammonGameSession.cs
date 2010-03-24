@@ -258,12 +258,6 @@ namespace NetworkBackgammonGameLogic
                             // Use random number generator to figure out which player starts
                             RollDice();
 
-                            // Roll dice until they're both different (no tie)
-                            while (dice[0].CurrentValue == dice[1].CurrentValue)
-                            {
-                                RollDice();
-                            }
-
                             player1.Active = false;
                             player2.Active = false;
 
@@ -300,23 +294,38 @@ namespace NetworkBackgammonGameLogic
                                         // Check whether both players have acknowledged initial dice roll
                                         if (player1.InitialDice.FlagUsed && player2.InitialDice.FlagUsed)
                                         {
-                                            // Determine active player (the one who won the initial dice roll
-                                            if (dice[0].CurrentValueUInt32 > dice[1].CurrentValueUInt32)
-                                                player1.Active = true;
+                                            // If dice rolled are a tie, roll again
+                                            if (dice[0].CurrentValue == dice[1].CurrentValue)
+                                            {
+                                                RollDice();
+
+                                                player1.InitialDice = dice[0];
+                                                player2.InitialDice = dice[1];
+
+                                                Broadcast(new GameSessionInitialDiceRollEvent(
+                                                    player1.PlayerName, player1.InitialDice,
+                                                    player2.PlayerName, player2.InitialDice));
+                                            }
                                             else
-                                                player2.Active = true;
+                                            {
+                                                // Determine active player (the one who won the initial dice roll
+                                                if (dice[0].CurrentValueUInt32 > dice[1].CurrentValueUInt32)
+                                                    player1.Active = true;
+                                                else
+                                                    player2.Active = true;
 
-                                            // Calculate number of moves left for active player (based on dice values)
-                                            activePlayerMoveDoubles = dice[0].CurrentValue == dice[1].CurrentValue;
-                                            activePlayerMovesLeft = (UInt32)(activePlayerMoveDoubles ? 4 : 2);
+                                                // Calculate number of moves left for active player (based on dice values)
+                                                activePlayerMoveDoubles = dice[0].CurrentValue == dice[1].CurrentValue;
+                                                activePlayerMovesLeft = (UInt32)(activePlayerMoveDoubles ? 4 : 2);
 
-                                            // Calculate possible moves for active player
-                                            NetworkBackgammonGameEngine.CalculatePossibleMoves(ref player1, ref player2, activePlayerMoveDoubles ? new NetworkBackgammonDice[] { dice[0] } : dice);
-                                            // Send initial checkers with positions (and possible valid moves
-                                            // for the active player) to both players
-                                            Broadcast(new GameSessionCheckerUpdatedEvent(player1, player2, dice[0], dice[1]));
-                                            // Set next iteration's state
-                                            currentState = GameSessionState.MoveExpected;
+                                                // Calculate possible moves for active player
+                                                NetworkBackgammonGameEngine.CalculatePossibleMoves(ref player1, ref player2, activePlayerMoveDoubles ? new NetworkBackgammonDice[] { dice[0] } : dice);
+                                                // Send initial checkers with positions (and possible valid moves
+                                                // for the active player) to both players
+                                                Broadcast(new GameSessionCheckerUpdatedEvent(player1, player2, dice[0], dice[1]));
+                                                // Set next iteration's state
+                                                currentState = GameSessionState.MoveExpected;
+                                            }
                                         }
                                     }
                                 }
