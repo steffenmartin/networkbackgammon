@@ -9,6 +9,10 @@ using System.Xml;
 
 namespace NetworkBackgammonRemotingLib
 {
+    /// <summary>
+    /// Class to manage the Player list for Network Backgammon
+    /// Save the list to an XML file in the Server local directory
+    /// </summary>
     class NetworkBackgammonPlayerList
     {
         DataTable playerDataTable;
