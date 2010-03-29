@@ -196,7 +196,7 @@ namespace NetworkBackgammon
             {
                 if (!NetworkBackgammonClient.Instance.GameRoom.RegisterPlayer(m_usernameTextBox.Text, m_passwordTextBox.Text))
                 {
-                    MessageBox.Show("Could not register: " + m_usernameTextBox.Text);
+                    MessageBox.Show(NetworkBackgammonClient.Instance.GameRoom.GetPlayerListError());
                 }
             }
         }
@@ -211,12 +211,6 @@ namespace NetworkBackgammon
                     NetworkBackgammonClient.Instance.GameRoom.Enter(m_usernameTextBox.Text, 
                                                                     m_passwordTextBox.Text);
 
-                // Register the remotable client object as a listner 
-                NetworkBackgammonClient.Instance.Player.AddListener(this);
-                // Register the parent window...
-                // TODO: Replace with notifier framework event
-                NetworkBackgammonClient.Instance.Player.AddListener(((NetworkBackGammonForm)Parent));
-               
                 if (NetworkBackgammonClient.Instance.Player == null)
                 {
                     MessageBox.Show("Could not login: " + m_usernameTextBox.Text);
@@ -226,6 +220,12 @@ namespace NetworkBackgammon
                 }
                 else
                 {
+                    // Register the remotable client object as a listener 
+                    NetworkBackgammonClient.Instance.Player.AddListener(this);
+                    // Register the parent window...
+                    // TODO: Replace with notifier framework event
+                    NetworkBackgammonClient.Instance.Player.AddListener(((NetworkBackGammonForm)Parent));
+
                     m_gameRoomPlayersListBox.Enabled = true;
                     m_playButton.Enabled = true;
                 }

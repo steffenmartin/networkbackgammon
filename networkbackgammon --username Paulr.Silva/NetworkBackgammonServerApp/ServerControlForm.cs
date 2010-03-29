@@ -30,9 +30,42 @@ namespace NetworkBackgammonServer
         // Log Message Delegate
         private delegate void OnLogMessageDelegate(string _message);
 
+        DataTable playerListTable;
+
         public ServerControlForm()
         {
             InitializeComponent();
+
+            playerListTable = new DataTable();
+            InitializePlayerTable();
+        }
+
+        private void InitializePlayerTable()
+        {
+            // Create table columns
+            DataColumn myColumn = new DataColumn();
+            myColumn.DataType = System.Type.GetType("System.String");
+            myColumn.ReadOnly = false;
+            myColumn.Caption = "Player Name";
+            myColumn.ColumnName = "PlayerName";
+            playerListTable.Columns.Add(myColumn);
+
+            myColumn = new DataColumn();
+            myColumn.DataType = System.Type.GetType("System.String");
+            myColumn.ReadOnly = false;
+            myColumn.Caption = "Player Password";
+            myColumn.ColumnName = "Password";
+            playerListTable.Columns.Add(myColumn);
+
+            myColumn = new DataColumn();
+            myColumn.DataType = System.Type.GetType("System.String");
+            myColumn.ReadOnly = false;
+            myColumn.Caption = "Player Login";
+            myColumn.ColumnName = "Login";
+            playerListTable.Columns.Add(myColumn);
+
+            playerListGridView.DataSource = playerListTable;
+
         }
 
         /**
@@ -113,6 +146,12 @@ namespace NetworkBackgammonServer
         private void Log(string message)
         {
             m_serverLogListBox.Items.Add(message);
+        }
+
+        // Update player list
+        private void UpdateList(DataTable playerTable)
+        {
+
         }
 
         #region INetworkBackgammonListener Members
