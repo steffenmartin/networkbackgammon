@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -113,7 +114,7 @@ namespace NetworkBackgammonRemotingLib
         /// <summary>
         /// Hashtable with clients username and passwords
         /// </summary>
-        Dictionary<string, string> clientUsernameList = new Dictionary<string, string>();
+        //Dictionary<string, string> clientUsernameList = new Dictionary<string, string>();
 
         /// <summary>
         /// Hashtable with data required for synchronizing game challenged (requests/responses)
@@ -154,6 +155,11 @@ namespace NetworkBackgammonRemotingLib
         /// </summary>
         Queue<NetworkBackgammonEventQueueElement> gameSessionsEventQueue = new Queue<NetworkBackgammonEventQueueElement>();
 
+        /// <summary>
+        /// Persistant list of registered Backgammon players
+        /// </summary>
+        NetworkBackgammonPlayerList gamePlayerList = new NetworkBackgammonPlayerList();
+
         #endregion
 
         #region Methods
@@ -162,7 +168,7 @@ namespace NetworkBackgammonRemotingLib
         /// Constructor
         /// </summary>
         public NetworkBackgammonRemoteGameRoom()
-        {
+        { 
             defaultNotifier = new NetworkBackgammonNotifier(this);
         }
 
@@ -182,14 +188,16 @@ namespace NetworkBackgammonRemotingLib
          */
         public bool RegisterPlayer(string username, string pw)
         {
-            bool retval = !clientUsernameList.ContainsKey(username);
+            //bool retval = !clientUsernameList.ContainsKey(username);
+            return gamePlayerList.AddPlayer(username, pw);
 
-            if (retval)
-            {
-                clientUsernameList.Add(username, pw);
-            }
+            //if (retval)
+            //{
 
-            return retval;
+            //    clientUsernameList.Add(username, pw);
+            //}
+
+            //return retval;
         }
 
         /**
@@ -201,10 +209,11 @@ namespace NetworkBackgammonRemotingLib
         {
             NetworkBackgammonPlayer newPlayer = new NetworkBackgammonPlayer(_playerName);
 
-            // Check the user is alread in the list
-            if (!connectedPlayers.Contains(newPlayer) && 
-                clientUsernameList.ContainsKey(_playerName) &&
-                string.Compare(clientUsernameList[_playerName], pw, false) == 0)
+            // Validate player
+            bool goodPlayer = gamePlayerList.VerifyLogin(_playerName, pw);
+
+            // Check the user is already in the list
+            if (!connectedPlayers.Contains(newPlayer) && goodPlayer)
             {
                 // Add new player object to the game room list
                 connectedPlayers.Add(newPlayer);
@@ -336,6 +345,12 @@ namespace NetworkBackgammonRemotingLib
 
             return retval;
         }
+
+        public string GetPlayerListError()
+        {
+            return gamePlayerList.GetError();
+        }
+
 
         /// <summary>
         /// Shutdown the game room - stop all sessions
