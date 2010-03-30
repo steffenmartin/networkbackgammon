@@ -41,6 +41,7 @@ namespace NetworkBackgammonLib
         /// <summary>
         /// Random number generator
         /// </summary>
+        [NonSerialized]
         Random rand = null;
 
         /// <summary>
@@ -106,11 +107,19 @@ namespace NetworkBackgammonLib
         /// <summary>
         /// Gets the current dice value
         /// </summary>
+        /// <remarks>
+        /// Remove 'set' part as soon as all testing & debugging is completed.
+        /// It's currently used for XML (de-)serialization.
+        /// </remarks>
         public DiceValue CurrentValue
         {
             get
             {
                 return currentValue;
+            }
+            set
+            {
+                currentValue = value;
             }
         }
 

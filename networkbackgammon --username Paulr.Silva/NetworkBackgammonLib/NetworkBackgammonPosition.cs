@@ -97,6 +97,16 @@ namespace NetworkBackgammonLib
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <remarks>
+        /// Parameterless constructor, mainly required for serialization.
+        /// </remarks>
+        public NetworkBackgammonPosition()
+        {
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         /// <param name="_position">Initial position</param>
         public NetworkBackgammonPosition(GameBoardPosition _position)
         {
@@ -144,11 +154,19 @@ namespace NetworkBackgammonLib
         /// <summary>
         /// Gets the current position on the game board
         /// </summary>
+        /// <remarks>
+        /// Remove 'set' part as soon as all testing & debugging is completed.
+        /// It's currently used for XML (de-)serialization.
+        /// </remarks>
         public GameBoardPosition CurrentPosition
         {
             get
             {
                 return currentPosition;
+            }
+            set
+            {
+                currentPosition = value;
             }
         }
 

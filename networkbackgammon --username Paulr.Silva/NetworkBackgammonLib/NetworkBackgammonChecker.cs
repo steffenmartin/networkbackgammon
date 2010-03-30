@@ -31,6 +31,17 @@ namespace NetworkBackgammonLib
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <remarks>
+        /// Parameterless constructor, mainly required for serialization.
+        /// </remarks>
+        public NetworkBackgammonChecker()
+        {
+            currentPosition = new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.INVALID);
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         /// <param name="_position">Initial position of this checker</param>
         public NetworkBackgammonChecker(NetworkBackgammonPosition _position)
         {
@@ -64,11 +75,19 @@ namespace NetworkBackgammonLib
         /// <summary>
         /// Gets the current position of this checker
         /// </summary>
+        /// <remarks>
+        /// Remove 'set' part as soon as all testing & debugging is completed.
+        /// It's currently used for XML (de-)serialization.
+        /// </remarks>
         public NetworkBackgammonPosition CurrentPosition
         {
             get
             {
                 return currentPosition;
+            }
+            set
+            {
+                currentPosition = value;
             }
         }
 

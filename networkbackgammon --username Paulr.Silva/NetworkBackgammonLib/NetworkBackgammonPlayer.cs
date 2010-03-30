@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NetworkBackgammonLib;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace NetworkBackgammonLib
 {
@@ -66,34 +68,103 @@ namespace NetworkBackgammonLib
         }
 
         /// <summary>
+        /// Destructor
+        /// </summary>
+        /// <remarks>
+        /// For debugging purposes: Try to serialize the checkers of this player
+        /// </remarks>
+        ~NetworkBackgammonPlayer()
+        {
+            TextWriter textWriter = null;
+
+            try
+            {
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<NetworkBackgammonChecker>));
+
+                textWriter = new StreamWriter(strPlayerName + ".out.xml");
+
+                xmlSerializer.Serialize(textWriter, checkers);
+
+                textWriter.Close();
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                if (textWriter != null)
+                {
+                    textWriter.Close();
+                }
+            }
+        }
+
+        /// <summary>
         /// Initializes list of checkers in their initial positions.
         /// </summary>
+        /// <remarks>
+        /// For debugging purposes: Try to de-serialize players checkers if a respective XML file can be found.
+        /// </remarks>
         public void InitCheckers()
         {
-            checkers.Clear();
+            TextReader textReader = null;
 
-            // 2 checkers on 1
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.ONE)));
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.ONE)));
+            try
+            {
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<NetworkBackgammonChecker>));
 
-            // 5 checkers on 12
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.TWELVE)));
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.TWELVE)));
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.TWELVE)));
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.TWELVE)));
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.TWELVE)));
+                textReader = new StreamReader(strPlayerName + ".in.xml");
 
-            // 3 checkers on 17
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.SEVENTEEN)));
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.SEVENTEEN)));
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.SEVENTEEN)));
+                checkers = (List<NetworkBackgammonChecker>)xmlSerializer.Deserialize(textReader);
 
-            // 5 checkers on 19
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
-            checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
+                textReader.Close();
+
+                if (checkers != null)
+                {
+                    if (checkers.Count != 15)
+                    {
+                        throw new Exception();
+                    }
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            catch (Exception)
+            {
+                checkers.Clear();
+
+                // 2 checkers on 1
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.ONE)));
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.ONE)));
+
+                // 5 checkers on 12
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.TWELVE)));
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.TWELVE)));
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.TWELVE)));
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.TWELVE)));
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.TWELVE)));
+
+                // 3 checkers on 17
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.SEVENTEEN)));
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.SEVENTEEN)));
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.SEVENTEEN)));
+
+                // 5 checkers on 19
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
+                checkers.Add(new NetworkBackgammonChecker(new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.NINETEEN)));
+            }
+            finally
+            {
+                if (textReader != null)
+                {
+                    textReader.Close();
+                }
+            }
         }
 
         /// <summary>
