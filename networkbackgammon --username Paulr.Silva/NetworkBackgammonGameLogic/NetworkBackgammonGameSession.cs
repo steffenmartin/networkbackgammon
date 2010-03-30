@@ -124,7 +124,7 @@ namespace NetworkBackgammonGameLogic
         /// </remarks>
         ~NetworkBackgammonGameSession()
         {
-            Stop();
+            //Stop();
         }
 
         /// <summary>

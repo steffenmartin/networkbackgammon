@@ -40,8 +40,8 @@
             this.Client = new System.Windows.Forms.ColumnHeader();
             this.activity = new System.Windows.Forms.ColumnHeader();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.gameRoomListView = new System.Windows.Forms.ListView();
             this.playerListGridView = new System.Windows.Forms.DataGridView();
+            this.gameRoomListView = new System.Windows.Forms.ListView();
             this.ServerControlTab.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -155,6 +155,14 @@
             this.tabPage3.Text = "Game Room";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // playerListGridView
+            // 
+            this.playerListGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.playerListGridView.Location = new System.Drawing.Point(6, 17);
+            this.playerListGridView.Name = "playerListGridView";
+            this.playerListGridView.Size = new System.Drawing.Size(498, 115);
+            this.playerListGridView.TabIndex = 1;
+            // 
             // gameRoomListView
             // 
             this.gameRoomListView.Location = new System.Drawing.Point(6, 148);
@@ -162,14 +170,6 @@
             this.gameRoomListView.Size = new System.Drawing.Size(498, 132);
             this.gameRoomListView.TabIndex = 0;
             this.gameRoomListView.UseCompatibleStateImageBehavior = false;
-            // 
-            // playerListGridView
-            // 
-            this.playerListGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.playerListGridView.Location = new System.Drawing.Point(19, 17);
-            this.playerListGridView.Name = "playerListGridView";
-            this.playerListGridView.Size = new System.Drawing.Size(471, 115);
-            this.playerListGridView.TabIndex = 1;
             // 
             // ServerControlForm
             // 
