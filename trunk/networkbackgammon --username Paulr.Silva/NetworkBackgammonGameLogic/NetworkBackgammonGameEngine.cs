@@ -84,7 +84,7 @@ namespace NetworkBackgammonGameLogic
                 checkerHistogramAP[checkerAP.CurrentPosition.CurrentPosition] += 1;
             }
 
-            foreach (NetworkBackgammonChecker checkerWP in activePlayer.Checkers)
+            foreach (NetworkBackgammonChecker checkerWP in waitingPlayer.Checkers)
             {
                 if (checkerWP.CurrentPosition.GetOppositePosition().CurrentPosition != NetworkBackgammonPosition.GameBoardPosition.INVALID)
                 {
@@ -156,7 +156,9 @@ namespace NetworkBackgammonGameLogic
                     {
                         // Check whether waiting player occupies the potential position for active players checker
                         // (i.e. waiting player has more than 1 checker on the potential position)
-                        if (checkerHistogramWP[kvpDicePos.Value.CurrentPosition] <= 1)
+                        // or potential position is off board (which is allways possible)
+                        if (checkerHistogramWP[kvpDicePos.Value.CurrentPosition] <= 1 ||
+                            kvpDicePos.Value.CurrentPosition == NetworkBackgammonPosition.GameBoardPosition.OFFBOARD)
                         {
                             kvp.Key.PossibleMoves.Add(kvpDicePos.Key);
 
