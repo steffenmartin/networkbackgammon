@@ -409,6 +409,9 @@ namespace NetworkBackgammonGameLogic
                                         else
                                         {
                                             // Inform both players that the game has been won by the active player
+                                            Broadcast(new GameSessionPlayerWonEvent(sendingPlayer.PlayerName));
+
+                                            currentState = GameSessionState.GameFinished;
                                         }
                                     }
                                     else

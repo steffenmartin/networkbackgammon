@@ -52,6 +52,7 @@
     <Compile Include="GameSessionNoPossibleMovesAcknowledgeEvent.cs" />
     <Compile Include="GameSessionNoPossibleMovesEvent.cs" />
     <Compile Include="GameSessionPlayerResignationEvent.cs" />
+    <Compile Include="GameSessionPlayerWonEvent.cs" />
     <Compile Include="NetworkBackgammonEventQueueElement.cs" />
     <Compile Include="NetworkBackgammonChallengeEvent.cs" />
     <Compile Include="NetworkBackgammonChallengeResponseEvent.cs" />

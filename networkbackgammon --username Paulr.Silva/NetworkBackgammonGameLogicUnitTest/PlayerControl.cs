@@ -442,6 +442,33 @@ namespace NetworkBackgammonGameLogicUnitTest
 
                             #endregion
 
+                            #region Actions for player won game
+
+                            else if (e is GameSessionPlayerWonEvent)
+                            {
+                                listBoxCheckers.Items.Clear();
+                                listBoxMoves.Items.Clear();
+
+                                GameSessionPlayerWonEvent gameSessionPlayerWonEvent = (GameSessionPlayerWonEvent)e;
+
+                                if (gameSessionPlayerWonEvent.WinningPlayer == player.PlayerName)
+                                {
+                                    listBoxLog.Items.Add("Yeah!!! I won the game!!!");
+                                }
+                                else
+                                {
+                                    listBoxLog.Items.Add("Player " + gameSessionPlayerWonEvent.WinningPlayer + " won the game");
+                                }
+
+                                listBoxCheckers.Items.Clear();
+
+                                groupBoxGameControls.BackColor = SystemColors.Control;
+
+                                groupBoxGameControls.Enabled = false;
+                            }
+
+                            #endregion
+
                             else if (e is NetworkBackgammonGameSessionEvent)
                             {
                                 listBoxCheckers.Items.Clear();
