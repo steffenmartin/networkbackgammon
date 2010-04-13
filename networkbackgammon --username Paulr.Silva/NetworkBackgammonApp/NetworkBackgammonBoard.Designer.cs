@@ -50,6 +50,7 @@
             this.Load += new System.EventHandler(this.NetworkBackgammonBoard_Load);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.NetworkBackgammonBoard_MouseUp);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.NetworkBackgammonBoard_Paint);
+            this.VisibleChanged += new System.EventHandler(this.NetworkBackgammonBoard_VisibleChanged);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.NetworkBackgammonBoard_MouseDown);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NetworkBackgammonBoard_FormClosing);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.NetworkBackgammonBoard_MouseMove);
