@@ -62,7 +62,6 @@ namespace NetworkBackgammonLib
 
                 if (retval)
                 {
-                    //listener.RemoveNotifier(this);
                     m_listeners.Remove(listener);
                 }
             }
