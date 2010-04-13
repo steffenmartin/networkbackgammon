@@ -133,6 +133,16 @@ namespace NetworkBackgammon
                     DrawPlayerPositions();
                 }
             }
+            else if (e is GameSessionCheckerUpdatedEvent)
+            {
+            }
+            else if (e is GameSessionInitialDiceRollEvent)
+            {
+                m_playerRollDice = true;
+                m_initDiceRoll = true;
+
+                Refresh();
+            }
         }
 
         #endregion
@@ -602,6 +612,26 @@ namespace NetworkBackgammon
             if (NetworkBackgammonClient.Instance.Player != null)
             {
                 NetworkBackgammonClient.Instance.Player.RemoveListener(this);
+            }
+        }
+
+        private void NetworkBackgammonBoard_VisibleChanged(object sender, EventArgs e)
+        {
+            if (Visible)
+            {
+                // Become a listener of the player 
+                if (NetworkBackgammonClient.Instance.Player != null)
+                {
+                    NetworkBackgammonClient.Instance.Player.AddListener(this);
+                }
+            }
+            else
+            {
+                // Remove self as a listener of player
+                if (NetworkBackgammonClient.Instance.Player != null)
+                {
+                    NetworkBackgammonClient.Instance.Player.RemoveListener(this);
+                }
             }
         }
     }
