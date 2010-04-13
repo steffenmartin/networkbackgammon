@@ -110,7 +110,7 @@ namespace NetworkBackgammon
                     // Remove self as listener of the player's events
                     if (NetworkBackgammonClient.Instance.Player != null)
                     {
-                        NetworkBackgammonClient.Instance.Player.AddListener(this);
+                        NetworkBackgammonClient.Instance.Player.RemoveListener(this);
                     }
                     
                     // Remove self as a listener of game room events
