@@ -132,6 +132,7 @@ namespace NetworkBackgammon
 
                     IDictionary props = new Hashtable();
                     props["port"] = clientChannel;
+                    props["machineName"] = System.Environment.MachineName;
 
                     // Register a client channel so the server an communicate back - it needs a channel
                     // opened for the callback to the CallbackSink object that is anchored on the client!
