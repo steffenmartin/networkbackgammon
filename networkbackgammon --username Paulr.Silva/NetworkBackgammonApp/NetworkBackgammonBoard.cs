@@ -55,6 +55,8 @@ namespace NetworkBackgammon
         int[] m_playerDiceIndex = new int[2];
         // Dice index for the current player
         int[] m_opponentDiceIndex = new int[2];
+        /// Update the game board check positions
+        delegate void OnUpdateCheckerPositionsDelegate();
 
         // Constructor
         public NetworkBackgammonBoard()
@@ -102,6 +104,30 @@ namespace NetworkBackgammon
         public void OnEventNotification(INetworkBackgammonNotifier notifier, INetworkBackgammonEvent e)
         {
             // TODO: Add game session events here...
+
+            if ( (e is GameSessionMoveExpectedEvent) || 
+                 (e is GameSessionCheckerUpdatedEvent) ||
+                 (e is GameSessionInitialDiceRollAcknowledgeEvent) ||
+                 (e is NetworkBackgammonChallengeResponseEvent) )
+            {
+                GameSessionMoveExpectedEvent moveExpEvent = ((GameSessionMoveExpectedEvent)e);
+
+                // Update game piece positions
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new OnUpdateCheckerPositionsDelegate(DrawPlayerPositions));
+                }
+                else
+                {
+                    DrawPlayerPositions();
+                }
+
+                // Check if the player expected to make the move is this player
+                if (string.Equals(NetworkBackgammonClient.Instance.Player.PlayerName, moveExpEvent.ActivePlayer))
+                {
+                    // Unlock the GUI so the player can move...
+                }
+            }
         }
 
         #endregion

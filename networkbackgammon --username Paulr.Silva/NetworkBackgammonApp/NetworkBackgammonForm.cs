@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
 using NetworkBackgammonLib;
 using NetworkBackgammonRemotingLib;
 
@@ -212,6 +213,7 @@ namespace NetworkBackgammon
                 NetworkBackgammonClient.Instance.Player.RespondToChallenge(true, challengingPlayerName);
 
                 // TODO: What happens here when the other player cancels his decision to challenge?
+                Thread.Sleep(500);
             }
             else
             {
@@ -224,6 +226,7 @@ namespace NetworkBackgammon
         {
             if (challengeResponse)
             {
+                Thread.Sleep(500);
                 // Close the login window 
                 m_backgammonLogin.Hide();
                 // Show the board
