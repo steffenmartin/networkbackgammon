@@ -105,10 +105,7 @@ namespace NetworkBackgammon
         {
             // TODO: Add game session events here...
 
-            if ( (e is GameSessionMoveExpectedEvent) || 
-                 (e is GameSessionCheckerUpdatedEvent) ||
-                 (e is GameSessionInitialDiceRollAcknowledgeEvent) ||
-                 (e is NetworkBackgammonChallengeResponseEvent) )
+            if (e is GameSessionMoveExpectedEvent) 
             {
                 GameSessionMoveExpectedEvent moveExpEvent = ((GameSessionMoveExpectedEvent)e);
 
@@ -121,11 +118,19 @@ namespace NetworkBackgammon
                 {
                     DrawPlayerPositions();
                 }
+            }
+            else if (e is GameSessionCheckerUpdatedEvent)
+            {
+                GameSessionCheckerUpdatedEvent moveExpEvent = ((GameSessionCheckerUpdatedEvent)e);
 
-                // Check if the player expected to make the move is this player
-                if (string.Equals(NetworkBackgammonClient.Instance.Player.PlayerName, moveExpEvent.ActivePlayer))
+                // Update game piece positions
+                if (InvokeRequired)
                 {
-                    // Unlock the GUI so the player can move...
+                    BeginInvoke(new OnUpdateCheckerPositionsDelegate(DrawPlayerPositions));
+                }
+                else
+                {
+                    DrawPlayerPositions();
                 }
             }
         }
@@ -391,7 +396,7 @@ namespace NetworkBackgammon
             }
             else // Check here if its the current players turn
             {
-                if (!m_playerRollDice)
+                if (!m_playerRollDice && NetworkBackgammonClient.Instance.Player.Active )
                 {
                     // Draw the back ground image
                     e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
@@ -459,7 +464,7 @@ namespace NetworkBackgammon
         // Handle mouse down event - check if mouse click position is inside a players chip
         private void NetworkBackgammonBoard_MouseDown(object sender, MouseEventArgs e)
         {
-            if (!m_playerRollDice && !m_diceRolling )
+            if (!m_playerRollDice && !m_diceRolling && NetworkBackgammonClient.Instance.Player.Active )
             {
                 for (int i = (m_playerChipList.Count - 1); i != -1; i--)
                 {
@@ -562,18 +567,21 @@ namespace NetworkBackgammon
                 }
                 else
                 {
-                    if( m_initDiceRoll )
+                    if (m_initDiceRoll)
                     {
                         m_playerDiceIndex[0] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
 
                         NetworkBackgammonClient.Instance.Player.Broadcast(new GameSessionInitialDiceRollAcknowledgeEvent(NetworkBackgammonClient.Instance.Player.PlayerName));
-                       
+
                         m_initDiceRoll = false;
                     }
                     else
                     {
-                        m_playerDiceIndex[0] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
-                        m_playerDiceIndex[1] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
+                        if (NetworkBackgammonClient.Instance.Player.Active)
+                        {
+                            m_playerDiceIndex[0] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
+                            m_playerDiceIndex[1] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
+                        }
                     }
 
                     m_diceRolling = false;
