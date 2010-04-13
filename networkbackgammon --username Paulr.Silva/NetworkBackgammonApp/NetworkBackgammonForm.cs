@@ -140,7 +140,7 @@ namespace NetworkBackgammon
         public void OnEventNotification(INetworkBackgammonNotifier sender, INetworkBackgammonEvent e)
         {
             // Challegne event
-            if (e is NetworkBackgammonChallengeResponseEvent)
+            /*if (e is NetworkBackgammonChallengeResponseEvent)
             {
                 NetworkBackgammonChallengeResponseEvent challengeRespEvent = ((NetworkBackgammonChallengeResponseEvent)e);
 
@@ -158,8 +158,8 @@ namespace NetworkBackgammon
                         ChallengeResponse(challengeAccepted);
                     }
                 }
-            }
-            else if (e is NetworkBackgammonGameRoomEvent)
+            }*/
+            if (e is NetworkBackgammonGameRoomEvent)
             {
                 switch (((NetworkBackgammonGameRoomEvent)e).EventType)
                 {
@@ -200,6 +200,19 @@ namespace NetworkBackgammon
                     }
                 }
             }
+            else if (e is GameSessionInitialDiceRollEvent)
+            {
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new OnGameRoomDelegate(ShowGameRoomScreen), false);
+                    BeginInvoke(new OnShowBoardDelegate(ShowBoard), true);
+                }
+                else
+                {
+                    ShowGameRoomScreen(false);
+                    ShowBoard(true);
+                }
+            }
         }
 
         #endregion
@@ -213,7 +226,6 @@ namespace NetworkBackgammon
                 NetworkBackgammonClient.Instance.Player.RespondToChallenge(true, challengingPlayerName);
 
                 // TODO: What happens here when the other player cancels his decision to challenge?
-                Thread.Sleep(500);
             }
             else
             {
@@ -224,14 +236,14 @@ namespace NetworkBackgammon
         // Handle the challenge response from the challenged player
         private void ChallengeResponse(bool challengeResponse)
         {
-            if (challengeResponse)
+            /*if (challengeResponse)
             {
-                Thread.Sleep(500);
                 // Close the login window 
                 m_backgammonLogin.Hide();
                 // Show the board
                 ShowBoard(true);
             }
+            */
         }
     }
 }
