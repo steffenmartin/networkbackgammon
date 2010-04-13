@@ -220,8 +220,10 @@ namespace NetworkBackgammon
                     boardChip.ChipBoardPosition = GetBoardPosition(newColPos, newRowPos);
 
                     m_playerChipList.Add(boardChip);
-
                 }
+
+                // Repaint board
+                Invalidate();
             }
 
             // Draw oppising players checkers too...
@@ -563,11 +565,15 @@ namespace NetworkBackgammon
                     if( m_initDiceRoll )
                     {
                         m_playerDiceIndex[0] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
+
+                        NetworkBackgammonClient.Instance.Player.Broadcast(new GameSessionInitialDiceRollAcknowledgeEvent(NetworkBackgammonClient.Instance.Player.PlayerName));
+                       
+                        m_initDiceRoll = false;
                     }
                     else
                     {
-                       // m_playerDiceIndex[0] = NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
-                       // m_playerDiceIndex[1] = NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
+                        m_playerDiceIndex[0] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
+                        m_playerDiceIndex[1] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
                     }
 
                     m_diceRolling = false;
