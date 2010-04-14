@@ -20,9 +20,9 @@ namespace NetworkBackgammon
         INetworkBackgammonListener m_defaultListener = new NetworkBackgammonListener();
     
         // Initial point for player 1 first piece
-        static Point m_startPoint1 = new Point(484, 12);
+        Point m_startPoint1 = new Point(484, 12);
         // Initial point for player 2 first piece
-        static Point m_startPoint2 = new Point(484, 359);
+        Point m_startPoint2 = new Point(484, 359);
         // Moveable chip represent this players pieces
         ArrayList m_playerChipList = new ArrayList();
         // Static pieces that represent the opponents chips
@@ -32,15 +32,15 @@ namespace NetworkBackgammon
         // List of available dice icon images
         ArrayList m_diceIconList = new ArrayList();
         // Chip adjacent placement padding 
-        int m_chipAdjPadding = 4;
+        const int m_chipAdjPadding = 4;
         // Bar width
-        int m_barWidth = 27;
+        const int m_barWidth = 27;
         // Maximum number of rows in a column
-        int m_maxRows = 5;
+        const int m_maxRows = 5;
         // Max number of columns
-        int m_maxCols = 24;
+        const int m_maxCols = 24;
         // Max number of chips (per player)
-        int m_maxNumChips = 15;
+        const int m_maxNumChips = 15;
         // Player needs to roll the dice
         bool m_playerRollDice = true;
         // Initial dice roll flag
@@ -422,22 +422,32 @@ namespace NetworkBackgammon
         // Draw opponents current dice roll
         private void DrawOpponentDice(object sender, PaintEventArgs e)
         {
-           /* if (m_diceRolling)
+            // Current player
+            NetworkBackgammonPlayer curPlayer = NetworkBackgammonClient.Instance.Player;
+            // Opposing player
+            NetworkBackgammonPlayer oppPlayer = NetworkBackgammonClient.Instance.GameRoom.GetOpposingPlayer(curPlayer);
+
+            if (oppPlayer != null)
             {
-                // Draw the back ground image
-                e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
-                e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
-            }
-            else // Check here if its the current players turn
-            {
-                if (!m_playerRollDice)
+                if (m_initDiceRoll)
                 {
-                    // Draw the back ground image
-                    e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
-                    e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
+                    int diceValue = (int)oppPlayer.InitialDice.CurrentValueUInt32;
+
+                    m_playerDiceIndex[1] = diceValue;
+
+                    e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 175, 185);
+                }
+                else if (!curPlayer.Active)
+                {
+                    //int diceValue1 = (int)oppPlayer.InitialDice.CurrentValueUInt32;
+                    //int diceValue2 = (int)oppPlayer.InitialDice.CurrentValueUInt32;
+
+                    //m_playerDiceIndex[0] = diceValue1;
+                    //m_playerDiceIndex[1] = diceValue2;
+
+                    //e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 175, 185);
                 }
             }
-            */
         }
 
         // Draw the roll dice button and hook up the handlers
@@ -526,6 +536,15 @@ namespace NetworkBackgammon
                             boardChip.ChipPixelPosition = ((NetworkBackgammonBoardPosition)m_boardPositionList[i]).LocationPoint;
                             // Move the board location to the drop chip position
                             boardChip.ChipBoardPosition = (NetworkBackgammonBoardPosition)m_boardPositionList[i];
+                            
+                            NetworkBackgammonPlayer curPlayer = NetworkBackgammonClient.Instance.Player;
+
+                            // Possible player moves
+                            System.Collections.Generic.List<NetworkBackgammonChecker> checkList = curPlayer.Checkers;
+                            // Checker possible moves - no idea what to do here...
+                            NetworkBackgammonDice moveDice = (NetworkBackgammonDice)checkList[i].PossibleMoves[0];
+                            // Finally, make the player move
+                            NetworkBackgammonClient.Instance.Player.MakeMove(new NetworkBackgammonChecker(new NetworkBackgammonPosition( (NetworkBackgammonPosition.GameBoardPosition)(i+1) )), moveDice);
                         }
                     }
 
@@ -581,7 +600,7 @@ namespace NetworkBackgammon
                     {
                         m_playerDiceIndex[0] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
 
-                        NetworkBackgammonClient.Instance.Player.Broadcast(new GameSessionInitialDiceRollAcknowledgeEvent(NetworkBackgammonClient.Instance.Player.PlayerName));
+                        NetworkBackgammonClient.Instance.Player.AcknowledgeInitialDiceRoll();
 
                         m_initDiceRoll = false;
                     }
