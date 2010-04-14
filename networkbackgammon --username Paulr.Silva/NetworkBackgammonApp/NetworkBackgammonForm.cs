@@ -23,6 +23,7 @@ namespace NetworkBackgammon
         delegate void OnQueryChallengeDelegate(string cPlayer);
         delegate void OnChallengeResponseDelegate(bool challengeResponse);
         delegate void OnShowBoardDelegate(bool show);
+        delegate void OnShowBoardWithInitialDiceDelegate(bool show, GameSessionInitialDiceRollEvent initialDiceRollEvent);
         delegate void OnGameRoomDelegate(bool show);
 
         public NetworkBackGammonForm()
@@ -34,6 +35,17 @@ namespace NetworkBackgammon
         {
             // Show the Login screen on load
             ShowGameRoomScreen(true);
+        }
+
+        // Show the game board display
+        private void ShowBoard(bool show, GameSessionInitialDiceRollEvent initialDiceRollEvent)
+        {
+            if (show)
+            {
+                m_backgammonBoard.m_CurrentInitialDice = initialDiceRollEvent.GetDiceForPlayer(NetworkBackgammonClient.Instance.Player.PlayerName);
+            }
+
+            ShowBoard(show);
         }
 
         // Show the game board display
@@ -202,10 +214,11 @@ namespace NetworkBackgammon
             }
             else if (e is GameSessionInitialDiceRollEvent)
             {
+                GameSessionInitialDiceRollEvent initialDiceRollEvent = (GameSessionInitialDiceRollEvent)e;
                 if (InvokeRequired)
                 {
                     BeginInvoke(new OnGameRoomDelegate(ShowGameRoomScreen), false);
-                    BeginInvoke(new OnShowBoardDelegate(ShowBoard), true);
+                    BeginInvoke(new OnShowBoardWithInitialDiceDelegate(ShowBoard), new object[] { true, initialDiceRollEvent });
                 }
                 else
                 {
