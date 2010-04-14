@@ -534,7 +534,6 @@ namespace NetworkBackgammon
         // Draw opponents current dice roll
         private void DrawOpponentDice(object sender, PaintEventArgs e)
         {
-            /*
             // Current player
             NetworkBackgammonPlayer curPlayer = NetworkBackgammonClient.Instance.Player;
             // Opposing player
@@ -542,9 +541,10 @@ namespace NetworkBackgammon
 
             if (oppPlayer != null)
             {
-                if (m_initDiceRoll)
+                if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_ROLLING ||
+                    m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_COMPLETED)
                 {
-                    int diceValue = (int)oppPlayer.InitialDice.CurrentValueUInt32;
+                    int diceValue = (int)(oppPlayer.InitialDice.CurrentValueUInt32 - 1);
 
                     m_playerDiceIndex[1] = diceValue;
 
@@ -561,7 +561,6 @@ namespace NetworkBackgammon
                     //e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 175, 185);
                 }
             }
-            */
         }
 
         // Draw the roll dice button and hook up the handlers
