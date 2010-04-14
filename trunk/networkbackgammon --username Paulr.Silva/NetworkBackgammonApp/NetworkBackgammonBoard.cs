@@ -41,12 +41,6 @@ namespace NetworkBackgammon
         const int m_maxCols = 24;
         // Max number of chips (per player)
         const int m_maxNumChips = 15;
-        // Player needs to roll the dice
-        bool m_playerRollDice = true;
-        // Initial dice roll flag
-        bool m_initDiceRoll = true;
-        // Dice are currently being rolled
-        bool m_diceRolling = false;
         // Button rolling dice
         Button m_rollDiceButton = new Button();
         // Dice animation count down timer
@@ -57,6 +51,56 @@ namespace NetworkBackgammon
         int[] m_opponentDiceIndex = new int[2];
         /// Update the game board check positions
         delegate void OnUpdateCheckerPositionsDelegate();
+        
+        /// <summary>
+        /// Delegate for initial dice roll tie handling
+        /// </summary>
+        delegate void OnIntialDiceRollTieDelegate();
+
+        /// <summary>
+        /// Delegate for handling an expected move from a player
+        /// </summary>
+        /// <param name="playerName"></param>
+        delegate void OnMoveExpectedDelegate(string playerName);
+        
+        /// <summary>
+        /// Delegate for handling a checker update
+        /// </summary>
+        delegate void OnCheckerUpdatedDelegate(GameSessionCheckerUpdatedEvent eventData);
+
+        /// <summary>
+        /// Enumeration of the various states the Game Board can be in
+        /// </summary>
+        enum GameBoardState
+        {
+            INITIAL_DICE_ROLL_EXPECTED,
+            INITIAL_DICE_ROLL_ROLLING,
+            INITIAL_DICE_ROLL_COMPLETED,
+            PLAYER_DICE_ROLL_EXPECTED,
+            PLAYER_DICE_ROLL_ROLLING,
+            PLAYER_MOVE_EXPECTED,
+            OPPONENT_MOVE_EXPECTED
+        };
+
+        /// <summary>
+        /// The current state of the Game Board
+        /// </summary>
+        NetworkBackgammonBoard.GameBoardState m_CurrentGameState = GameBoardState.INITIAL_DICE_ROLL_EXPECTED;
+
+        /// <summary>
+        /// The current initial dice as received from the Player (via Game Session)
+        /// </summary>
+        public NetworkBackgammonDice m_CurrentInitialDice = null;
+
+        /// <summary>
+        /// The current dice as received from the Player (via Game Session)
+        /// </summary>
+        NetworkBackgammonDice[] m_CurrentDice = null;
+
+        /// <summary>
+        /// The current player data as received from the Player (via Game Session)
+        /// </summary>
+        NetworkBackgammonPlayer[] m_CurrentPlayerData = null;
 
         // Constructor
         public NetworkBackgammonBoard()
@@ -112,36 +156,40 @@ namespace NetworkBackgammon
                 // Update game piece positions
                 if (InvokeRequired)
                 {
-                    BeginInvoke(new OnUpdateCheckerPositionsDelegate(DrawPlayerPositions));
+                    BeginInvoke(new OnMoveExpectedDelegate(OnMoveExpected), moveExpEvent.ActivePlayer);
                 }
                 else
                 {
-                    DrawPlayerPositions();
+                    OnMoveExpected(moveExpEvent.ActivePlayer);
                 }
             }
             else if (e is GameSessionCheckerUpdatedEvent)
             {
-                GameSessionCheckerUpdatedEvent moveExpEvent = ((GameSessionCheckerUpdatedEvent)e);
+                GameSessionCheckerUpdatedEvent checkerUpdEvent = ((GameSessionCheckerUpdatedEvent)e);
 
                 // Update game piece positions
                 if (InvokeRequired)
                 {
-                    BeginInvoke(new OnUpdateCheckerPositionsDelegate(DrawPlayerPositions));
+                    BeginInvoke(new OnCheckerUpdatedDelegate(OnCheckerUpdated), checkerUpdEvent);
                 }
                 else
                 {
-                    DrawPlayerPositions();
+                    OnCheckerUpdated(checkerUpdEvent);
                 }
-            }
-            else if (e is GameSessionCheckerUpdatedEvent)
-            {
             }
             else if (e is GameSessionInitialDiceRollEvent)
             {
-                m_playerRollDice = true;
-                m_initDiceRoll = true;
+                m_CurrentGameState = GameBoardState.INITIAL_DICE_ROLL_EXPECTED;
 
-                Refresh();
+                // Inform player about initial dice roll tie
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new OnIntialDiceRollTieDelegate(OnIntialDiceRollTie));
+                }
+                else
+                {
+                    OnIntialDiceRollTie();
+                }
             }
         }
 
@@ -273,6 +321,68 @@ namespace NetworkBackgammon
             }
         }
 
+        /// <summary>
+        /// Handler for the initial dice roll (which only occurs on a tie)
+        /// </summary>
+        private void OnIntialDiceRollTie()
+        {
+            MessageBox.Show("Initial dice rolled a tie!", "Initial Dice Roll", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+
+            Refresh();
+        }
+
+        /// <summary>
+        /// Handler for an expected move from a player
+        /// </summary>
+        private void OnMoveExpected(string playerName)
+        {
+            if (playerName == NetworkBackgammonClient.Instance.Player.PlayerName &&
+                NetworkBackgammonClient.Instance.Player.Active)
+            {
+                // After completing the initial dice roll, this player can only have won the initial dice roll, so let him/her know
+                if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_COMPLETED)
+                {
+                    MessageBox.Show("You won the initial dice roll!", "Initial Dice Roll", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+
+                    m_CurrentGameState = GameBoardState.PLAYER_MOVE_EXPECTED;
+                }
+                else
+                {
+                    // This will bring up the respective button for rolling a dice after which the board will go into
+                    // the PLAYER_MOVE_EXPECTED state
+                    m_CurrentGameState = GameBoardState.PLAYER_DICE_ROLL_EXPECTED;
+                }
+            }
+            else
+            {
+                // After completing the initial dice roll, this player can only have lost the initial dice roll, so let him/her know
+                if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_COMPLETED)
+                {
+                    MessageBox.Show("You lost the initial dice roll!", "Initial Dice Roll", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                }
+
+                m_CurrentGameState = GameBoardState.OPPONENT_MOVE_EXPECTED;
+            }
+
+            if (m_CurrentDice != null)
+            {
+                m_playerDiceIndex[0] = (int)(m_CurrentDice[0].CurrentValueUInt32 - 1);
+                m_playerDiceIndex[1] = (int)(m_CurrentDice[1].CurrentValueUInt32 - 1);
+            }
+
+            Refresh();
+        }
+
+        /// <summary>
+        /// Handler for a checker update
+        /// </summary>
+        private void OnCheckerUpdated(GameSessionCheckerUpdatedEvent eventData)
+        {
+            m_CurrentDice = eventData.DiceRolled;
+
+            DrawPlayerPositions();
+        }
+
         // Overriden load function of the form
         private void NetworkBackgammonBoard_Load(object sender, EventArgs e)
         {
@@ -394,24 +504,26 @@ namespace NetworkBackgammon
         // Draw/Animate the rolling dice
         private void DrawRollingDice(object sender, PaintEventArgs e)
         {
-            if (m_diceRolling)
+            if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_ROLLING ||
+                m_CurrentGameState == GameBoardState.PLAYER_DICE_ROLL_ROLLING)
             {
-               // Draw the back ground image
-               e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
+                // Draw the back ground image
+                e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
 
-               if (!m_initDiceRoll)
-               {
-                   e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
-               }
+                if (m_CurrentGameState != GameBoardState.INITIAL_DICE_ROLL_ROLLING)
+                {
+                    e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
+                }
             }
             else // Check here if its the current players turn
             {
-                if (!m_playerRollDice && NetworkBackgammonClient.Instance.Player.Active )
+                if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_COMPLETED ||
+                    m_CurrentGameState == GameBoardState.PLAYER_MOVE_EXPECTED)
                 {
                     // Draw the back ground image
                     e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
 
-                    if (!m_initDiceRoll)
+                    if (m_CurrentGameState != GameBoardState.INITIAL_DICE_ROLL_COMPLETED)
                     {
                         e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 417, 185);
                     }
@@ -422,6 +534,7 @@ namespace NetworkBackgammon
         // Draw opponents current dice roll
         private void DrawOpponentDice(object sender, PaintEventArgs e)
         {
+            /*
             // Current player
             NetworkBackgammonPlayer curPlayer = NetworkBackgammonClient.Instance.Player;
             // Opposing player
@@ -448,12 +561,14 @@ namespace NetworkBackgammon
                     //e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 175, 185);
                 }
             }
+            */
         }
 
         // Draw the roll dice button and hook up the handlers
         private void DrawDiceButton(object sender, PaintEventArgs e)
         {
-            if (m_playerRollDice)
+            if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_EXPECTED ||
+                m_CurrentGameState == GameBoardState.PLAYER_DICE_ROLL_EXPECTED)
             {
                 m_rollDiceButton.Text = "Roll Dice";
                 m_rollDiceButton.Name = "rollDiceButton";
@@ -471,10 +586,18 @@ namespace NetworkBackgammon
         // Button handler for the dice roll button
         private void OnClickRollButton(object sender, System.EventArgs e)
         {
-            if (m_playerRollDice)
+            if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_EXPECTED ||
+                m_CurrentGameState == GameBoardState.PLAYER_DICE_ROLL_EXPECTED)
             {
-                m_playerRollDice = false;
-                m_diceRolling = true;
+                if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_EXPECTED)
+                {
+                    m_CurrentGameState = GameBoardState.INITIAL_DICE_ROLL_ROLLING;
+                }
+                else
+                {
+                    m_CurrentGameState = GameBoardState.PLAYER_DICE_ROLL_ROLLING;
+                }
+
                 m_diceTimer = 10;
                 // Repaint the screen
                 Refresh();
@@ -484,7 +607,7 @@ namespace NetworkBackgammon
         // Handle mouse down event - check if mouse click position is inside a players chip
         private void NetworkBackgammonBoard_MouseDown(object sender, MouseEventArgs e)
         {
-            if (!m_playerRollDice && !m_diceRolling && NetworkBackgammonClient.Instance.Player.Active )
+            if (m_CurrentGameState == GameBoardState.PLAYER_MOVE_EXPECTED)
             {
                 for (int i = (m_playerChipList.Count - 1); i != -1; i--)
                 {
@@ -501,7 +624,7 @@ namespace NetworkBackgammon
         // Handle mouse up click event - check if moving a chip and whether or not it can repositioned
         private void NetworkBackgammonBoard_MouseUp(object sender, MouseEventArgs e)
         {
-            if (!m_playerRollDice && !m_diceRolling)
+            if (m_CurrentGameState == GameBoardState.PLAYER_MOVE_EXPECTED)
             {
                 int i = -1;
 
@@ -559,7 +682,7 @@ namespace NetworkBackgammon
         // Handle mouse move event - move the currently selected players chip (if any)
         private void NetworkBackgammonBoard_MouseMove(object sender, MouseEventArgs e)
         {
-            if (!m_playerRollDice && !m_diceRolling)
+            if (m_CurrentGameState == GameBoardState.PLAYER_MOVE_EXPECTED)
             {
                 // Any mouse up click will reset the moving flag
                 for (int i = 0; i < m_playerChipList.Count; i++)
@@ -580,7 +703,8 @@ namespace NetworkBackgammon
         private void timerRollDice_Tick(object sender, EventArgs e)
         {
             // Check if we are rolling our dice
-            if (m_diceRolling)
+            if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_ROLLING ||
+                m_CurrentGameState == GameBoardState.PLAYER_DICE_ROLL_ROLLING)
             {
                 if (m_diceTimer-- > 0)
                 {
@@ -589,31 +713,31 @@ namespace NetworkBackgammon
                     m_playerDiceIndex[0] = random.Next(0, 5);
                     
                     // Check if the this is the initial dice roll (only need one dice)
-                    if (!m_initDiceRoll)
+                    if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_ROLLING)
                     {
                         m_playerDiceIndex[1] = random.Next(0, 5);
                     }
                 }
                 else
                 {
-                    if (m_initDiceRoll)
+                    if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_ROLLING)
                     {
-                        m_playerDiceIndex[0] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
+                        m_playerDiceIndex[0] = (int)(m_CurrentInitialDice.CurrentValueUInt32 - 1);
 
                         NetworkBackgammonClient.Instance.Player.AcknowledgeInitialDiceRoll();
 
-                        m_initDiceRoll = false;
+                        m_CurrentGameState = GameBoardState.INITIAL_DICE_ROLL_COMPLETED;
                     }
                     else
                     {
                         if (NetworkBackgammonClient.Instance.Player.Active)
                         {
-                            m_playerDiceIndex[0] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
-                            m_playerDiceIndex[1] = (int)NetworkBackgammonClient.Instance.Player.InitialDice.CurrentValueUInt32;
+                            m_playerDiceIndex[0] = (int)(m_CurrentDice[0].CurrentValueUInt32 - 1);
+                            m_playerDiceIndex[1] = (int)(m_CurrentDice[1].CurrentValueUInt32 - 1);
                         }
-                    }
 
-                    m_diceRolling = false;
+                        m_CurrentGameState = GameBoardState.PLAYER_MOVE_EXPECTED;
+                    }
                 }
 
                 // Redraw the screen
