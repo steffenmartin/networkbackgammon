@@ -251,7 +251,7 @@ namespace NetworkBackgammon
             }
         }
 
-        // Get both players check positions and draw them tot he screen 
+        // Get both players check positions and draw them to the screen 
         private void DrawPlayerPositions()
         {
             NetworkBackgammonChip boardChip;
@@ -625,51 +625,73 @@ namespace NetworkBackgammon
         {
             if (m_CurrentGameState == GameBoardState.PLAYER_MOVE_EXPECTED)
             {
-                int i = -1;
-
-                for (i = 0; i < m_boardPositionList.Count; i++)
+                // Dropped board position
+                NetworkBackgammonBoardPosition boardPosition = null;
+                
+                // Determine if the chip is being dropped on one of the mapped board positions
+                for (int i = 0; i < m_boardPositionList.Count; i++)
                 {
                     NetworkBackgammonBoardPosition tempObj = (NetworkBackgammonBoardPosition)m_boardPositionList[i];
 
-                    if ((e.X >= tempObj.LocationPoint.X) &&
-                         (e.X < tempObj.LocationPoint.X + tempObj.LocationSize.Width) &&
-                         (e.Y >= tempObj.LocationPoint.Y) &&
-                         (e.Y < tempObj.LocationPoint.Y + tempObj.LocationSize.Height))
+                    if ((e.X >= tempObj.LocationPoint.X) && (e.X < tempObj.LocationPoint.X + tempObj.LocationSize.Width) &&
+                        (e.Y >= tempObj.LocationPoint.Y) && (e.Y < tempObj.LocationPoint.Y + tempObj.LocationSize.Height))
                     {
+                        boardPosition = (NetworkBackgammonBoardPosition)m_boardPositionList[i];
                         break;
                     }
                 }
+              
 
-                // Any mouse up click will reset the moving flag
+                // Loop through all board chips and determine if any are moving
                 for (int chipIndex = 0; chipIndex < m_playerChipList.Count; chipIndex++)
                 {
                     NetworkBackgammonChip boardChip = (NetworkBackgammonChip)m_playerChipList[chipIndex];
 
                     if (boardChip.Moving)
                     {
-                        if (i == m_boardPositionList.Count)
+                        if (boardPosition != null)
                         {
-                            // Move the location to the drop chip position
-                            boardChip.ChipPixelPosition = boardChip.ChipBoardPosition.LocationPoint;
+                            NetworkBackgammonDice moveToPosition = null;
+
+                            // Get the "dice" movement
+                            int moveDelta = (boardPosition.PositionID.X - boardChip.ChipBoardPosition.PositionID.X);
+
+                            // Current player 
+                            NetworkBackgammonPlayer curPlayer = NetworkBackgammonClient.Instance.Player;
+                            // Possible player moves
+                            System.Collections.Generic.List<NetworkBackgammonChecker> checkList = curPlayer.Checkers;
+                            // Loop through possible moves for the moving checker
+                            foreach (NetworkBackgammonDice move in checkList[chipIndex].PossibleMoves)
+                            {
+                                if (moveDelta == move.CurrentValueUInt32)
+                                {
+                                    moveToPosition = move;
+                                }
+                            }
+
+                            if (moveToPosition != null)
+                            {
+                                // Move the location to the drop chip position
+                                boardChip.ChipPixelPosition = boardPosition.LocationPoint;
+                                // Move the board location to the drop chip position
+                                boardChip.ChipBoardPosition = boardPosition;
+                                // Finally, make the player move
+                                NetworkBackgammonClient.Instance.Player.MakeMove(checkList[chipIndex], moveToPosition);
+                            }
+                            else
+                            {
+                                // Move back to the previous position
+                                boardChip.ChipPixelPosition = boardChip.ChipBoardPosition.LocationPoint;
+                            }
                         }
                         else
                         {
-                            // Move the location to the drop chip position
-                            boardChip.ChipPixelPosition = ((NetworkBackgammonBoardPosition)m_boardPositionList[i]).LocationPoint;
-                            // Move the board location to the drop chip position
-                            boardChip.ChipBoardPosition = (NetworkBackgammonBoardPosition)m_boardPositionList[i];
-                            
-                            NetworkBackgammonPlayer curPlayer = NetworkBackgammonClient.Instance.Player;
-
-                            // Possible player moves
-                            System.Collections.Generic.List<NetworkBackgammonChecker> checkList = curPlayer.Checkers;
-                            // Checker possible moves - no idea what to do here...
-                            NetworkBackgammonDice moveDice = (NetworkBackgammonDice)checkList[i].PossibleMoves[0];
-                            // Finally, make the player move
-                            NetworkBackgammonClient.Instance.Player.MakeMove(new NetworkBackgammonChecker(new NetworkBackgammonPosition( (NetworkBackgammonPosition.GameBoardPosition)(i+1) )), moveDice);
+                            // Move back to the previous position
+                            boardChip.ChipPixelPosition = boardChip.ChipBoardPosition.LocationPoint;
                         }
                     }
 
+                    // Any mouse up click will reset the moving flag
                     boardChip.Moving = false;
 
                     // Redraw the board
