@@ -194,12 +194,12 @@ namespace NetworkBackgammonGameLogic
             foreach (NetworkBackgammonChecker checkerAP in activePlayer.Checkers)
             {
                 // Found checker, now find checker's move that has been selected
-                if ( string.Equals( checkerAP.ToString(), _checker.ToString()) )
+                if ( checkerAP == _checker )
                 {
                     foreach (NetworkBackgammonDice move in checkerAP.PossibleMoves)
                     {
                         // Found move
-                        if ( string.Equals(move.ToString(), _move.ToString()) )
+                        if ( move == _move )
                         {
                             checkerAP.MoveChecker(_move);
 

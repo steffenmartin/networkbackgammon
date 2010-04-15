@@ -55,6 +55,15 @@ namespace NetworkBackgammonLib
         /// </summary>
         Int32 seed = 0;
 
+        /// <summary>
+        /// A unique ID for every instance of this object
+        /// </summary>
+        /// <remarks>
+        /// This is mainly required for remoting purposes to be able to compare two objects with at least on of them being transmitted via remoting, thus
+        /// having a different object reference although it could potentially be the same exact object.
+        /// </remarks>
+        int uniqueObjectID = 0;
+
         #endregion
 
         #region Methods
@@ -67,6 +76,9 @@ namespace NetworkBackgammonLib
             seed = DateTime.Now.Millisecond;
 
             rand = new Random(seed);
+
+            // Create a unique object ID (Is this function really creating just uniqe IDs?)
+            uniqueObjectID = System.Guid.NewGuid().GetHashCode();
         }
 
         /// <summary>
@@ -76,6 +88,9 @@ namespace NetworkBackgammonLib
         public NetworkBackgammonDice(Int32 _seed)
         {
             rand = new Random(_seed);
+
+            // Create a unique object ID (Is this function really creating just uniqe IDs?)
+            uniqueObjectID = System.Guid.NewGuid().GetHashCode();
         }
 
         /// <summary>
@@ -167,6 +182,57 @@ namespace NetworkBackgammonLib
         public override string ToString()
         {
             return currentValue.ToString();
+        }
+
+        public override int GetHashCode()
+        {
+            return uniqueObjectID;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        #endregion
+
+        #region Operators
+
+        /// <summary>
+        /// Tests two dice for equality
+        /// </summary>
+        /// <param name="a">Dice 1</param>
+        /// <param name="b">Dice 2</param>
+        /// <returns>"True" if both dice refer to the same original dice, otherwise "false"</returns>
+        public static bool operator ==(NetworkBackgammonDice a, NetworkBackgammonDice b)
+        {
+            if ((object)b != null)
+            {
+                return a.uniqueObjectID == b.uniqueObjectID;
+            }
+            else
+            {
+                return (object)a == null;
+            }
+
+        }
+
+        /// <summary>
+        /// Tests two dice for inequality
+        /// </summary>
+        /// <param name="a">Dice 1</param>
+        /// <param name="b">Dice 2</param>
+        /// <returns>"True" if both dice refer to different original dice, otherwise "false"</returns>
+        public static bool operator !=(NetworkBackgammonDice a, NetworkBackgammonDice b)
+        {
+            if ((object)b != null)
+            {
+                return a.uniqueObjectID != b.uniqueObjectID;
+            }
+            else
+            {
+                return (object)a != null;
+            }
         }
 
         #endregion
