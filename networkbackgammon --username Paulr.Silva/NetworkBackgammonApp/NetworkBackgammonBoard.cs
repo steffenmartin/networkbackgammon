@@ -550,15 +550,10 @@ namespace NetworkBackgammon
 
                     e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 175, 185);
                 }
-                else if (!curPlayer.Active)
+                else if (!curPlayer.Active && m_CurrentGameState == GameBoardState.OPPONENT_MOVE_EXPECTED)
                 {
-                    //int diceValue1 = (int)oppPlayer.InitialDice.CurrentValueUInt32;
-                    //int diceValue2 = (int)oppPlayer.InitialDice.CurrentValueUInt32;
-
-                    //m_playerDiceIndex[0] = diceValue1;
-                    //m_playerDiceIndex[1] = diceValue2;
-
-                    //e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 175, 185);
+                    e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 143, 185);
+                    e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 175, 185);
                 }
             }
         }
@@ -741,7 +736,7 @@ namespace NetworkBackgammon
                 }
                 else
                 {
-                    if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_ROLLING)
+                    if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_ROLLING) 
                     {
                         m_playerDiceIndex[0] = (int)(m_CurrentInitialDice.CurrentValueUInt32 - 1);
 
@@ -751,7 +746,7 @@ namespace NetworkBackgammon
                     }
                     else
                     {
-                        if (NetworkBackgammonClient.Instance.Player.Active)
+                        if (NetworkBackgammonClient.Instance.Player.Active || m_CurrentGameState == GameBoardState.OPPONENT_MOVE_EXPECTED)
                         {
                             m_playerDiceIndex[0] = (int)(m_CurrentDice[0].CurrentValueUInt32 - 1);
                             m_playerDiceIndex[1] = (int)(m_CurrentDice[1].CurrentValueUInt32 - 1);
