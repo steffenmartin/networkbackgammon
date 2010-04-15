@@ -98,9 +98,14 @@ namespace NetworkBackgammon
         NetworkBackgammonDice[] m_CurrentDice = null;
 
         /// <summary>
-        /// The current player data as received from the Player (via Game Session)
+        /// The current player's checkers as received from the Player (via Game Session)
         /// </summary>
-        NetworkBackgammonPlayer[] m_CurrentPlayerData = null;
+        System.Collections.Generic.List<NetworkBackgammonChecker> m_PlayersCurrentCheckers = null;
+
+        /// <summary>
+        /// The current opponent's checkers as received from the Player (via Game Session)
+        /// </summary>
+        System.Collections.Generic.List<NetworkBackgammonChecker> m_OpponentsCurrentCheckers = null;
 
         // Constructor
         public NetworkBackgammonBoard()
@@ -348,9 +353,13 @@ namespace NetworkBackgammon
                 }
                 else
                 {
-                    // This will bring up the respective button for rolling a dice after which the board will go into
-                    // the PLAYER_MOVE_EXPECTED state
-                    m_CurrentGameState = GameBoardState.PLAYER_DICE_ROLL_EXPECTED;
+                    // If it is the 1st expected move for the player we'll have to simulate the dice rolling first
+                    if (m_CurrentGameState != GameBoardState.PLAYER_MOVE_EXPECTED)
+                    {
+                        // This will bring up the respective button for rolling a dice after which the board will go into
+                        // the PLAYER_MOVE_EXPECTED state
+                        m_CurrentGameState = GameBoardState.PLAYER_DICE_ROLL_EXPECTED;
+                    }
                 }
             }
             else
@@ -379,6 +388,9 @@ namespace NetworkBackgammon
         private void OnCheckerUpdated(GameSessionCheckerUpdatedEvent eventData)
         {
             m_CurrentDice = eventData.DiceRolled;
+            
+            m_PlayersCurrentCheckers = eventData.GetPlayerByName(NetworkBackgammonClient.Instance.Player.PlayerName).Checkers;
+            m_OpponentsCurrentCheckers = eventData.GetPlayerByName(NetworkBackgammonClient.Instance.GameRoom.GetOpposingPlayer(NetworkBackgammonClient.Instance.Player).PlayerName).Checkers;
 
             DrawPlayerPositions();
         }

@@ -24,6 +24,15 @@ namespace NetworkBackgammonLib
         /// </summary>
         List<NetworkBackgammonDice> possibleMoves = new List<NetworkBackgammonDice>();
 
+        /// <summary>
+        /// A unique ID for every instance of this object
+        /// </summary>
+        /// <remarks>
+        /// This is mainly required for remoting purposes to be able to compare two objects with at least on of them being transmitted via remoting, thus
+        /// having a different object reference although it could potentially be the same exact object.
+        /// </remarks>
+        int uniqueObjectID = 0;
+
         #endregion
 
         #region Methods
@@ -37,6 +46,9 @@ namespace NetworkBackgammonLib
         public NetworkBackgammonChecker()
         {
             currentPosition = new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.INVALID);
+
+            // Create a unique object ID (Is this function really creating just uniqe IDs?)
+            uniqueObjectID = System.Guid.NewGuid().GetHashCode();
         }
 
         /// <summary>
@@ -46,6 +58,9 @@ namespace NetworkBackgammonLib
         public NetworkBackgammonChecker(NetworkBackgammonPosition _position)
         {
             currentPosition = _position;
+
+            // Create a unique object ID (Is this function really creating just uniqe IDs?)
+            uniqueObjectID = System.Guid.NewGuid().GetHashCode();
         }
 
         /// <summary>
@@ -98,6 +113,42 @@ namespace NetworkBackgammonLib
         public override string ToString()
         {
             return currentPosition.ToString();
+        }
+
+        public override int GetHashCode()
+        {
+            return uniqueObjectID;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        #endregion
+
+        #region Operators
+
+        /// <summary>
+        /// Tests two checkers for equality
+        /// </summary>
+        /// <param name="a">Checker 1</param>
+        /// <param name="b">Checker 2</param>
+        /// <returns>"True" if both checker refer to the same original checker, otherwise "false"</returns>
+        public static bool operator ==(NetworkBackgammonChecker a, NetworkBackgammonChecker b)
+        {
+            return a.uniqueObjectID == b.uniqueObjectID;
+        }
+
+        /// <summary>
+        /// Tests two checkers for inequality
+        /// </summary>
+        /// <param name="a">Checker 1</param>
+        /// <param name="b">Checker 2</param>
+        /// <returns>"True" if both checkers refer to different original checkers, otherwise "false"</returns>
+        public static bool operator !=(NetworkBackgammonChecker a, NetworkBackgammonChecker b)
+        {
+            return a.uniqueObjectID != b.uniqueObjectID;
         }
 
         #endregion
