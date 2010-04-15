@@ -26,7 +26,7 @@ namespace NetworkBackgammon
             m_locationSize = posSize;
         }
 
-        // Position ID property
+        // Position ID property (Board matrix position)
         public Point PositionID
         {
             get
@@ -38,7 +38,7 @@ namespace NetworkBackgammon
                 m_positionID = value;
             }
         }
-        // Upper Left Position property
+        // Upper left position (pixels) property
         public Point LocationPoint
         {
             get
