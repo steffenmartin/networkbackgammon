@@ -275,6 +275,29 @@ namespace NetworkBackgammonLib
             return strPlayerName;
         }
 
+        /// <summary>
+        /// Override Equals to compare the Player name
+        /// instead of the Player object
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns>True if matches PlayerName</returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            string inPlayerName = ((NetworkBackgammonPlayer)obj).PlayerName;
+            if (inPlayerName != null)
+                return PlayerName.ToLower().Equals(inPlayerName.ToLower());
+            else
+                return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return PlayerName.GetHashCode();
+        }
+
         #endregion
 
         #region INetworkBackgammonNotifier Members
