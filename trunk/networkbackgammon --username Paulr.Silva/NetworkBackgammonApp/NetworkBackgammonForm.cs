@@ -128,7 +128,8 @@ namespace NetworkBackgammon
 
         private void gameRoomToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowGameRoomScreen(!m_backgammonLogin.Visible);
+            ShowBoard(false);
+            ShowGameRoomScreen(true);
         }
 
         private void NetworkBackGammonForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -224,6 +225,19 @@ namespace NetworkBackgammon
                 {
                     ShowGameRoomScreen(false);
                     ShowBoard(true);
+                }
+            }
+            else if (e is GameSessionPlayerResignationEvent)
+            {
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new OnGameRoomDelegate(ShowGameRoomScreen), true);
+                    // BeginInvoke(new OnShowBoardDelegate(ShowBoard), false);
+                }
+                else
+                {
+                    ShowGameRoomScreen(true);
+                    // ShowBoard(false);
                 }
             }
         }

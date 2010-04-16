@@ -112,6 +112,8 @@ namespace NetworkBackgammonServer
                 {
                     // Stop listening to the server
                     m_server.RemoveListener(this);
+                    m_server.Shutdown();
+                    m_server = null;
 
                     if (m_channel != null)
                     {
