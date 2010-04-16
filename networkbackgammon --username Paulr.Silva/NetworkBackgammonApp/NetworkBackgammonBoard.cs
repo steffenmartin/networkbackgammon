@@ -48,7 +48,10 @@ namespace NetworkBackgammon
             PLAYER_DICE_ROLL_EXPECTED,
             PLAYER_DICE_ROLL_ROLLING,
             PLAYER_MOVE_EXPECTED,
-            OPPONENT_MOVE_EXPECTED
+            OPPONENT_MOVE_EXPECTED,
+            PLAYER_RESIGNED,
+            OPPONENT_RESIGNED,
+            GAME_OVER
         };
 
         #endregion
@@ -98,6 +101,12 @@ namespace NetworkBackgammon
         /// Delegate for handling a checker update
         /// </summary>
         delegate void OnCheckerUpdatedDelegate(GameSessionCheckerUpdatedEvent eventData);
+
+        /// <summary>
+        /// Delegate for handling a player resignation
+        /// </summary>
+        /// <param name="resigningPlayer"></param>
+        delegate void OnPlayerResignationDelegate(string resigningPlayer);
 
 
         /// <summary>
@@ -221,6 +230,19 @@ namespace NetworkBackgammon
                 else
                 {
                     OnIntialDiceRollTie();
+                }
+            }
+            else if (e is GameSessionPlayerResignationEvent)
+            {
+                GameSessionPlayerResignationEvent playerResigEvt = (GameSessionPlayerResignationEvent)e;
+
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new OnPlayerResignationDelegate(OnPlayerResignation), playerResigEvt.ResigningPlayer);
+                }
+                else
+                {
+                    OnPlayerResignation(playerResigEvt.ResigningPlayer);
                 }
             }
         }
@@ -524,6 +546,23 @@ namespace NetworkBackgammon
             m_OpponentsCurrentCheckers = eventData.GetPlayerByName(NetworkBackgammonClient.Instance.GameRoom.GetOpposingPlayer(NetworkBackgammonClient.Instance.Player).PlayerName).Checkers;
 
             DrawPlayerPositions();
+        }
+
+        /// <summary>
+        /// Handler for a player resignation
+        /// </summary>
+        /// <param name="resigningPlayer">Name of the resigning player</param>
+        private void OnPlayerResignation(string resigningPlayer)
+        {
+            if (m_CurrentGameState != GameBoardState.PLAYER_RESIGNED &&
+                m_CurrentGameState != GameBoardState.GAME_OVER)
+            {
+                m_CurrentGameState = GameBoardState.OPPONENT_RESIGNED;
+
+                MessageBox.Show("Player " + resigningPlayer + " resigned from the game", "Player Resignation", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+            }
+
+            Hide();
         }
 
         // Overriden load function of the form
@@ -907,20 +946,23 @@ namespace NetworkBackgammon
         // Handle the event when the form is closing
         private void NetworkBackgammonBoard_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Stop the timer loop
-            timerRollDice.Stop();
+            UninitializeGamePre();
 
             // Stop listening to the player 
             if (NetworkBackgammonClient.Instance.Player != null)
             {
                 NetworkBackgammonClient.Instance.Player.RemoveListener(this);
             }
+
+            UninitializeGamePost();
         }
 
         private void NetworkBackgammonBoard_VisibleChanged(object sender, EventArgs e)
         {
             if (Visible)
             {
+                InitializeGame();
+
                 // Become a listener of the player 
                 if (NetworkBackgammonClient.Instance.Player != null)
                 {
@@ -929,12 +971,60 @@ namespace NetworkBackgammon
             }
             else
             {
+                UninitializeGamePre();
+
                 // Remove self as a listener of player
                 if (NetworkBackgammonClient.Instance.Player != null)
                 {
                     NetworkBackgammonClient.Instance.Player.RemoveListener(this);
                 }
+
+                UninitializeGamePost();
             }
+        }
+
+        /// <summary>
+        /// Initializes a (new) game
+        /// </summary>
+        private void InitializeGame()
+        {
+            m_CurrentGameState = GameBoardState.INITIAL_DICE_ROLL_EXPECTED;
+
+            // Start the timer loop
+            timerRollDice.Start();
+        }
+
+        /// <summary>
+        /// Performs game uninitialization actions before the detaching as a listener
+        /// </summary>
+        private void UninitializeGamePre()
+        {
+            // Stop the timer loop
+            timerRollDice.Stop();
+
+            if (m_CurrentGameState != GameBoardState.GAME_OVER)
+            {
+                // The opponent has resigned
+                if (m_CurrentGameState == GameBoardState.OPPONENT_RESIGNED)
+                {
+                    m_CurrentGameState = GameBoardState.GAME_OVER;
+                }
+                // This player is resigning
+                else
+                {
+                    m_CurrentGameState = GameBoardState.PLAYER_RESIGNED;
+
+                    NetworkBackgammonClient.Instance.Player.ResignFromGame();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Performs game uninitialization action after detaching as a listener
+        /// </summary>
+        private void UninitializeGamePost()
+        {
+            m_CurrentGameState = GameBoardState.GAME_OVER;
         }
     }
 }
