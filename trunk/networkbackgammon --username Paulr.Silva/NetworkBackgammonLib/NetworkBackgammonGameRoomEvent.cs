@@ -12,7 +12,8 @@ namespace NetworkBackgammonLib
         public enum GameRoomEventType
         {
             PlayerConnected,
-            PlayerDisconnected
+            PlayerDisconnected,
+            PlayerPlaying
         };
 
         GameRoomEventType type;

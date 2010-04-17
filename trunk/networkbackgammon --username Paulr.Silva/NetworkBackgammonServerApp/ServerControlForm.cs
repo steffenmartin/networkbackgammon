@@ -29,6 +29,8 @@ namespace NetworkBackgammonServer
         INetworkBackgammonListener m_localListener = new NetworkBackgammonListener();
         // Log Message Delegate
         private delegate void OnLogMessageDelegate(string _message);
+        // Update Player List Delegate
+        private delegate void UpdatePlayerListDelegate();
 
         DataTable playerListTable;
 
@@ -62,6 +64,13 @@ namespace NetworkBackgammonServer
             myColumn.ReadOnly = false;
             myColumn.Caption = "Player Login";
             myColumn.ColumnName = "Login";
+            playerListTable.Columns.Add(myColumn);
+
+            myColumn = new DataColumn();
+            myColumn.DataType = System.Type.GetType("System.String");
+            myColumn.ReadOnly = false;
+            myColumn.Caption = "Opponent";
+            myColumn.ColumnName = "Opponent";
             playerListTable.Columns.Add(myColumn);
 
             playerListGridView.DataSource = playerListTable;
@@ -150,10 +159,35 @@ namespace NetworkBackgammonServer
             m_serverLogListBox.Items.Add(message);
         }
 
-        // Update player list
-        private void UpdateList(DataTable playerTable)
+        /// <summary>
+        /// Call GameRoom to get list of logged on players
+        /// </summary>
+        private void UpdateList()
         {
-
+            // Build DataView of player list
+            playerListTable.Rows.Clear();
+            ArrayList registeredPlayers = m_server.GetRegisteredPlayers();
+            List<NetworkBackgammonPlayer> activePlayers;
+            activePlayers = m_server.ConnectedPlayers;
+            foreach (string regPlayer in registeredPlayers)
+            {
+                DataRow playerRow = playerListTable.NewRow();
+                playerRow["PlayerName"] = regPlayer;
+                foreach (NetworkBackgammonPlayer player in activePlayers)
+                {
+                    if (regPlayer.ToLower().Equals(player.PlayerName.ToLower()))
+                    {
+                        playerRow["Login"] = true;
+                        if (m_server.GetOpposingPlayer(player) != null)
+                        {
+                            string otherPlayer = (m_server.GetOpposingPlayer(player)).PlayerName;
+                            playerRow["Opponent"] = otherPlayer;
+                        }
+                    }
+                }
+                playerListTable.Rows.Add(playerRow);
+            }
+            playerListGridView.Update();
         }
 
         #region INetworkBackgammonListener Members
@@ -178,12 +212,39 @@ namespace NetworkBackgammonServer
                 BeginInvoke(new OnLogMessageDelegate(Log), ("***** Event ***** "));
                 BeginInvoke(new OnLogMessageDelegate(Log), "Sender: " + sender.ToString());
                 BeginInvoke(new OnLogMessageDelegate(Log), "Event: " + e.ToString());
+                if (e is NetworkBackgammonGameRoomEvent)
+                {
+                    NetworkBackgammonGameRoomEvent eGameRoom = (NetworkBackgammonGameRoomEvent)e;
+                    if (eGameRoom.EventType == 
+                            NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerConnected
+                        || eGameRoom.EventType == 
+                            NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected
+                        || eGameRoom.EventType == 
+                            NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerPlaying)
+                    {
+                        BeginInvoke(new UpdatePlayerListDelegate(UpdateList));
+                    }
+                }
             }
             else
             {
                 Log("***** Event ***** ");
                 Log("Sender: " + sender.ToString());
                 Log("Event: " + e.ToString());
+
+                if (e is NetworkBackgammonGameRoomEvent)
+                {
+                    NetworkBackgammonGameRoomEvent eGameRoom = (NetworkBackgammonGameRoomEvent)e;
+                    if (eGameRoom.EventType ==
+                            NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerConnected
+                        || eGameRoom.EventType ==
+                            NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected
+                        || eGameRoom.EventType == 
+                            NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerPlaying)
+                    {
+                        UpdateList();
+                    }
+                }
             }
         }
 

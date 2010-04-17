@@ -327,6 +327,9 @@ namespace NetworkBackgammonRemotingLib
                             gameSessions.Add(gameSession);
                             // Start the game...
                             gameSession.Start();
+
+                            // Broadcast the game active event to all registered listeners
+                            Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerPlaying));
                         }
 
                         challengeSyncList.Remove(_challengedPlayer);
@@ -452,6 +455,11 @@ namespace NetworkBackgammonRemotingLib
             }
 
             return retval;
+        }
+
+        public ArrayList GetRegisteredPlayers()
+        {
+            return gamePlayerList.GetPlayerList();
         }
 
         /// <summary>
