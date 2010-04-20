@@ -116,6 +116,8 @@ namespace NetworkBackgammonServer
                   
                     // Log status message 
                     Log("Server Started...");
+
+                    UpdateList();
                 }
                 else
                 {
@@ -216,14 +218,14 @@ namespace NetworkBackgammonServer
                 {
                     NetworkBackgammonGameRoomEvent eGameRoom = (NetworkBackgammonGameRoomEvent)e;
                     if (eGameRoom.EventType == 
-                            NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerConnected
-                        || eGameRoom.EventType == 
-                            NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected
-                        || eGameRoom.EventType == 
-                            NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerPlaying)
-                    {
+                                NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerConnected
+                            || eGameRoom.EventType == 
+                                NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected
+                            || eGameRoom.EventType == 
+                                NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerPlaying
+                            || eGameRoom.EventType == 
+                                NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerFinished)
                         BeginInvoke(new UpdatePlayerListDelegate(UpdateList));
-                    }
                 }
             }
             else
@@ -240,7 +242,9 @@ namespace NetworkBackgammonServer
                         || eGameRoom.EventType ==
                             NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerDisconnected
                         || eGameRoom.EventType == 
-                            NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerPlaying)
+                            NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerPlaying
+                        || eGameRoom.EventType == 
+                            NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerFinished)
                     {
                         UpdateList();
                     }
@@ -253,6 +257,11 @@ namespace NetworkBackgammonServer
         private void ServerControlForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             ActivateServer(false);
+        }
+
+        private void killGamesButton_Click(object sender, EventArgs e)
+        {
+
         }
 
     }

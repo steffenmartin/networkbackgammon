@@ -530,6 +530,9 @@ namespace NetworkBackgammonRemotingLib
 
                         if (gameSessionEvent.EventType == NetworkBackgammonGameSessionEvent.GameSessionEventType.GameFinished)
                         {
+                            // Broadcast the game active event to all registered listeners
+                            Broadcast(new NetworkBackgammonGameRoomEvent(NetworkBackgammonGameRoomEvent.GameRoomEventType.PlayerFinished));
+
                             gameSession.Stop();
 
                             gameSessions.Remove(gameSession);

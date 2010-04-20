@@ -13,7 +13,8 @@ namespace NetworkBackgammonLib
         {
             PlayerConnected,
             PlayerDisconnected,
-            PlayerPlaying
+            PlayerPlaying,
+            PlayerFinished
         };
 
         GameRoomEventType type;
