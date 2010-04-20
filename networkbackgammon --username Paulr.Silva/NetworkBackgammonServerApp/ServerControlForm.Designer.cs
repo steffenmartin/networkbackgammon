@@ -42,6 +42,7 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.playerListGridView = new System.Windows.Forms.DataGridView();
             this.gameRoomListView = new System.Windows.Forms.ListView();
+            this.killGamesButton = new System.Windows.Forms.Button();
             this.ServerControlTab.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -145,6 +146,7 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.killGamesButton);
             this.tabPage3.Controls.Add(this.playerListGridView);
             this.tabPage3.Controls.Add(this.gameRoomListView);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
@@ -165,11 +167,21 @@
             // 
             // gameRoomListView
             // 
-            this.gameRoomListView.Location = new System.Drawing.Point(6, 148);
+            this.gameRoomListView.Location = new System.Drawing.Point(6, 182);
             this.gameRoomListView.Name = "gameRoomListView";
-            this.gameRoomListView.Size = new System.Drawing.Size(498, 132);
+            this.gameRoomListView.Size = new System.Drawing.Size(498, 98);
             this.gameRoomListView.TabIndex = 0;
             this.gameRoomListView.UseCompatibleStateImageBehavior = false;
+            // 
+            // killGamesButton
+            // 
+            this.killGamesButton.Location = new System.Drawing.Point(13, 144);
+            this.killGamesButton.Name = "killGamesButton";
+            this.killGamesButton.Size = new System.Drawing.Size(110, 23);
+            this.killGamesButton.TabIndex = 2;
+            this.killGamesButton.Text = "Terminate all games";
+            this.killGamesButton.UseVisualStyleBackColor = true;
+            this.killGamesButton.Click += new System.EventHandler(this.killGamesButton_Click);
             // 
             // ServerControlForm
             // 
@@ -207,6 +219,7 @@
         private System.Windows.Forms.ListView gameRoomListView;
         private System.Windows.Forms.ListBox m_serverLogListBox;
         private System.Windows.Forms.DataGridView playerListGridView;
+        private System.Windows.Forms.Button killGamesButton;
     }
 }
 
