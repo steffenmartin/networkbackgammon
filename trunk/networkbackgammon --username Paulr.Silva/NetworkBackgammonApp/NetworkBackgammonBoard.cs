@@ -500,9 +500,9 @@ namespace NetworkBackgammon
                 // After completing the initial dice roll, this player can only have won the initial dice roll, so let him/her know
                 if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_COMPLETED)
                 {
-                    MessageBox.Show("You won the initial dice roll!", "Initial Dice Roll", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
-
                     m_CurrentGameState = GameBoardState.PLAYER_MOVE_EXPECTED;
+
+                    MessageBox.Show("You won the initial dice roll!", "Initial Dice Roll", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
                 }
                 else
                 {
@@ -520,10 +520,14 @@ namespace NetworkBackgammon
                 // After completing the initial dice roll, this player can only have lost the initial dice roll, so let him/her know
                 if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_COMPLETED)
                 {
+                    m_CurrentGameState = GameBoardState.OPPONENT_MOVE_EXPECTED;
+
                     MessageBox.Show("You lost the initial dice roll!", "Initial Dice Roll", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
                 }
-
-                m_CurrentGameState = GameBoardState.OPPONENT_MOVE_EXPECTED;
+                else
+                {
+                    m_CurrentGameState = GameBoardState.OPPONENT_MOVE_EXPECTED;
+                }
             }
 
             if (m_CurrentDice != null)
