@@ -319,18 +319,36 @@ namespace NetworkBackgammonGameLogic
                                                 activePlayerMoveDoubles = dice[0].CurrentValue == dice[1].CurrentValue;
                                                 activePlayerMovesLeft = (UInt32)(activePlayerMoveDoubles ? 4 : 2);
 
-                                                // Calculate possible moves for active player
-                                                NetworkBackgammonGameEngine.CalculatePossibleMoves(ref player1, ref player2, activePlayerMoveDoubles ? new NetworkBackgammonDice[] { dice[0] } : dice);
+                                                // Calculate possible moves for active player (and figure out whether active player
+                                                // actually has possible moves)
+                                                bool activePlayerHasPossibleMoves = 
+                                                    NetworkBackgammonGameEngine.CalculatePossibleMoves(
+                                                        ref player1,
+                                                        ref player2,
+                                                        activePlayerMoveDoubles ? 
+                                                            new NetworkBackgammonDice[] { dice[0] } :
+                                                            dice);
                                                 
                                                 // Send initial checkers with positions (and possible valid moves
                                                 // for the active player) to both players
                                                 Broadcast(new GameSessionCheckerUpdatedEvent(player1, player2, dice[0], dice[1]));
 
-                                                // Inform players about who's expected to make the next move
-                                                Broadcast(new GameSessionMoveExpectedEvent(player1.Active ? player1.PlayerName : player2.PlayerName));
-                                                
-                                                // Set next iteration's state
-                                                currentState = GameSessionState.MoveExpected;
+                                                if (activePlayerHasPossibleMoves)
+                                                {
+                                                    // Inform players about who's expected to make the next move
+                                                    Broadcast(new GameSessionMoveExpectedEvent(player1.Active ? player1.PlayerName : player2.PlayerName));
+
+                                                    // Set next iteration's state
+                                                    currentState = GameSessionState.MoveExpected;
+                                                }
+                                                else
+                                                {
+                                                    // Inform both players that currently active player has no moves left
+                                                    // which needs to be acknowledged by the active player
+                                                    Broadcast(new GameSessionNoPossibleMovesEvent(player1.Active ? player1.PlayerName : player2.PlayerName));
+
+                                                    currentState = GameSessionState.NoPossibleMovesAcknowledgeExpected;
+                                                }
                                             }
                                         }
                                     }
