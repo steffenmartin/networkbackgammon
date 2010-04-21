@@ -49,6 +49,11 @@ namespace NetworkBackgammon
             PLAYER_DICE_ROLL_ROLLING,
             PLAYER_MOVE_EXPECTED,
             OPPONENT_MOVE_EXPECTED,
+            PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_EXPECTED,
+            PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_ROLLING,
+            PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_COMPLETED,
+            PLAYER_NO_POSSIBLE_MOVES_ACKNOWLEDGED,
+            OPPONENT_NO_POSSIBLE_MOVES,
             PLAYER_RESIGNED,
             OPPONENT_RESIGNED,
             GAME_OVER
@@ -108,6 +113,11 @@ namespace NetworkBackgammon
         /// <param name="resigningPlayer"></param>
         delegate void OnPlayerResignationDelegate(string resigningPlayer);
 
+        /// <summary>
+        /// Delegate for handling a player that has no possible moves on his/her turn
+        /// </summary>
+        /// <param name="playerWithoutPossibleMoves">Name of the player who has no possible moves</param>
+        delegate void OnNoPossibleMovesDelegate(string playerWithoutPossibleMoves);
 
         /// <summary>
         /// The current state of the Game Board
@@ -243,6 +253,19 @@ namespace NetworkBackgammon
                 else
                 {
                     OnPlayerResignation(playerResigEvt.ResigningPlayer);
+                }
+            }
+            else if (e is GameSessionNoPossibleMovesEvent)
+            {
+                GameSessionNoPossibleMovesEvent noPossMovesEvt = (GameSessionNoPossibleMovesEvent)e;
+
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new OnNoPossibleMovesDelegate(OnNoPossibleMoves), noPossMovesEvt.PlayerName);
+                }
+                else
+                {
+                    OnNoPossibleMoves(noPossMovesEvt.PlayerName);
                 }
             }
         }
@@ -569,6 +592,31 @@ namespace NetworkBackgammon
             Hide();
         }
 
+        /// <summary>
+        /// Handler for a player that has no possible moves on his/her turn
+        /// </summary>
+        /// <param name="playerWithoutPossibleMoves">Name of the player who has no possible moves</param>
+        private void OnNoPossibleMoves(string playerWithoutPossibleMoves)
+        {
+            if (playerWithoutPossibleMoves == NetworkBackgammonClient.Instance.Player.PlayerName &&
+                NetworkBackgammonClient.Instance.Player.Active)
+            {
+                m_CurrentGameState = GameBoardState.PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_EXPECTED;
+            }
+            else
+            {
+                m_CurrentGameState = GameBoardState.OPPONENT_NO_POSSIBLE_MOVES;
+            }
+
+            if (m_CurrentDice != null)
+            {
+                m_playerDiceIndex[0] = (int)(m_CurrentDice[0].CurrentValueUInt32 - 1);
+                m_playerDiceIndex[1] = (int)(m_CurrentDice[1].CurrentValueUInt32 - 1);
+            }
+
+            Refresh();
+        }
+
         // Overriden load function of the form
         private void NetworkBackgammonBoard_Load(object sender, EventArgs e)
         {
@@ -691,7 +739,8 @@ namespace NetworkBackgammon
         private void DrawRollingDice(object sender, PaintEventArgs e)
         {
             if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_ROLLING ||
-                m_CurrentGameState == GameBoardState.PLAYER_DICE_ROLL_ROLLING)
+                m_CurrentGameState == GameBoardState.PLAYER_DICE_ROLL_ROLLING ||
+                m_CurrentGameState == GameBoardState.PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_ROLLING)
             {
                 // Draw the back ground image
                 e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
@@ -704,7 +753,9 @@ namespace NetworkBackgammon
             else // Check here if its the current players turn
             {
                 if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_COMPLETED ||
-                    m_CurrentGameState == GameBoardState.PLAYER_MOVE_EXPECTED)
+                    m_CurrentGameState == GameBoardState.PLAYER_MOVE_EXPECTED ||
+                    m_CurrentGameState == GameBoardState.PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_COMPLETED ||
+                    m_CurrentGameState == GameBoardState.PLAYER_NO_POSSIBLE_MOVES_ACKNOWLEDGED)
                 {
                     // Draw the back ground image
                     e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 385, 185);
@@ -736,7 +787,9 @@ namespace NetworkBackgammon
 
                     e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 175, 185);
                 }
-                else if (!curPlayer.Active && m_CurrentGameState == GameBoardState.OPPONENT_MOVE_EXPECTED)
+                else if (!curPlayer.Active && 
+                    (m_CurrentGameState == GameBoardState.OPPONENT_MOVE_EXPECTED ||
+                     m_CurrentGameState == GameBoardState.OPPONENT_NO_POSSIBLE_MOVES))
                 {
                     e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[0]], 143, 185);
                     e.Graphics.DrawImage((Bitmap)m_diceIconList[m_playerDiceIndex[1]], 175, 185);
@@ -748,7 +801,8 @@ namespace NetworkBackgammon
         private void DrawDiceButton(object sender, PaintEventArgs e)
         {
             if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_EXPECTED ||
-                m_CurrentGameState == GameBoardState.PLAYER_DICE_ROLL_EXPECTED)
+                m_CurrentGameState == GameBoardState.PLAYER_DICE_ROLL_EXPECTED ||
+                m_CurrentGameState == GameBoardState.PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_EXPECTED)
             {
                 m_rollDiceButton.Text = "Roll Dice";
                 m_rollDiceButton.Name = "rollDiceButton";
@@ -767,11 +821,16 @@ namespace NetworkBackgammon
         private void OnClickRollButton(object sender, System.EventArgs e)
         {
             if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_EXPECTED ||
-                m_CurrentGameState == GameBoardState.PLAYER_DICE_ROLL_EXPECTED)
+                m_CurrentGameState == GameBoardState.PLAYER_DICE_ROLL_EXPECTED ||
+                m_CurrentGameState == GameBoardState.PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_EXPECTED)
             {
                 if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_EXPECTED)
                 {
                     m_CurrentGameState = GameBoardState.INITIAL_DICE_ROLL_ROLLING;
+                }
+                else if (m_CurrentGameState == GameBoardState.PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_EXPECTED)
+                {
+                    m_CurrentGameState = GameBoardState.PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_ROLLING;
                 }
                 else
                 {
@@ -906,23 +965,24 @@ namespace NetworkBackgammon
         {
             // Check if we are rolling our dice
             if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_ROLLING ||
-                m_CurrentGameState == GameBoardState.PLAYER_DICE_ROLL_ROLLING)
+                m_CurrentGameState == GameBoardState.PLAYER_DICE_ROLL_ROLLING ||
+                m_CurrentGameState == GameBoardState.PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_ROLLING)
             {
                 if (m_diceTimer-- > 0)
                 {
                     Random random = new Random();
 
                     m_playerDiceIndex[0] = random.Next(0, 5);
-                    
+
                     // Check if the this is the initial dice roll (only need one dice)
-                    if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_ROLLING)
+                    if (m_CurrentGameState != GameBoardState.INITIAL_DICE_ROLL_ROLLING)
                     {
                         m_playerDiceIndex[1] = random.Next(0, 5);
                     }
                 }
                 else
                 {
-                    if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_ROLLING) 
+                    if (m_CurrentGameState == GameBoardState.INITIAL_DICE_ROLL_ROLLING)
                     {
                         m_playerDiceIndex[0] = (int)(m_CurrentInitialDice.CurrentValueUInt32 - 1);
 
@@ -932,18 +992,38 @@ namespace NetworkBackgammon
                     }
                     else
                     {
-                        if (NetworkBackgammonClient.Instance.Player.Active || m_CurrentGameState == GameBoardState.OPPONENT_MOVE_EXPECTED)
+                        if (NetworkBackgammonClient.Instance.Player.Active ||
+                            (m_CurrentGameState == GameBoardState.OPPONENT_MOVE_EXPECTED ||
+                             m_CurrentGameState == GameBoardState.OPPONENT_NO_POSSIBLE_MOVES))
                         {
                             m_playerDiceIndex[0] = (int)(m_CurrentDice[0].CurrentValueUInt32 - 1);
                             m_playerDiceIndex[1] = (int)(m_CurrentDice[1].CurrentValueUInt32 - 1);
                         }
 
-                        m_CurrentGameState = GameBoardState.PLAYER_MOVE_EXPECTED;
+                        if (m_CurrentGameState == GameBoardState.PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_ROLLING)
+                        {
+                            m_CurrentGameState = GameBoardState.PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_COMPLETED;
+                        }
+                        else
+                        {
+                            m_CurrentGameState = GameBoardState.PLAYER_MOVE_EXPECTED;
+                        }
                     }
                 }
 
                 // Redraw the screen
                 Refresh();
+            }
+            else
+            {
+                if (m_CurrentGameState == GameBoardState.PLAYER_NO_POSSIBLE_MOVES_DICE_ROLL_COMPLETED)
+                {
+                    m_CurrentGameState = GameBoardState.PLAYER_NO_POSSIBLE_MOVES_ACKNOWLEDGED;
+
+                    MessageBox.Show("You have no possible moves on this turn", "No Possible Moves", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+
+                    NetworkBackgammonClient.Instance.Player.AcknowledgeNoMoves();
+                }
             }
         }
 
