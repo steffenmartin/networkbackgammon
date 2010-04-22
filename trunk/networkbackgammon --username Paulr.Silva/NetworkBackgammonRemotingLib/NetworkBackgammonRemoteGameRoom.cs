@@ -385,7 +385,7 @@ namespace NetworkBackgammonRemotingLib
             {
                 if (session.ContainsPlayer(player))
                 {
-                    retval = false;
+                    retval = true;
                     break;
                 }
             }

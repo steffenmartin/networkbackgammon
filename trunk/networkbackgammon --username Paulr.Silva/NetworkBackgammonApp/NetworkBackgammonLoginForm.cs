@@ -15,13 +15,93 @@ namespace NetworkBackgammon
 {
     public partial class NetworkBackgammonLoginForm : Form, INetworkBackgammonListener
     {
+        #region Declarations
+
+        /// <summary>
+        /// Container for exchanging data relevant for a game challenge between threads
+        /// </summary>
+        private class GameChallengeDataContainer
+        {
+            #region Declarations
+
+            /// <summary>
+            /// Enumerations of results of a game challenge
+            /// </summary>
+            public enum ChallengeResultType
+            {
+                CHALLENGE_ACCEPTED,
+                CHALLENGE_REJECTED,
+                CHALLENGE_FAILED,
+                CHALLENGE_CANCELLED,
+                CHALLENGE_UNKNOWN
+            }
+
+            #endregion
+
+            #region Members
+
+            /// <summary>
+            /// Name of the challenged player
+            /// </summary>
+            string challengedPlayerName;
+
+            /// <summary>
+            /// Results of the game challenge (to be set)
+            /// </summary>
+            ChallengeResultType challengeResult = ChallengeResultType.CHALLENGE_UNKNOWN;
+
+            #endregion
+
+            #region Methods
+
+            public GameChallengeDataContainer(string _challengedPlayerName)
+            {
+                challengedPlayerName = _challengedPlayerName;
+            }
+
+            #endregion
+
+            #region Properties
+
+            /// <summary>
+            /// Gets the name of the challenged player
+            /// </summary>
+            public string ChallengedPlayerName
+            {
+                get
+                {
+                    return challengedPlayerName;
+                }
+            }
+
+            /// <summary>
+            /// Gets or sets the game challenge result
+            /// </summary>
+            public ChallengeResultType ChallengeResult
+            {
+                get
+                {
+                    return challengeResult;
+                }
+                set
+                {
+                    challengeResult = value;
+                }
+            }
+
+            #endregion
+        }
+
+        #endregion
+
         INetworkBackgammonListener defaultListener = new NetworkBackgammonListener();
         NetworkBackgammonWaitDialog waitDlg = null;
-        string threadAccessibleChallengedPlayerName;
+        GameChallengeDataContainer gameChallengeThreadExchangeData = null;
+        object gameChallengeMutex = new object();
         Thread challengeThread = null;
         delegate void OnNotificationDelegate();
         delegate bool OnChallengeDelegate(NetworkBackgammonPlayer _challengingPlayer, NetworkBackgammonPlayer _challengedPlayer);
-        delegate void OnChallengeResponseDelegate(bool challengeResponse);
+        delegate void OnChallengeResponseDelegate();
 
         // Update list box with players in the game room
         private void UpdateGameRoomList()
@@ -44,28 +124,118 @@ namespace NetworkBackgammon
             }
         }
 
-        // Handle the challenge response from the challenged player
-        private void ChallengeResponse(bool challengeResponse)
+        /// <summary>
+        /// Handler for a cancellation of a game challenge (e.g. from the wait dialog)
+        /// </summary>
+        private void OnChallengeCancelled()
         {
+            lock (gameChallengeMutex)
+            {
+                if (gameChallengeThreadExchangeData != null)
+                {
+                    gameChallengeThreadExchangeData.ChallengeResult = GameChallengeDataContainer.ChallengeResultType.CHALLENGE_CANCELLED;
+
+                    if (InvokeRequired)
+                    {
+                        BeginInvoke(new OnChallengeResponseDelegate(OnChallengeResponse));
+                    }
+                    else
+                    {
+                        OnChallengeResponse();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handler for a challenge response (incuding cancellation)
+        /// </summary>
+        private void OnChallengeResponse()
+        {
+            GameChallengeDataContainer.ChallengeResultType result = GameChallengeDataContainer.ChallengeResultType.CHALLENGE_UNKNOWN;
+
+            bool challengeProceed = false;
+
+            lock (gameChallengeMutex)
+            {
+                if (gameChallengeThreadExchangeData != null)
+                {
+                    result = gameChallengeThreadExchangeData.ChallengeResult;
+
+                    gameChallengeThreadExchangeData = null;
+
+                    challengeProceed = true;
+                }
+            }
+
             if (waitDlg.Visible) waitDlg.Close();
 
-            if (challengeResponse)
+            if (challengeProceed)
             {
-                this.DialogResult = DialogResult.OK;
-                Hide();
-            }
-            else
-            {
-                MessageBox.Show(this, "Challenge Rejected");
+                switch (result)
+                {
+                    case GameChallengeDataContainer.ChallengeResultType.CHALLENGE_FAILED:
+                        MessageBox.Show("Game Challenge Failed!", "Game Challenge", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                        break;
+                    case GameChallengeDataContainer.ChallengeResultType.CHALLENGE_REJECTED:
+                        MessageBox.Show("Game Challenge Rejected!", "Game Challenge", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+                        break;
+                    case GameChallengeDataContainer.ChallengeResultType.CHALLENGE_ACCEPTED:
+                        break;
+                    case GameChallengeDataContainer.ChallengeResultType.CHALLENGE_CANCELLED:
+                        break;
+                    default:
+                        MessageBox.Show("Game Challenge Error!", "Game Challenge", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                        break;
+                }
+
+                if (result == GameChallengeDataContainer.ChallengeResultType.CHALLENGE_ACCEPTED)
+                {
+                    this.DialogResult = DialogResult.OK;
+                    Hide();
+                }
             }
         }
 
         // Call the challenge routine on a seperate thread than the GUI thread to prevent blocking
         private void ChallengeThread()
         {
-            string tempString = threadAccessibleChallengedPlayerName;
+            string tempString = null;
 
-            NetworkBackgammonClient.Instance.GameRoom.Challenge(NetworkBackgammonClient.Instance.Player.PlayerName, tempString);
+            lock (gameChallengeMutex)
+            {
+                if (gameChallengeThreadExchangeData != null)
+                {
+                    tempString = gameChallengeThreadExchangeData.ChallengedPlayerName;
+                }
+            }
+
+            bool gameChallengeResult = false;
+
+            if (tempString != null)
+            {
+                gameChallengeResult = NetworkBackgammonClient.Instance.GameRoom.Challenge(NetworkBackgammonClient.Instance.Player.PlayerName, tempString);
+            }
+
+            lock (gameChallengeMutex)
+            {
+                if (gameChallengeThreadExchangeData != null)
+                {
+                    if (!gameChallengeResult)
+                    {
+                        gameChallengeThreadExchangeData.ChallengeResult = GameChallengeDataContainer.ChallengeResultType.CHALLENGE_FAILED;
+
+                        if (InvokeRequired)
+                        {
+                            BeginInvoke(new OnChallengeResponseDelegate(OnChallengeResponse));
+                        }
+                        else
+                        {
+                            OnChallengeResponse();
+                        }
+                    }
+                }
+            }
         }
 
         public NetworkBackgammonLoginForm()
@@ -173,13 +343,24 @@ namespace NetworkBackgammon
 
                     if (NetworkBackgammonClient.Instance.Player.PlayerName.CompareTo(challengeRespEvent.ChallengingPlayer) == 0)
                     {
+                        lock (gameChallengeMutex)
+                        {
+                            if (gameChallengeThreadExchangeData != null)
+                            {
+                                gameChallengeThreadExchangeData.ChallengeResult = 
+                                    challengeAccepted ?
+                                        GameChallengeDataContainer.ChallengeResultType.CHALLENGE_ACCEPTED :
+                                        GameChallengeDataContainer.ChallengeResultType.CHALLENGE_REJECTED;
+                            }
+                        }
+
                         if (InvokeRequired)
                         {
-                            BeginInvoke(new OnChallengeResponseDelegate(ChallengeResponse), challengeAccepted);
+                            BeginInvoke(new OnChallengeResponseDelegate(OnChallengeResponse));
                         }
                         else
                         {
-                            ChallengeResponse(challengeAccepted);
+                            OnChallengeResponse();
                         }
                     }
                 }
@@ -273,21 +454,37 @@ namespace NetworkBackgammon
                 string tempChallengedlayer = String.Copy(challengedPlayer.PlayerName);
 
                 // Setup the wait dialog
-                waitDlg = new NetworkBackgammonWaitDialog(null);
+                waitDlg = new NetworkBackgammonWaitDialog(new NetworkBackgammonWaitDialog.WaitButtonActionDelegate(OnChallengeCancelled));
                 waitDlg.WaitDialogLabel.Text = "Waiting for response from " + challengedPlayer.PlayerName;
 
-                // Store challenged player for thread access
-                threadAccessibleChallengedPlayerName = challengedPlayer.PlayerName;
-                // Create the challenge thread
-                challengeThread = new Thread(new ThreadStart(ChallengeThread));
-                // Start the thread
-                challengeThread.Start();
+                bool challengeProceed = true;
 
-                //NetworkBackgammonClient.Instance.GameRoom.Challenge(tempChallengingPlayer, tempChallengedlayer);
+                lock (gameChallengeMutex)
+                {
+                    // Only execute challenge if none is pending (i.e. if gameChallengeThreadExchangeData object exists)
+                    if (gameChallengeThreadExchangeData == null)
+                    {
+                        // Store challenged player name for thread access
+                        gameChallengeThreadExchangeData = new GameChallengeDataContainer(challengedPlayer.PlayerName);
+                    }
+                    else
+                    {
+                        challengeProceed = false;
+                    }
+                }
 
-                // Start up the wait dialog
-                waitDlg.ShowDialog(this);
+                if (challengeProceed)
+                {
+                    // Create the challenge thread
+                    challengeThread = new Thread(new ThreadStart(ChallengeThread));
+                    // Start the thread
+                    challengeThread.Start();
+
+                    // Start up the wait dialog
+                    waitDlg.ShowDialog(this);
+                }
             }
+
         }
 
         private void m_gameRoomPlayersListBox_SelectedIndexChanged(object sender, EventArgs e)
