@@ -19,7 +19,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkBackgammonApp", "Net
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkBackgammonServerApp", "NetworkBackgammonServerApp\NetworkBackgammonServerApp.csproj", "{319155EF-381E-4A58-9582-B632656B1D5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPlayerList", "TestPlayerList\TestPlayerList.csproj", "{D09427FA-FEAE-499E-BCEB-A8C4B45A67CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DB1C53A3-0D9F-405B-8455-21BC8FBAB6A5}"
+	ProjectSection(SolutionItems) = preProject
+		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
+		NetworkBackgammon.vsmdi = NetworkBackgammon.vsmdi
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = NetworkBackgammon.vsmdi
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -99,13 +110,25 @@ Global
 		{319155EF-381E-4A58-9582-B632656B1D5B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{319155EF-381E-4A58-9582-B632656B1D5B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{319155EF-381E-4A58-9582-B632656B1D5B}.Release|Win32.ActiveCfg = Release|Any CPU
+		{D09427FA-FEAE-499E-BCEB-A8C4B45A67CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D09427FA-FEAE-499E-BCEB-A8C4B45A67CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D09427FA-FEAE-499E-BCEB-A8C4B45A67CC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D09427FA-FEAE-499E-BCEB-A8C4B45A67CC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D09427FA-FEAE-499E-BCEB-A8C4B45A67CC}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{D09427FA-FEAE-499E-BCEB-A8C4B45A67CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D09427FA-FEAE-499E-BCEB-A8C4B45A67CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D09427FA-FEAE-499E-BCEB-A8C4B45A67CC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D09427FA-FEAE-499E-BCEB-A8C4B45A67CC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D09427FA-FEAE-499E-BCEB-A8C4B45A67CC}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{CC9D0D0B-EBDF-41DF-BEF3-EF09CDCC7DA5} = {F2F04DD8-E585-4217-9F31-48D4CE8E8FAD}
 		{36035814-3C1B-4767-8DBA-A17B73340C0C} = {F2F04DD8-E585-4217-9F31-48D4CE8E8FAD}
+		{CC9D0D0B-EBDF-41DF-BEF3-EF09CDCC7DA5} = {F2F04DD8-E585-4217-9F31-48D4CE8E8FAD}
+		{D09427FA-FEAE-499E-BCEB-A8C4B45A67CC} = {F2F04DD8-E585-4217-9F31-48D4CE8E8FAD}
+		{DB1C53A3-0D9F-405B-8455-21BC8FBAB6A5} = {F2F04DD8-E585-4217-9F31-48D4CE8E8FAD}
 		{97DDCB0F-23F9-4496-94C2-5F740159D900} = {36035814-3C1B-4767-8DBA-A17B73340C0C}
 	EndGlobalSection
 EndGlobal

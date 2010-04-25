@@ -13,7 +13,7 @@ namespace NetworkBackgammonRemotingLib
     /// Class to manage the Player list for Network Backgammon
     /// Save the list to an XML file in the Server local directory
     /// </summary>
-    class NetworkBackgammonPlayerList
+    public class NetworkBackgammonPlayerList
     {
         DataTable playerDataTable;
         string lastError = null;
