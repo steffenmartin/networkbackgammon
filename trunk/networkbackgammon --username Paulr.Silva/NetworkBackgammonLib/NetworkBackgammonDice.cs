@@ -26,7 +26,8 @@ namespace NetworkBackgammonLib
             FOUR,
             FIVE,
             SIX,
-            MAX = SIX
+            MAX = SIX,
+            INVALID
         };
 
         #endregion

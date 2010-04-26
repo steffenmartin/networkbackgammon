@@ -38,6 +38,26 @@ namespace NetworkBackgammon
         const int m_barXPos = 272;
 
         /// <summary>
+        /// Offboard "bin" X position
+        /// </summary>
+        const int m_offboardXPos = 531;
+
+        /// <summary>
+        /// Offboard "bin" Y position
+        /// </summary>
+        const int m_offboardYPos = 13;
+
+        /// <summary>
+        /// Offboard "bin" width
+        /// </summary>
+        const int m_offboardWidth = 32;
+
+        /// <summary>
+        /// Offboard "bin" height
+        /// </summary>
+        const int m_offboardHeight = 120;
+
+        /// <summary>
         /// Enumeration of the various states the Game Board can be in
         /// </summary>
         enum GameBoardState
@@ -135,6 +155,16 @@ namespace NetworkBackgammon
         NetworkBackgammonDice[] m_CurrentDice = null;
 
         /// <summary>
+        /// Available offboard positions for the current player
+        /// </summary>
+        // System.Collections.Generic.List<NetworkBackgammonBoardPosition> m_offboardPlayerPositionList = new System.Collections.Generic.List<NetworkBackgammonBoardPosition>();
+
+        /// <summary>
+        /// Available offboard positions for the opposing player
+        /// </summary>
+        // System.Collections.Generic.List<NetworkBackgammonBoardPosition> m_offboardOpponentPositionList = new System.Collections.Generic.List<NetworkBackgammonBoardPosition>();
+
+        /// <summary>
         /// The current player's checkers as received from the Player (via Game Session)
         /// </summary>
         System.Collections.Generic.List<NetworkBackgammonChecker> m_PlayersCurrentCheckers = null;
@@ -166,11 +196,16 @@ namespace NetworkBackgammon
                 }
             }
 
-            // Add a board position for the "bar" - outide of the board matrix - there can be as many chips in the bar as there are total chips
+            // Add a board position for the "bar" and "offboard" - outide of the board matrix - there can be as many chips in the bar as there are total chips per player
             for (int i = 0; i < m_maxNumChips; i++)
             {
+                // Board positions for "bar"
                 m_barPlayerPositionList.Add(new NetworkBackgammonBoardPosition(new Point((int)NetworkBackgammonPosition.GameBoardPosition.BAR - 1, i)));
                 m_barOpponentPositionList.Add(new NetworkBackgammonBoardPosition(new Point((int)NetworkBackgammonPosition.GameBoardPosition.BAR - 1, i)));
+
+                // Board positions for "offboard"
+                // m_offboardPlayerPositionList.Add(new NetworkBackgammonBoardPosition(new Point((int)NetworkBackgammonPosition.GameBoardPosition.OFFBOARD - 1, i)));
+                // m_offboardOpponentPositionList.Add(new NetworkBackgammonBoardPosition(new Point((int)NetworkBackgammonPosition.GameBoardPosition.OFFBOARD - 1, i)));
             }
 
             // Create icon image list for the each dice face
@@ -341,6 +376,36 @@ namespace NetworkBackgammon
             return retval;
         }
 
+        /// <summary>
+        /// Get the offboard position for current player or opponent
+        /// </summary>
+        /// <param name="col">Column board matrix position</param>
+        /// <param name="row">Row board matrix position</param>
+        /// <param name="opponent">If "true", get opposing players offboard position, otherwise get the current players offboard position</param>
+        /// <returns>NetworkBackgammonBoardPosition object</returns>
+        /*
+        public NetworkBackgammonBoardPosition GetOffboardPosition(int col, int row, bool opponent)
+        {
+            NetworkBackgammonBoardPosition retVal = null;
+
+            System.Collections.Generic.List<NetworkBackgammonBoardPosition> tmpList =
+                opponent ?
+                m_offboardOpponentPositionList :
+                m_offboardPlayerPositionList;
+
+            foreach (NetworkBackgammonBoardPosition pos in tmpList)
+            {
+                if ((pos.PositionID.X == col) && (pos.PositionID.Y == row))
+                {
+                    retVal = pos;
+                    break;
+                }
+            }
+
+            return retVal;
+        }
+        */
+
         // Map board position objects to pixel locations on the board
         private void MapBoardPositions()
         {
@@ -409,7 +474,6 @@ namespace NetworkBackgammon
 
                     Int32 newColPos = Convert.ToInt32(checkerAP.CurrentPosition.CurrentPosition) - 1;
                     Int32 newRowPos = 0;
-                    bool isCheckerOnBar = (checkerAP.CurrentPosition.CurrentPosition == NetworkBackgammonPosition.GameBoardPosition.BAR ? true : false);
 
                     // Search board chip list and determine the row
                     foreach (NetworkBackgammonChip chip in m_playerChipList)
@@ -423,19 +487,25 @@ namespace NetworkBackgammon
                         }
                     }
 
-                    // Is the current checker on the "bar"
-                    if (isCheckerOnBar)
+                    switch (checkerAP.CurrentPosition.CurrentPositionType)
                     {
-                        // Get the mapped board position based on the new game engine defined position
-                        boardChip.ChipBoardPosition = GetPlayerBarPosition(newColPos, newRowPos);
-                    }
-                    else
-                    {
-                        // Get the mapped board position based on the new game engine defined position
-                        boardChip.ChipBoardPosition = GetBoardPosition(newColPos, newRowPos);
+                        // Is the current checker on the "bar"
+                        case NetworkBackgammonPosition.GameBoardPositionType.BAR:
+                            // Get the mapped board position based on the new game engine defined position
+                            boardChip.ChipBoardPosition = GetPlayerBarPosition(newColPos, newRowPos);
+                            break;
+                        case NetworkBackgammonPosition.GameBoardPositionType.ONBOARD:
+                            // Get the mapped board position based on the new game engine defined position
+                            boardChip.ChipBoardPosition = GetBoardPosition(newColPos, newRowPos);
+                            break;
+                        case NetworkBackgammonPosition.GameBoardPositionType.OFFBOARD:
+                            // boardChip.ChipBoardPosition = GetOffboardPosition(newColPos, newRowPos, false);
+                            break;
                     }
 
-                    if (boardChip != null)
+                    if (boardChip != null &&
+                        (checkerAP.CurrentPosition.CurrentPositionType == NetworkBackgammonPosition.GameBoardPositionType.ONBOARD ||
+                         checkerAP.CurrentPosition.CurrentPositionType == NetworkBackgammonPosition.GameBoardPositionType.BAR))
                     {
                         // Add the new chip object to the player's chip list
                         m_playerChipList.Add(boardChip);
@@ -464,8 +534,7 @@ namespace NetworkBackgammon
                     Int32 newColPos = (normalPosition ? Convert.ToInt32(checkerAP.CurrentPosition.GetOppositePosition().CurrentPosition) - 1 : 
                                                         Convert.ToInt32(checkerAP.CurrentPosition.CurrentPosition) - 1);
                     Int32 newRowPos = 0;
-                    bool isCheckerOnBar = (checkerAP.CurrentPosition.CurrentPosition == NetworkBackgammonPosition.GameBoardPosition.BAR ? true : false);
-
+                    
                     // Search board chip list and determine the row
                     foreach (NetworkBackgammonChip chip in m_opponentChipList)
                     {
@@ -478,19 +547,25 @@ namespace NetworkBackgammon
                         }
                     }
 
-                    // Is the current checker on the "bar"
-                    if (isCheckerOnBar)
+                    switch (checkerAP.CurrentPosition.CurrentPositionType)
                     {
-                        // Get the mapped board position based on the new game engine defined position
-                        boardChip.ChipBoardPosition = GetOppBarPosition(newColPos, newRowPos);
-                    }
-                    else
-                    {
-                        // Get the mapped board position based on the new game engine defined position
-                        boardChip.ChipBoardPosition = GetBoardPosition(newColPos, newRowPos);
+                        // Is the current checker on the "bar"
+                        case NetworkBackgammonPosition.GameBoardPositionType.BAR:
+                            // Get the mapped board position based on the new game engine defined position
+                            boardChip.ChipBoardPosition = GetOppBarPosition(newColPos, newRowPos);
+                            break;
+                        case NetworkBackgammonPosition.GameBoardPositionType.ONBOARD:
+                            // Get the mapped board position based on the new game engine defined position
+                            boardChip.ChipBoardPosition = GetBoardPosition(newColPos, newRowPos);
+                            break;
+                        case NetworkBackgammonPosition.GameBoardPositionType.OFFBOARD:
+                            // boardChip.ChipBoardPosition = GetOffboardPosition(newColPos, newRowPos, false);
+                            break;
                     }
 
-                    if (boardChip != null)
+                    if (boardChip != null &&
+                        (checkerAP.CurrentPosition.CurrentPositionType == NetworkBackgammonPosition.GameBoardPositionType.ONBOARD ||
+                         checkerAP.CurrentPosition.CurrentPositionType == NetworkBackgammonPosition.GameBoardPositionType.BAR))
                     {
                         // Add the new chip object to the player's chip list
                         m_opponentChipList.Add(boardChip);
@@ -703,7 +778,7 @@ namespace NetworkBackgammon
                 Rectangle rectPlayer = new Rectangle(531, 13 + 8 * (i), 32, 8); // 124
                 e.Graphics.DrawRectangle(trayOutlinePen, rectPlayer);
 
-                if (i > chipListSize)
+                if (i >= chipListSize)
                 {
                     // Load the bitmap directly from the manifest resource
                     Icon trayIcon = new Icon(this.GetType(), "Resources.Player1TrayChip.ico");
@@ -723,7 +798,7 @@ namespace NetworkBackgammon
                 Rectangle rectOpponent = new Rectangle(531, 269 + 8 * (i), 32, 8);
                 e.Graphics.DrawRectangle(trayOutlinePen, rectOpponent);
 
-                if (i > oppListSize)
+                if (i >= oppListSize)
                 {
                     // Load the bitmap directly from the manifest resource
                     Icon trayIcon = new Icon(this.GetType(), "Resources.Player2TrayChip.ico");
@@ -867,8 +942,9 @@ namespace NetworkBackgammon
             {
                 // Dropped board position
                 NetworkBackgammonBoardPosition boardPosition = null;
+                NetworkBackgammonPosition gamePositionDropped = null;
                 
-                // Determine if the chip is being dropped on one of the mapped board positions
+                // Determine if the chip is being dropped on one of the "regular" mapped board positions
                 for (int i = 0; i < m_boardPositionList.Count; i++)
                 {
                     NetworkBackgammonBoardPosition tempObj = (NetworkBackgammonBoardPosition)m_boardPositionList[i];
@@ -877,10 +953,20 @@ namespace NetworkBackgammon
                         (e.Y >= tempObj.LocationPoint.Y) && (e.Y < tempObj.LocationPoint.Y + tempObj.LocationSize.Height))
                     {
                         boardPosition = (NetworkBackgammonBoardPosition)m_boardPositionList[i];
+                        gamePositionDropped = new NetworkBackgammonPosition((NetworkBackgammonPosition.GameBoardPosition)(boardPosition.PositionID.X + 1));
                         break;
                     }
                 }
-              
+
+                // If chip hasn't been dropped on one of the "regular" mapped board positions, it might have been dropped on the offboard "bin"
+                if (gamePositionDropped == null)
+                {
+                    if ((e.X >= m_offboardXPos) && (e.X < m_offboardXPos + m_offboardWidth) &&
+                        (e.Y >= m_offboardYPos) && (e.Y < m_offboardHeight))
+                    {
+                        gamePositionDropped = new NetworkBackgammonPosition(NetworkBackgammonPosition.GameBoardPosition.OFFBOARD);
+                    }
+                }
 
                 // Loop through all board chips and determine if any are moving
                 for (int chipIndex = 0; chipIndex < m_playerChipList.Count; chipIndex++)
@@ -889,12 +975,14 @@ namespace NetworkBackgammon
 
                     if (boardChip.Moving)
                     {
-                        if (boardPosition != null)
+                        if (gamePositionDropped != null)
                         {
                             NetworkBackgammonDice moveToPosition = null;
 
+                            NetworkBackgammonPosition gamePositionChip = new NetworkBackgammonPosition((NetworkBackgammonPosition.GameBoardPosition)(boardChip.ChipBoardPosition.PositionID.X + 1));
+
                             // Get the "dice" movement
-                            int moveDelta = (boardPosition.PositionID.X - (boardChip.ChipBoardPosition.PositionID.X == (int)NetworkBackgammonPosition.GameBoardPosition.BAR-1 ? (int)NetworkBackgammonPosition.GameBoardPosition.ONE-2 : boardChip.ChipBoardPosition.PositionID.X ));
+                            NetworkBackgammonDice moveDelta = gamePositionDropped - gamePositionChip;
 
                             // Current player 
                             NetworkBackgammonPlayer curPlayer = NetworkBackgammonClient.Instance.Player;
@@ -903,18 +991,30 @@ namespace NetworkBackgammon
                             // Loop through possible moves for the moving checker
                             foreach (NetworkBackgammonDice move in checkList[chipIndex].PossibleMoves)
                             {
-                                if (moveDelta == move.CurrentValueUInt32)
+                                NetworkBackgammonPosition allowedPosition = gamePositionChip + move;
+
+                                // if (moveDelta.CurrentValueUInt32 == move.CurrentValueUInt32)
+                                if (allowedPosition == gamePositionDropped)
                                 {
                                     moveToPosition = move;
+                                    break;
                                 }
                             }
 
                             if (moveToPosition != null)
                             {
-                                // Move the location to the drop chip position
-                                boardChip.ChipPixelPosition = boardPosition.LocationPoint;
-                                // Move the board location to the drop chip position
-                                boardChip.ChipBoardPosition = boardPosition;
+                                if (boardPosition != null)
+                                {
+                                    // Move the location to the drop chip position
+                                    boardChip.ChipPixelPosition = boardPosition.LocationPoint;
+                                    // Move the board location to the drop chip position
+                                    boardChip.ChipBoardPosition = boardPosition;
+                                }
+                                else
+                                {
+                                    m_playerChipList.Remove(boardChip);
+                                }
+
                                 // Finally, make the player move
                                 NetworkBackgammonClient.Instance.Player.MakeMove(checkList[chipIndex], moveToPosition);
                             }

@@ -81,6 +81,17 @@ namespace NetworkBackgammonLib
             HOME_END = TWENTYFOUR
         }
 
+        /// <summary>
+        /// Enumeration of (possible) position types of checkers on the game board
+        /// </summary>
+        public enum GameBoardPositionType
+        {
+            INVALID,
+            ONBOARD,
+            BAR,
+            OFFBOARD
+        };
+
         #endregion
 
         #region Members
@@ -170,6 +181,33 @@ namespace NetworkBackgammonLib
             }
         }
 
+        /// <summary>
+        /// Maps the current game board position to a position type
+        /// </summary>
+        public GameBoardPositionType CurrentPositionType
+        {
+            get
+            {
+                GameBoardPositionType retVal = GameBoardPositionType.INVALID;
+
+                if (currentPosition >= GameBoardPosition.NORMAL_START &&
+                    currentPosition <= GameBoardPosition.NORMAL_END)
+                {
+                    retVal = GameBoardPositionType.ONBOARD;
+                }
+                else if (currentPosition == GameBoardPosition.BAR)
+                {
+                    retVal = GameBoardPositionType.BAR;
+                }
+                else if (currentPosition == GameBoardPosition.OFFBOARD)
+                {
+                    retVal = GameBoardPositionType.OFFBOARD;
+                }
+
+                return retVal;
+            }
+        }
+
         #endregion
 
         #region Operators
@@ -213,6 +251,107 @@ namespace NetworkBackgammonLib
         }
 
         /// <summary>
+        /// Calculates the move (dice value) it takes to get from one position to another one
+        /// </summary>
+        /// <param name="a">Position to move to</param>
+        /// <param name="b">Position to move from</param>
+        /// <returns>Dice value required for the move</returns>
+        public static NetworkBackgammonDice operator -(NetworkBackgammonPosition a, NetworkBackgammonPosition b)
+        {
+            NetworkBackgammonDice retVal = new NetworkBackgammonDice();
+            
+            retVal.CurrentValue = NetworkBackgammonDice.DiceValue.INVALID;
+
+            if (a != null && b != null)
+            {
+                if (a > b)
+                {
+                    Int32 delta = 0;
+                    Int32 deltaMax = Convert.ToInt32(NetworkBackgammonDice.DiceValue.MAX);
+
+                    switch (b.currentPosition)
+                    {
+                        case GameBoardPosition.BAR:
+                            delta = Convert.ToInt32(a.currentPosition);
+                            break;
+                        // This should be impossible since a cannot be "bigger" than "offboard"
+                        case GameBoardPosition.OFFBOARD:
+                            break;
+                        default:
+                            delta = Convert.ToInt32(a.currentPosition) - Convert.ToInt32(b.currentPosition);
+                            break;
+                    }
+
+                    if (delta > 0 && delta <= deltaMax)
+                    {
+                        retVal.CurrentValue = (NetworkBackgammonDice.DiceValue)delta;
+                    }
+
+                }
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
+        /// Determines whether one position is "greater" than another position
+        /// </summary>
+        /// <param name="a">Position 1</param>
+        /// <param name="b">Position 2</param>
+        /// <returns>"True" if position 1 (a) is "greater" than (i.e. ahead of) position 2, otherwise "false"</returns>
+        public static bool operator >(NetworkBackgammonPosition a, NetworkBackgammonPosition b)
+        {
+            bool retVal = false;
+
+            if (a != null && b != null)
+            {
+                if (a.currentPosition != GameBoardPosition.INVALID && b.currentPosition != GameBoardPosition.INVALID)
+                {
+                    switch (b.currentPosition)
+                    {
+                        // "Offboard" is the "biggest" position (no positions beyond "Offboard" are possible)
+                        case GameBoardPosition.OFFBOARD:
+                            break;
+                        // "Bar" is the "lowest" position (no positions before "Bar" are possible
+                        case GameBoardPosition.BAR:
+                            // Unless b is also sitting on "Bar", it is always "bigger" than b
+                            retVal = a.currentPosition != GameBoardPosition.BAR;
+                            break;
+                        // If position of b is NOT "Offboard" and NOT "Bar"
+                        default:
+                            switch (a.currentPosition)
+                            {
+                                // If a is "Offboard" it's definitely ahead of b
+                                case GameBoardPosition.OFFBOARD:
+                                    retVal = true;
+                                    break;
+                                // If a is "Bar" it's definitely before b
+                                case GameBoardPosition.BAR:
+                                    break;
+                                default:
+                                    retVal = Convert.ToInt32(a.currentPosition) > Convert.ToInt32(b.currentPosition);
+                                    break;
+                            }
+                            break;
+                    }
+                }
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
+        /// Determines whether one position is "smaller" than another position
+        /// </summary>
+        /// <param name="a">Position 1</param>
+        /// <param name="b">Position 2</param>
+        /// <returns>"True" if position 1 (a) is "smaller" than (i.e. before) position 2, otherwise "false"</returns>
+        public static bool operator <(NetworkBackgammonPosition a, NetworkBackgammonPosition b)
+        {
+            return (!(a > b)) && (a != b);
+        }
+
+        /// <summary>
         /// Tests two position for equality
         /// </summary>
         /// <param name="a">Position 1</param>
@@ -220,7 +359,14 @@ namespace NetworkBackgammonLib
         /// <returns>"True" if both positions refer to the same point (column), otherwise "false"</returns>
         public static bool operator ==(NetworkBackgammonPosition a, NetworkBackgammonPosition b)
         {
-            return a.currentPosition == b.currentPosition;
+            try
+            {
+                return a.currentPosition == b.currentPosition;
+            }
+            catch (NullReferenceException)
+            {
+                return ((object)a == null);
+            }
         }
 
         /// <summary>
@@ -231,7 +377,14 @@ namespace NetworkBackgammonLib
         /// <returns>"True" if both positions refer to different points (column), otherwise "false"</returns>
         public static bool operator !=(NetworkBackgammonPosition a, NetworkBackgammonPosition b)
         {
-            return a.currentPosition != b.currentPosition;
+            try
+            {
+                return a.currentPosition != b.currentPosition;
+            }
+            catch (NullReferenceException)
+            {
+                return ((object)a != null);
+            }
         }
 
         #endregion
