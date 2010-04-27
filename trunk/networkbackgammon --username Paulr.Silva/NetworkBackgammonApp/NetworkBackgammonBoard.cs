@@ -470,7 +470,7 @@ namespace NetworkBackgammon
                 foreach (NetworkBackgammonChecker checkerAP in curPlayer.Checkers)
                 {
                     // Create a board chip object that will be used for the current player
-                    boardChip = new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_1);
+                    boardChip = new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_1, checkerAP);
 
                     Int32 newColPos = Convert.ToInt32(checkerAP.CurrentPosition.CurrentPosition) - 1;
                     Int32 newRowPos = 0;
@@ -524,7 +524,7 @@ namespace NetworkBackgammon
             {
                 foreach (NetworkBackgammonChecker checkerAP in oppPlayer.Checkers)
                 {
-                    boardChip = new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_2);
+                    boardChip = new NetworkBackgammonChip(CHIP_TYPE.OPPONENT_2, checkerAP);
 
                     // Determine whether or not the opponent game position is in one of the "normal" positions
                     bool normalPosition = ((checkerAP.CurrentPosition.CurrentPosition >= NetworkBackgammonPosition.GameBoardPosition.NORMAL_START &&
@@ -987,17 +987,21 @@ namespace NetworkBackgammon
                             // Current player 
                             NetworkBackgammonPlayer curPlayer = NetworkBackgammonClient.Instance.Player;
                             // Possible player moves
-                            System.Collections.Generic.List<NetworkBackgammonChecker> checkList = curPlayer.Checkers;
-                            // Loop through possible moves for the moving checker
-                            foreach (NetworkBackgammonDice move in checkList[chipIndex].PossibleMoves)
-                            {
-                                NetworkBackgammonPosition allowedPosition = gamePositionChip + move;
+                            // System.Collections.Generic.List<NetworkBackgammonChecker> checkList = curPlayer.Checkers;
 
-                                // if (moveDelta.CurrentValueUInt32 == move.CurrentValueUInt32)
-                                if (allowedPosition == gamePositionDropped)
+                            if (boardChip.Checker != null)
+                            {
+                                // Loop through possible moves for the moving checker
+                                foreach (NetworkBackgammonDice move in boardChip.Checker.PossibleMoves)
                                 {
-                                    moveToPosition = move;
-                                    break;
+                                    NetworkBackgammonPosition allowedPosition = gamePositionChip + move;
+
+                                    // if (moveDelta.CurrentValueUInt32 == move.CurrentValueUInt32)
+                                    if (allowedPosition == gamePositionDropped)
+                                    {
+                                        moveToPosition = move;
+                                        break;
+                                    }
                                 }
                             }
 
@@ -1016,7 +1020,7 @@ namespace NetworkBackgammon
                                 }
 
                                 // Finally, make the player move
-                                NetworkBackgammonClient.Instance.Player.MakeMove(checkList[chipIndex], moveToPosition);
+                                NetworkBackgammonClient.Instance.Player.MakeMove(boardChip.Checker, moveToPosition);
                             }
                             else
                             {

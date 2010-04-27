@@ -137,7 +137,14 @@ namespace NetworkBackgammonLib
         /// <returns>"True" if both checker refer to the same original checker, otherwise "false"</returns>
         public static bool operator ==(NetworkBackgammonChecker a, NetworkBackgammonChecker b)
         {
-            return a.uniqueObjectID == b.uniqueObjectID;
+            try
+            {
+                return a.uniqueObjectID == b.uniqueObjectID;
+            }
+            catch (NullReferenceException)
+            {
+                return ((object)a == null);
+            }
         }
 
         /// <summary>
@@ -148,7 +155,14 @@ namespace NetworkBackgammonLib
         /// <returns>"True" if both checkers refer to different original checkers, otherwise "false"</returns>
         public static bool operator !=(NetworkBackgammonChecker a, NetworkBackgammonChecker b)
         {
-            return a.uniqueObjectID != b.uniqueObjectID;
+            try
+            {
+                return a.uniqueObjectID != b.uniqueObjectID;
+            }
+            catch (NullReferenceException)
+            {
+                return ((object)a != null);
+            }
         }
 
         #endregion
