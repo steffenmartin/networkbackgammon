@@ -266,6 +266,35 @@ namespace NetworkBackgammonLib
             }
         }
 
+        /// <summary>
+        /// Get the players current pip count
+        /// </summary>
+        public Int32 PipCount
+        {
+            get
+            {
+                Int32 pipCount = 0;
+
+                // Loop through all the checkers the current player has...
+                foreach (NetworkBackgammonChecker playerChecker in this.Checkers)
+                {
+                    // Determine whether or not the opponent game position is in one of the "normal" positions
+                    bool normalPosition = ((playerChecker.CurrentPosition.CurrentPosition >= NetworkBackgammonPosition.GameBoardPosition.NORMAL_START &&
+                                            playerChecker.CurrentPosition.CurrentPosition <= NetworkBackgammonPosition.GameBoardPosition.NORMAL_END) ? true : false);
+
+                    if (normalPosition)
+                    {
+                        pipCount += Convert.ToInt32(playerChecker.CurrentPosition.GetOppositePosition().CurrentPosition);
+                    }
+                    else if (playerChecker.CurrentPosition.CurrentPosition == NetworkBackgammonPosition.GameBoardPosition.BAR)
+                    {
+                        pipCount += Convert.ToInt32(NetworkBackgammonPosition.GameBoardPosition.HOME_END) + 1;
+                    }
+                }
+
+                return pipCount;
+            }
+        }
         #endregion
 
         #region Overrides

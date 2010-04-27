@@ -83,6 +83,7 @@
             this.groupPlayerScoreBoard.TabIndex = 4;
             this.groupPlayerScoreBoard.TabStop = false;
             this.groupPlayerScoreBoard.Text = "Player Name";
+            this.groupPlayerScoreBoard.VisibleChanged += new System.EventHandler(this.groupPlayerScoreBoard_VisibleChanged);
             // 
             // NetworkBackgammonScoreBoard
             // 
@@ -97,7 +98,7 @@
             this.Name = "NetworkBackgammonScoreBoard";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "NetworkBackgammonScoreBoard";
-            this.Load += new System.EventHandler(this.NetworkBackgammonScoreBoard_Load);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NetworkBackgammonScoreBoard_FormClosing);
             this.groupPlayerScoreBoard.ResumeLayout(false);
             this.groupPlayerScoreBoard.PerformLayout();
             this.ResumeLayout(false);
