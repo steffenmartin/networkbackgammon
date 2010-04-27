@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using NetworkBackgammonLib;
 
 namespace NetworkBackgammon
 {
@@ -15,6 +16,7 @@ namespace NetworkBackgammon
         Size m_chipSize = new Size();
         Bitmap m_chipBitmap;
         NetworkBackgammonBoardPosition m_chipBoardPosition = new NetworkBackgammonBoardPosition(new Point(0,0));
+        NetworkBackgammonChecker m_checker = null;
 
         // Constructor
         public NetworkBackgammonChip(CHIP_TYPE chipType)
@@ -27,6 +29,20 @@ namespace NetworkBackgammon
             m_chipBitmap = new Bitmap(blackChipIcon.ToBitmap());
             // Set the chip size based on the image size
             ChipSize = new Size(blackChipIcon.ToBitmap().Width, blackChipIcon.ToBitmap().Height);
+        }
+
+        public NetworkBackgammonChip(CHIP_TYPE chipType, NetworkBackgammonChecker checker)
+        {
+            // Load the icon directly from the manifest resource
+            Icon blackChipIcon = new Icon(this.GetType(),
+                (chipType == CHIP_TYPE.OPPONENT_1 ? "Resources.BlackChip.ico" : "Resources.WhipChip.ico"));
+
+            // Set the chip bitmap
+            m_chipBitmap = new Bitmap(blackChipIcon.ToBitmap());
+            // Set the chip size based on the image size
+            ChipSize = new Size(blackChipIcon.ToBitmap().Width, blackChipIcon.ToBitmap().Height);
+
+            m_checker = checker;
         }
 
         // Chip moving property
@@ -92,6 +108,15 @@ namespace NetworkBackgammon
             set
             {
                 m_chipBitmap = value;
+            }
+        }
+
+        // Checker property
+        public NetworkBackgammonChecker Checker
+        {
+            get
+            {
+                return m_checker;
             }
         }
        
