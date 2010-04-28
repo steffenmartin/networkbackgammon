@@ -240,6 +240,24 @@ namespace NetworkBackgammon
                     // ShowBoard(false);
                 }
             }
+            else if (e is NetworkBackgammonGameSessionEvent)
+            {
+                NetworkBackgammonGameSessionEvent gameSessionEvt = (NetworkBackgammonGameSessionEvent)e;
+
+                if (gameSessionEvt.EventType == NetworkBackgammonGameSessionEvent.GameSessionEventType.GameFinished)
+                {
+                    if (InvokeRequired)
+                    {
+                        BeginInvoke(new OnGameRoomDelegate(ShowGameRoomScreen), true);
+                        // BeginInvoke(new OnShowBoardDelegate(ShowBoard), false);
+                    }
+                    else
+                    {
+                        ShowGameRoomScreen(true);
+                        // ShowBoard(false);
+                    }
+                }
+            }
         }
 
         #endregion
