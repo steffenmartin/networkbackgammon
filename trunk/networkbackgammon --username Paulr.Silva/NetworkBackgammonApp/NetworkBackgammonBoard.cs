@@ -140,6 +140,12 @@ namespace NetworkBackgammon
         delegate void OnNoPossibleMovesDelegate(string playerWithoutPossibleMoves);
 
         /// <summary>
+        /// Delegate for handling a game win
+        /// </summary>
+        /// <param name="winningPlayerName">Name of the player who won the game</param>
+        delegate void OnPlayerWonDelegate(string winningPlayerName);
+
+        /// <summary>
         /// The current state of the Game Board
         /// </summary>
         NetworkBackgammonBoard.GameBoardState m_CurrentGameState = GameBoardState.INITIAL_DICE_ROLL_EXPECTED;
@@ -301,6 +307,19 @@ namespace NetworkBackgammon
                 else
                 {
                     OnNoPossibleMoves(noPossMovesEvt.PlayerName);
+                }
+            }
+            else if (e is GameSessionPlayerWonEvent)
+            {
+                GameSessionPlayerWonEvent playerWonEvt = (GameSessionPlayerWonEvent)e;
+
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new OnPlayerWonDelegate(OnPlayerWon), playerWonEvt.WinningPlayer);
+                }
+                else
+                {
+                    OnPlayerWon(playerWonEvt.WinningPlayer);
                 }
             }
         }
@@ -690,6 +709,27 @@ namespace NetworkBackgammon
             }
 
             Refresh();
+        }
+
+        /// <summary>
+        /// Handler for game win
+        /// </summary>
+        /// <param name="winningPlayer">Name of the player who won the game</param>
+        private void OnPlayerWon(string winningPlayer)
+        {
+            m_CurrentGameState = GameBoardState.GAME_OVER;
+
+            Hide();
+
+            // Inform player whether or not he/she is the winner of the game
+            if (NetworkBackgammonClient.Instance.Player.PlayerName == winningPlayer)
+            {
+                MessageBox.Show("You are the winner of this game!", "Game Over", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+            }
+            else
+            {
+                MessageBox.Show("You lost this game!", "Game Over", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);                
+            }
         }
 
         // Overriden load function of the form

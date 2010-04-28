@@ -8,6 +8,7 @@ namespace NetworkBackgammonLib
     /// <summary>
     /// Event for a win of the game by one player
     /// </summary>
+    [Serializable]
     public class GameSessionPlayerWonEvent : NetworkBackgammonGameSessionEvent
     {
         #region Members
