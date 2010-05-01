@@ -60,12 +60,19 @@ namespace NetworkBackgammonGameLogicUnitTester
         [TestInitialize()]
         public void Initialize()
         {
+            // Check whether players have actually been created
+            Assert.IsNotNull(player1, "Player 1 object hasn't been created");
+            Assert.IsNotNull(player1, "Player 2 object hasn't been created");
+
             // Initialize both players checkers to their intial configuration
             // (start positions)
             player1.InitCheckers();
             player2.InitCheckers();
 
             dice = new NetworkBackgammonDice[] { new NetworkBackgammonDice(), new NetworkBackgammonDice() };
+
+            // Check whether dice have actually been created
+            Assert.IsNotNull(dice, "Dice objects haven't been created");
         }
 
         /// <summary>
@@ -74,13 +81,6 @@ namespace NetworkBackgammonGameLogicUnitTester
         [TestMethod]
         public void TestMethod_VerifyInitialPossibleMoves()
         {
-            // Check whether players have actually been created
-            Assert.IsNotNull(player1, "Player 1 object hasn't been created");
-            Assert.IsNotNull(player1, "Player 2 object hasn't been created");
-
-            // Check whether dice have actually been created
-            Assert.IsNotNull(dice, "Dice objects haven't been created");
-
             // Configure players
             player1.Active = true;
             player2.Active = false;
@@ -134,6 +134,152 @@ namespace NetworkBackgammonGameLogicUnitTester
                 }
             }
         }
+
+        #region Tests for calculation of possible moves
+
+        // Abbreviations:
+        //
+        // VBC: Verification of Boundary Conditions
+
+        /// <summary>
+        /// Verifies whether the game engine handles the (errorneous) case of 2 active players properly
+        /// </summary>
+        /// <remarks>
+        /// Expected behavior: Throws a NetworkBackgammonGameEngineException
+        /// </remarks>
+        [TestMethod]
+        public void TestMethod_VBC_PossibleMoveCalculations_BothPlayersActive()
+        {
+            try
+            {
+                // Set both player to active
+                player1.Active = true;
+                player2.Active = true;
+
+                dice[0].CurrentValue = NetworkBackgammonDice.DiceValue.MIN;
+                dice[1].CurrentValue = NetworkBackgammonDice.DiceValue.MIN;
+
+                // Should throw a NetworkBackgammonGameEngineException
+                bool retVal = NetworkBackgammonGameEngine.CalculatePossibleMoves(ref player1, ref player2, dice);
+
+                Assert.Fail("Calculation of possible moves returned ( " + retVal + " but should have thrown a NetworkBackgammonGameEngineException instead");
+            }
+            catch (NetworkBackgammonGameEngineException)
+            {
+                // TODO: Check the details of the exception
+            }
+        }
+
+        /// <summary>
+        /// Verifies whether the game engine handles the (errorneous) case of more than 2 dice being passed in
+        /// </summary>
+        /// <remarks>
+        /// Expected behavior: Throws a NetworkBackgammonGameEngineException
+        /// </remarks>
+        [TestMethod]
+        public void TestMethod_VBC_PossibleMovesCalculations_MoreThanTwoDice()
+        {
+            try
+            {
+                player1.Active = true;
+                player2.Active = false;
+
+                // Create dice array with 3 elements
+                NetworkBackgammonDice[] diceForTest = new NetworkBackgammonDice[] { new NetworkBackgammonDice(), new NetworkBackgammonDice(), new NetworkBackgammonDice() };
+
+                // Should throw a NetworkBackgammonGameEngineException
+                bool retVal = NetworkBackgammonGameEngine.CalculatePossibleMoves(ref player1, ref player2, diceForTest);
+
+                Assert.Fail("Calculation of possible moves returned ( " + retVal + " but should have thrown a NetworkBackgammonGameEngineException instead");
+            }
+            catch (NetworkBackgammonGameEngineException)
+            {
+                // TODO: Check the details of the exception
+            }
+        }
+
+        /// <summary>
+        /// Verifies whether the game engine handles the (errorneous) case of a 0-element dice array being passed in
+        /// </summary>
+        /// <remarks>
+        /// Expected behavior: Throws a NetworkBackgammonGameEngineException
+        /// </remarks>
+        [TestMethod]
+        public void TestMethod_VBC_PossibleMovesCalculations_ZeroDice()
+        {
+            try
+            {
+                player1.Active = true;
+                player2.Active = false;
+
+                // Create dice array with 0 elements
+                NetworkBackgammonDice[] diceForTest = new NetworkBackgammonDice[] { };
+
+                // Should throw a NetworkBackgammonGameEngineException
+                bool retVal = NetworkBackgammonGameEngine.CalculatePossibleMoves(ref player1, ref player2, diceForTest);
+
+                Assert.Fail("Calculation of possible moves returned ( " + retVal + " but should have thrown a NetworkBackgammonGameEngineException instead");
+            }
+            catch (NetworkBackgammonGameEngineException)
+            {
+                // TODO: Check the details of the exception
+            }
+        }
+
+        /// <summary>
+        /// Verifies whether the game engine handles the (errorneous) case of a null reference being passed in for dice
+        /// </summary>
+        /// <remarks>
+        /// Expected behavior: Throws a NetworkBackgammonGameEngineException
+        /// </remarks>
+        [TestMethod]
+        public void TestMethod_VBC_PossibleMovesCalculations_NullDice()
+        {
+            try
+            {
+                player1.Active = true;
+                player2.Active = false;
+
+                // Should throw a NetworkBackgammonGameEngineException
+                bool retVal = NetworkBackgammonGameEngine.CalculatePossibleMoves(ref player1, ref player2, null);
+
+                Assert.Fail("Calculation of possible moves returned ( " + retVal + " but should have thrown a NetworkBackgammonGameEngineException instead");
+            }
+            catch (NetworkBackgammonGameEngineException)
+            {
+                // TODO: Check the details of the exception
+            }
+        }
+
+        /// <summary>
+        /// Verifies whether the game engine handles the (errorneous) case of a invalid dice value being passed in
+        /// </summary>
+        /// <remarks>
+        /// Expected behavior: Throws a NetworkBackgammonGameEngineException
+        /// </remarks>
+        [TestMethod]
+        public void TestMethod_VBC_PossibleMovesCalculations_InvalidDice()
+        {
+            try
+            {
+                player1.Active = true;
+                player2.Active = false;
+
+                dice[0].CurrentValue = NetworkBackgammonDice.DiceValue.MIN;
+                dice[1].CurrentValue = NetworkBackgammonDice.DiceValue.INVALID;
+
+                // Should throw a NetworkBackgammonGameEngineException
+                bool retVal = NetworkBackgammonGameEngine.CalculatePossibleMoves(ref player1, ref player2, dice);
+
+                Assert.Fail("Calculation of possible moves returned ( " + retVal + " but should have thrown a NetworkBackgammonGameEngineException instead");
+            }
+            catch (NetworkBackgammonGameEngineException)
+            {
+                // TODO: Check the details of the exception
+            }
+        }
+
+        #endregion
 
         #endregion
 
