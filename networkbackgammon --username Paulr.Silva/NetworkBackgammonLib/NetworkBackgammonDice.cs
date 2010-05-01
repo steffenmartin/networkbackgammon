@@ -9,7 +9,7 @@ namespace NetworkBackgammonLib
     /// Single dice for playing a game (e.g. backgammon)
     /// </summary>
     [Serializable]
-    public class NetworkBackgammonDice
+    public class NetworkBackgammonDice : IComparable
     {
 
         #region Declarations
@@ -234,6 +234,15 @@ namespace NetworkBackgammonLib
             {
                 return (object)a != null;
             }
+        }
+
+        #endregion
+
+        #region IComparable Members
+
+        public int CompareTo(object obj)
+        {
+            return CurrentValueUInt32.CompareTo(((NetworkBackgammonDice)obj).CurrentValueUInt32);
         }
 
         #endregion
