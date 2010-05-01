@@ -30,6 +30,16 @@ namespace NetworkBackgammonGameLogic
             NetworkBackgammonPlayer activePlayer = player1.Active ? player1 : player2;
             NetworkBackgammonPlayer waitingPlayer = player1.Active ? player2 : player1;
 
+            // Check whether dice values are the same (tie) -> Use just one dice for all sub-sequent processing steps if it's a tie
+            NetworkBackgammonDice[] diceToUse = _dice;
+            if (_dice.Count() > 1)
+            {
+                if (_dice[0].CurrentValue == _dice[1].CurrentValue)
+                {
+                    diceToUse = new NetworkBackgammonDice[] { _dice[0] };
+                }
+            }
+
             bool bMovesCalulationDone = false;
             bool bAllCheckersHomeOrOffBoard = true;
             bool bActivePlayerHasMoves = false;
@@ -106,7 +116,7 @@ namespace NetworkBackgammonGameLogic
                     // List of potential positions associated associated with a certain dice value
                     List<KeyValuePair<NetworkBackgammonDice, NetworkBackgammonPosition>> potPosList = new List<KeyValuePair<NetworkBackgammonDice, NetworkBackgammonPosition>>();
 
-                    foreach (NetworkBackgammonDice dice in _dice)
+                    foreach (NetworkBackgammonDice dice in diceToUse)
                     {
                         // Moving a checker off the board (bear off) is only allowed if all checkers of active player are in the home position
                         // (or off the board already)
@@ -134,7 +144,7 @@ namespace NetworkBackgammonGameLogic
                 {
                     bMovesCalulationDone = true;
 
-                    foreach (NetworkBackgammonDice dice in _dice)
+                    foreach (NetworkBackgammonDice dice in diceToUse)
                     {
                         // Now, see whether opponents checker position allow us to move
                         if (checkerHistogramWP[(checkerAP.CurrentPosition + dice).CurrentPosition] <= 1)
