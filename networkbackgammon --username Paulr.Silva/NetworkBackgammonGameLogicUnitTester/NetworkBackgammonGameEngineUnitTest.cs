@@ -12,7 +12,7 @@ using System.Reflection;
 namespace NetworkBackgammonGameLogicUnitTester
 {
     /// <summary>
-    /// Summary description for UnitTest1
+    /// Various tests to verify functionality and validity of the game engine
     /// </summary>
     [TestClass]
     public class NetworkBackgammonGameEngineUnitTest
@@ -69,7 +69,7 @@ namespace NetworkBackgammonGameLogicUnitTester
         }
 
         /// <summary>
-        /// Verifies whether the active player's initial possible moves are valid
+        /// Verifies whether the active player's initial possible moves are valid for all possible initial dice combinations
         /// </summary>
         [TestMethod]
         public void TestMethod_VerifyInitialPossibleMoves()
@@ -81,41 +81,69 @@ namespace NetworkBackgammonGameLogicUnitTester
             // Check whether dice have actually been created
             Assert.IsNotNull(dice, "Dice objects haven't been created");
 
-            // Set (not random) dice values
-            dice[0].CurrentValue = NetworkBackgammonDice.DiceValue.ONE;
-            dice[1].CurrentValue = NetworkBackgammonDice.DiceValue.ONE;
-
             // Configure players
             player1.Active = true;
             player2.Active = false;
 
+            // Set reference to active player
             NetworkBackgammonPlayer activePlayer = player1.Active ? player1 : player2;
 
-            bool activePlayerHasPossibleMoves =
-                NetworkBackgammonGameEngine.CalculatePossibleMoves(
-                    ref player1,
-                    ref player2,
-                    dice);
+            // Loop through all possible dice combinations
+            foreach (NetworkBackgammonDice.DiceValue diceValueOne in Enum.GetValues(typeof(NetworkBackgammonDice.DiceValue)))
+            {
+                if (diceValueOne >= NetworkBackgammonDice.DiceValue.MIN &&
+                    diceValueOne <= NetworkBackgammonDice.DiceValue.MAX)
+                {
+                    foreach (NetworkBackgammonDice.DiceValue diceValueTwo in Enum.GetValues(typeof(NetworkBackgammonDice.DiceValue)))
+                    {
+                        if (diceValueTwo >= NetworkBackgammonDice.DiceValue.MIN &&
+                            diceValueTwo <= NetworkBackgammonDice.DiceValue.MAX)
+                        {
+                            // Set (not random) dice values
+                            dice[0].CurrentValue = diceValueOne;
+                            dice[1].CurrentValue = diceValueTwo;
 
-            Assert.IsTrue(activePlayerHasPossibleMoves, "Active player should always have possible moves after the winning the initial dice roll");
+                            bool activePlayerHasPossibleMoves =
+                                NetworkBackgammonGameEngine.CalculatePossibleMoves(
+                                ref player1,
+                                ref player2,
+                                dice);
 
-            Stream stream = GetManifestResourceStreamByName("InitialCheckers_" +
-                                                            dice[0].CurrentValueUInt32.ToString() +
-                                                            "_" +
-                                                            dice[1].CurrentValueUInt32.ToString() +
-                                                            ".xml");
+                            Assert.IsTrue(activePlayerHasPossibleMoves, "Active player should always have possible moves after the winning the initial dice roll");
 
-            Assert.IsNotNull(stream, "Data (XML) for verification comparison purposes is missing");
-            
-            List<NetworkBackgammonChecker> checkersVerified = LoadCheckersFromXMLFile(stream);
+                            Stream stream = GetManifestResourceStreamByName("InitialCheckers_" +
+                                                                             (dice[0].CurrentValueUInt32 <= dice[1].CurrentValueUInt32 ?
+                                                                                dice[0].CurrentValueUInt32.ToString() :
+                                                                                dice[1].CurrentValueUInt32.ToString()) +
+                                                                            "_" +
+                                                                             (dice[1].CurrentValueUInt32 >= dice[0].CurrentValueUInt32 ?
+                                                                                dice[1].CurrentValueUInt32.ToString() :
+                                                                                dice[0].CurrentValueUInt32.ToString()) +
+                                                                            ".xml");
 
-            Assert.IsTrue(VerifyCheckersAndPossibleMoves(activePlayer.Checkers, checkersVerified), "Possible moves of active player for initial dice roll of " + dice[0] + ", " + dice[1] + " incorrect");
+                            Assert.IsNotNull(stream, "Data (XML) for verification comparison purposes is missing");
+
+                            List<NetworkBackgammonChecker> checkersVerified = LoadCheckersFromXMLFile(stream);
+
+                            string checkerVerificationMessage = "";
+                            bool checkerVerificationResult = VerifyCheckersAndPossibleMoves(activePlayer.Checkers, checkersVerified, ref checkerVerificationMessage);
+
+                            Assert.IsTrue(checkerVerificationResult, "Possible moves of active player for initial dice roll of " + dice[0] + ", " + dice[1] + " incorrect. Detail: " + checkerVerificationMessage);
+                        }
+                    }
+                }
+            }
         }
 
         #endregion
 
         #region Utility Methods
 
+        /// <summary>
+        /// Queries the assembly for a resource file stream
+        /// </summary>
+        /// <param name="resourceName">Name of the resource (e.g. file or image)</param>
+        /// <returns>File stream for the requested resource (null if resource couldn't be found)</returns>
         private Stream GetManifestResourceStreamByName(string resourceName)
         {
             Stream retVal = null;
@@ -132,24 +160,41 @@ namespace NetworkBackgammonGameLogicUnitTester
             return retVal;
         }
 
+        /// <summary>
+        /// Loads (de-serializes) a list of checkers from an XML stream (e.g. file stream)
+        /// </summary>
+        /// <param name="stream">Stream with XML data to read</param>
+        /// <returns>(De-serialized) list of checkers from the XML stream</returns>
         private List<NetworkBackgammonChecker> LoadCheckersFromXMLFile(Stream stream)
         {
             List<NetworkBackgammonChecker> retVal = null;
 
-            TextReader textReader = null;
+            if (stream != null)
+            {
+                TextReader textReader = null;
 
-            XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<NetworkBackgammonChecker>));
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<NetworkBackgammonChecker>));
 
-            textReader = new StreamReader(stream);
+                textReader = new StreamReader(stream);
 
-            retVal = (List<NetworkBackgammonChecker>)xmlSerializer.Deserialize(textReader);
+                retVal = (List<NetworkBackgammonChecker>)xmlSerializer.Deserialize(textReader);
 
-            textReader.Close();
+                textReader.Close();
+            }
 
             return retVal;
         }
 
-        private bool VerifyCheckersAndPossibleMoves(List<NetworkBackgammonChecker> checkersToVerify, List<NetworkBackgammonChecker> checkersVerified)
+        /// <summary>
+        /// Verifies a list of checkers and possible moves against a verified list of checkers and possible moves
+        /// </summary>
+        /// <param name="checkersToVerify">List of checkers and possible moves to be verified</param>
+        /// <param name="checkersVerified">List of verified checkers and possible moves</param>
+        /// <param name="returnMessage">Additional detail information if verification fails</param>
+        /// <returns>"True" if both lists (checkers and possible moves) match, otherwise "false"</returns>
+        private bool VerifyCheckersAndPossibleMoves(List<NetworkBackgammonChecker> checkersToVerify,
+                                                    List<NetworkBackgammonChecker> checkersVerified,
+                                                    ref string returnMessage)
         {
             bool bRetVal = false;
 
@@ -160,7 +205,7 @@ namespace NetworkBackgammonGameLogicUnitTester
             {
                 List<NetworkBackgammonChecker> checkersCheckOffList = new List<NetworkBackgammonChecker>();
 
-                // Build a list of checkers that need to be verified (and checked off one verified)
+                // Build a list of checkers that need to be verified (and checked off once verified)
                 foreach (NetworkBackgammonChecker checker in checkersVerified)
                 {
                     checkersCheckOffList.Add(checker);
@@ -169,7 +214,7 @@ namespace NetworkBackgammonGameLogicUnitTester
                 // Loop through the list of checkers to be verified
                 foreach (NetworkBackgammonChecker checkerToVerify in checkersToVerify)
                 {
-                    NetworkBackgammonChecker checkerToCheckoff = null; 
+                    NetworkBackgammonChecker checkerToCheckoff = null;
 
                     // Loop through the list of verified checkers to find the matching one
                     foreach (NetworkBackgammonChecker checkerVerified in checkersCheckOffList)
@@ -183,6 +228,10 @@ namespace NetworkBackgammonGameLogicUnitTester
                                 // We can potentially check this one off, unless we find the actual possible moves list not matching
                                 checkerToCheckoff = checkerVerified;
 
+                                // Sort possible moves
+                                checkerVerified.PossibleMoves.Sort();
+                                checkerToVerify.PossibleMoves.Sort();
+
                                 // Verify whether the list of actual possible moves matches
                                 for (int i = 0; i < checkerVerified.PossibleMoves.Count; i++)
                                 {
@@ -191,20 +240,37 @@ namespace NetworkBackgammonGameLogicUnitTester
                                     {
                                         // So, we cannot check it off
                                         checkerToCheckoff = null;
+
+                                        returnMessage += "Not all possible moves of verified checkers and checkers to be verified match for position " +
+                                                         checkerVerified.CurrentPosition.ToString() + ". Verified checker has possible move " +
+                                                         checkerVerified.PossibleMoves[i].CurrentValue.ToString() +
+                                                         " at this position. However, checker to be verified has possible move " +
+                                                         checkerToVerify.PossibleMoves[i].CurrentValue.ToString() + ".";
+
+                                        bRetVal = false;
                                         break;
                                     }
                                 }
                             }
                             else
                             {
-                                break;
+                                returnMessage += "Number of possible moves (" +
+                                                  checkerToVerify.PossibleMoves.Count() +
+                                                  ") for checker to be verified doesn't match number of possible moves (" +
+                                                  checkerVerified.PossibleMoves.Count() +
+                                                  ") for verified checker at position " + checkerVerified.CurrentPosition.ToString() + ".";
+                                
+                                bRetVal = false;
                             }
+
+                            break;
                         }
                     }
 
                     if (checkerToCheckoff != null)
                     {
                         checkersCheckOffList.Remove(checkerToCheckoff);
+                        checkerToCheckoff = null;
                     }
                     else
                     {
@@ -213,9 +279,12 @@ namespace NetworkBackgammonGameLogicUnitTester
                     }
                 }
             }
+            else
+            {
+                returnMessage += "Number of checkers to be verified (" + checkersToVerify.Count + ") doesn't match number of verified checkers (" + checkersVerified.Count + ")";
+            }
 
-            // return bRetVal;
-            return false;
+            return bRetVal;
         }
 
         #endregion

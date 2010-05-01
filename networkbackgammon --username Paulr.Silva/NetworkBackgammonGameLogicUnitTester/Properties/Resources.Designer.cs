@@ -69,15 +69,435 @@ namespace NetworkBackgammonGameLogicUnitTester.Properties {
         ///        &lt;CurrentValue&gt;MIN&lt;/CurrentValue&gt;
         ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
         ///      &lt;/NetworkBackgammonDice&gt;
-        ///      &lt;NetworkBackgammonDice&gt;
-        ///        &lt;CurrentValue&gt;MIN&lt;/CurrentValue&gt;
-        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
-        ///      &lt;/NetworkBackgammonDice&gt;
-        ///    &lt; [rest of string was truncated]&quot;;.
+        ///    &lt;/PossibleMoves&gt;
+        ///    &lt;CurrentPosition&gt;
+        ///      &lt;CurrentPosition&gt;NORMAL_START&lt;/CurrentPosition&gt;
+        ///    &lt;/CurrentPosition&gt;
+        ///  &lt;/NetworkBackgammonC [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string InitialCheckers_1_1 {
             get {
                 return ResourceManager.GetString("InitialCheckers_1_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;MIN&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;TWO&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    &lt; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_1_2 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_1_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;MIN&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;THREE&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_1_3 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_1_3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;MIN&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;FOUR&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_1_4 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_1_4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;MIN&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    &lt;/PossibleMoves&gt;
+        ///    &lt;CurrentPosition&gt;
+        ///      &lt;CurrentPosition&gt;NORMAL_START&lt;/CurrentPosition&gt;
+        ///    &lt;/CurrentPosition&gt;
+        ///  &lt;/NetworkBackgammonC [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_1_5 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_1_5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;MIN&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;SIX&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    &lt; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_1_6 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_1_6", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;TWO&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    &lt;/PossibleMoves&gt;
+        ///    &lt;CurrentPosition&gt;
+        ///      &lt;CurrentPosition&gt;NORMAL_START&lt;/CurrentPosition&gt;
+        ///    &lt;/CurrentPosition&gt;
+        ///  &lt;/NetworkBackgammonC [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_2_2 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_2_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;TWO&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;THREE&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_2_3 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_2_3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;TWO&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;FOUR&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_2_4 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_2_4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;TWO&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    &lt;/PossibleMoves&gt;
+        ///    &lt;CurrentPosition&gt;
+        ///      &lt;CurrentPosition&gt;NORMAL_START&lt;/CurrentPosition&gt;
+        ///    &lt;/CurrentPosition&gt;
+        ///  &lt;/NetworkBackgammonC [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_2_5 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_2_5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;TWO&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;SIX&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    &lt; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_2_6 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_2_6", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;THREE&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    &lt;/PossibleMoves&gt;
+        ///    &lt;CurrentPosition&gt;
+        ///      &lt;CurrentPosition&gt;NORMAL_START&lt;/CurrentPosition&gt;
+        ///    &lt;/CurrentPosition&gt;
+        ///  &lt;/NetworkBackgammo [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_3_3 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_3_3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;THREE&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;FOUR&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///   [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_3_4 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_3_4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;THREE&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    &lt;/PossibleMoves&gt;
+        ///    &lt;CurrentPosition&gt;
+        ///      &lt;CurrentPosition&gt;NORMAL_START&lt;/CurrentPosition&gt;
+        ///    &lt;/CurrentPosition&gt;
+        ///  &lt;/NetworkBackgammo [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_3_5 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_3_5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;THREE&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;SIX&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_3_6 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_3_6", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;FOUR&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    &lt;/PossibleMoves&gt;
+        ///    &lt;CurrentPosition&gt;
+        ///      &lt;CurrentPosition&gt;NORMAL_START&lt;/CurrentPosition&gt;
+        ///    &lt;/CurrentPosition&gt;
+        ///  &lt;/NetworkBackgammon [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_4_4 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_4_4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;FOUR&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    &lt;/PossibleMoves&gt;
+        ///    &lt;CurrentPosition&gt;
+        ///      &lt;CurrentPosition&gt;NORMAL_START&lt;/CurrentPosition&gt;
+        ///    &lt;/CurrentPosition&gt;
+        ///  &lt;/NetworkBackgammon [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_4_5 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_4_5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;FOUR&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;SIX&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_4_6 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_4_6", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves /&gt;
+        ///    &lt;CurrentPosition&gt;
+        ///      &lt;CurrentPosition&gt;NORMAL_START&lt;/CurrentPosition&gt;
+        ///    &lt;/CurrentPosition&gt;
+        ///  &lt;/NetworkBackgammonChecker&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves /&gt;
+        ///    &lt;CurrentPosition&gt;
+        ///      &lt;CurrentPosition&gt;NORMAL_START&lt;/CurrentPosition&gt;
+        ///    &lt;/CurrentPosition [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_5_5 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_5_5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;SIX&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    &lt;/PossibleMoves&gt;
+        ///    &lt;CurrentPosition&gt;
+        ///      &lt;CurrentPosition&gt;NORMAL_START&lt;/CurrentPosition&gt;
+        ///    &lt;/CurrentPosition&gt;
+        ///  &lt;/NetworkBackgammonC [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_5_6 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_5_6", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfNetworkBackgammonChecker xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;NetworkBackgammonChecker&gt;
+        ///    &lt;PossibleMoves&gt;
+        ///      &lt;NetworkBackgammonDice&gt;
+        ///        &lt;CurrentValue&gt;SIX&lt;/CurrentValue&gt;
+        ///        &lt;FlagUsed&gt;false&lt;/FlagUsed&gt;
+        ///      &lt;/NetworkBackgammonDice&gt;
+        ///    &lt;/PossibleMoves&gt;
+        ///    &lt;CurrentPosition&gt;
+        ///      &lt;CurrentPosition&gt;NORMAL_START&lt;/CurrentPosition&gt;
+        ///    &lt;/CurrentPosition&gt;
+        ///  &lt;/NetworkBackgammonC [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitialCheckers_6_6 {
+            get {
+                return ResourceManager.GetString("InitialCheckers_6_6", resourceCulture);
             }
         }
     }

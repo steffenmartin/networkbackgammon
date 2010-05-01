@@ -6,15 +6,8 @@
         <CurrentValue>MIN</CurrentValue>
         <FlagUsed>false</FlagUsed>
       </NetworkBackgammonDice>
-    </PossibleMoves>
-    <CurrentPosition>
-      <CurrentPosition>NORMAL_START</CurrentPosition>
-    </CurrentPosition>
-  </NetworkBackgammonChecker>
-  <NetworkBackgammonChecker>
-    <PossibleMoves>
       <NetworkBackgammonDice>
-        <CurrentValue>MIN</CurrentValue>
+        <CurrentValue>TWO</CurrentValue>
         <FlagUsed>false</FlagUsed>
       </NetworkBackgammonDice>
     </PossibleMoves>
@@ -23,31 +16,71 @@
     </CurrentPosition>
   </NetworkBackgammonChecker>
   <NetworkBackgammonChecker>
-    <PossibleMoves />
+    <PossibleMoves>
+      <NetworkBackgammonDice>
+        <CurrentValue>MIN</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+      <NetworkBackgammonDice>
+        <CurrentValue>TWO</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+    </PossibleMoves>
+    <CurrentPosition>
+      <CurrentPosition>NORMAL_START</CurrentPosition>
+    </CurrentPosition>
+  </NetworkBackgammonChecker>
+  <NetworkBackgammonChecker>
+    <PossibleMoves>
+      <NetworkBackgammonDice>
+        <CurrentValue>TWO</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+    </PossibleMoves>
     <CurrentPosition>
       <CurrentPosition>TWELVE</CurrentPosition>
     </CurrentPosition>
   </NetworkBackgammonChecker>
   <NetworkBackgammonChecker>
-    <PossibleMoves />
+    <PossibleMoves>
+      <NetworkBackgammonDice>
+        <CurrentValue>TWO</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+    </PossibleMoves>
     <CurrentPosition>
       <CurrentPosition>TWELVE</CurrentPosition>
     </CurrentPosition>
   </NetworkBackgammonChecker>
   <NetworkBackgammonChecker>
-    <PossibleMoves />
+    <PossibleMoves>
+      <NetworkBackgammonDice>
+        <CurrentValue>TWO</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+    </PossibleMoves>
     <CurrentPosition>
       <CurrentPosition>TWELVE</CurrentPosition>
     </CurrentPosition>
   </NetworkBackgammonChecker>
   <NetworkBackgammonChecker>
-    <PossibleMoves />
+    <PossibleMoves>
+      <NetworkBackgammonDice>
+        <CurrentValue>TWO</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+    </PossibleMoves>
     <CurrentPosition>
       <CurrentPosition>TWELVE</CurrentPosition>
     </CurrentPosition>
   </NetworkBackgammonChecker>
   <NetworkBackgammonChecker>
-    <PossibleMoves />
+    <PossibleMoves>
+      <NetworkBackgammonDice>
+        <CurrentValue>TWO</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+    </PossibleMoves>
     <CurrentPosition>
       <CurrentPosition>TWELVE</CurrentPosition>
     </CurrentPosition>
@@ -56,6 +89,10 @@
     <PossibleMoves>
       <NetworkBackgammonDice>
         <CurrentValue>MIN</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+      <NetworkBackgammonDice>
+        <CurrentValue>TWO</CurrentValue>
         <FlagUsed>false</FlagUsed>
       </NetworkBackgammonDice>
     </PossibleMoves>
@@ -69,15 +106,8 @@
         <CurrentValue>MIN</CurrentValue>
         <FlagUsed>false</FlagUsed>
       </NetworkBackgammonDice>
-    </PossibleMoves>
-    <CurrentPosition>
-      <CurrentPosition>SEVENTEEN</CurrentPosition>
-    </CurrentPosition>
-  </NetworkBackgammonChecker>
-  <NetworkBackgammonChecker>
-    <PossibleMoves>
       <NetworkBackgammonDice>
-        <CurrentValue>MIN</CurrentValue>
+        <CurrentValue>TWO</CurrentValue>
         <FlagUsed>false</FlagUsed>
       </NetworkBackgammonDice>
     </PossibleMoves>
@@ -91,15 +121,23 @@
         <CurrentValue>MIN</CurrentValue>
         <FlagUsed>false</FlagUsed>
       </NetworkBackgammonDice>
+      <NetworkBackgammonDice>
+        <CurrentValue>TWO</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
     </PossibleMoves>
     <CurrentPosition>
-      <CurrentPosition>NINETEEN</CurrentPosition>
+      <CurrentPosition>SEVENTEEN</CurrentPosition>
     </CurrentPosition>
   </NetworkBackgammonChecker>
   <NetworkBackgammonChecker>
     <PossibleMoves>
       <NetworkBackgammonDice>
         <CurrentValue>MIN</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+      <NetworkBackgammonDice>
+        <CurrentValue>TWO</CurrentValue>
         <FlagUsed>false</FlagUsed>
       </NetworkBackgammonDice>
     </PossibleMoves>
@@ -113,15 +151,8 @@
         <CurrentValue>MIN</CurrentValue>
         <FlagUsed>false</FlagUsed>
       </NetworkBackgammonDice>
-    </PossibleMoves>
-    <CurrentPosition>
-      <CurrentPosition>NINETEEN</CurrentPosition>
-    </CurrentPosition>
-  </NetworkBackgammonChecker>
-  <NetworkBackgammonChecker>
-    <PossibleMoves>
       <NetworkBackgammonDice>
-        <CurrentValue>MIN</CurrentValue>
+        <CurrentValue>TWO</CurrentValue>
         <FlagUsed>false</FlagUsed>
       </NetworkBackgammonDice>
     </PossibleMoves>
@@ -133,6 +164,40 @@
     <PossibleMoves>
       <NetworkBackgammonDice>
         <CurrentValue>MIN</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+      <NetworkBackgammonDice>
+        <CurrentValue>TWO</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+    </PossibleMoves>
+    <CurrentPosition>
+      <CurrentPosition>NINETEEN</CurrentPosition>
+    </CurrentPosition>
+  </NetworkBackgammonChecker>
+  <NetworkBackgammonChecker>
+    <PossibleMoves>
+      <NetworkBackgammonDice>
+        <CurrentValue>MIN</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+      <NetworkBackgammonDice>
+        <CurrentValue>TWO</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+    </PossibleMoves>
+    <CurrentPosition>
+      <CurrentPosition>NINETEEN</CurrentPosition>
+    </CurrentPosition>
+  </NetworkBackgammonChecker>
+  <NetworkBackgammonChecker>
+    <PossibleMoves>
+      <NetworkBackgammonDice>
+        <CurrentValue>MIN</CurrentValue>
+        <FlagUsed>false</FlagUsed>
+      </NetworkBackgammonDice>
+      <NetworkBackgammonDice>
+        <CurrentValue>TWO</CurrentValue>
         <FlagUsed>false</FlagUsed>
       </NetworkBackgammonDice>
     </PossibleMoves>
