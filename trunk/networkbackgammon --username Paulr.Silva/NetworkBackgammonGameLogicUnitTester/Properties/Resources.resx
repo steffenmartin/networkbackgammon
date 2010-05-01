@@ -121,4 +121,64 @@
   <data name="InitialCheckers_1_1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\InitialCheckers_1_1.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="InitialCheckers_1_2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_1_2.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_1_3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_1_3.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_1_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_1_4.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_1_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_1_5.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_1_6" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_1_6.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_2_2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_2_2.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_2_3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_2_3.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_2_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_2_4.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_2_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_2_5.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_2_6" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_2_6.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_3_3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_3_3.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_3_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_3_4.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_3_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_3_5.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_3_6" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_3_6.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_4_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_4_4.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_4_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_4_5.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_4_6" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_4_6.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_5_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_5_5.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_5_6" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_5_6.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="InitialCheckers_6_6" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitialCheckers_6_6.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
 </root>
