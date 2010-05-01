@@ -26,9 +26,47 @@ namespace NetworkBackgammonGameLogic
             // WP: Waiting Player (e.g. checkerWP -> checkers of the waiting player)
             // kvp: key-value-pair
 
+            // Check whether only one player is active
+            if (player1.Active == true && player2.Active == true)
+            {
+                throw new NetworkBackgammonGameEngineException("Both backgammon players cannot be active (it can only by one player's turn)!");
+            }
+
             // Determine the active player
             NetworkBackgammonPlayer activePlayer = player1.Active ? player1 : player2;
             NetworkBackgammonPlayer waitingPlayer = player1.Active ? player2 : player1;
+
+            // Check whether dice values are passed in and if the array has no more than 2 elements and more than 0 elements
+            // and if dice values are valid
+            if (_dice == null)
+            {
+                throw new NetworkBackgammonGameEngineException("Dice values missing (reference to array is null)!");
+            }
+            else
+            {
+                if (_dice.Count() == 0)
+                {
+                    throw new NetworkBackgammonGameEngineException("Dice value array has 0 elements! Need at least on element!");
+                }
+                else
+                {
+                    if (_dice.Count() > 2)
+                    {
+                        throw new NetworkBackgammonGameEngineException("Too many dice values (passed in " + _dice.Count() + ", expected 1..2)");
+                    }
+                    else
+                    {
+                        foreach (NetworkBackgammonDice diceValue in _dice)
+                        {
+                            if (diceValue.CurrentValue < NetworkBackgammonDice.DiceValue.MIN ||
+                                diceValue.CurrentValue > NetworkBackgammonDice.DiceValue.MAX)
+                            {
+                                throw new NetworkBackgammonGameEngineException("At least one dice has an invalid value (" + diceValue.CurrentValue + ")");
+                            }
+                        }
+                    }
+                }
+            }
 
             // Check whether dice values are the same (tie) -> Use just one dice for all sub-sequent processing steps if it's a tie
             NetworkBackgammonDice[] diceToUse = _dice;
