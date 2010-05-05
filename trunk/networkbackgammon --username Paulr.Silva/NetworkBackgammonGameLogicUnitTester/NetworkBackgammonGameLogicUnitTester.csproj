@@ -36,9 +36,12 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NetworkBackgammonGameRoomUnitTest.cs" />
+    <Compile Include="NetworkBackgammonPlayerController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NetworkBackgammonGameEngineUnitTest.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -56,9 +59,10 @@
       <Project>{D43DCC49-2262-47CD-8355-A215BEC431BA}</Project>
       <Name>NetworkBackgammonLib</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
+    <ProjectReference Include="..\NetworkBackgammonRemotingLib\NetworkBackgammonRemotingLib.csproj">
+      <Project>{CFA9371F-0F61-4D4D-82A0-09AC32BD3566}</Project>
+      <Name>NetworkBackgammonRemotingLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
