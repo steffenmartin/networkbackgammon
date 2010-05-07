@@ -81,5 +81,13 @@ namespace TestPlayerList
             Assert.IsTrue(myList.VerifyLogin("Player1","Password1"));
             Assert.IsFalse(myList.VerifyLogin("Player1","BadPassword1"));
         }
+
+        [TestMethod]
+        public void TestEmptyArgs()
+        {
+            // Test if password works
+            Assert.IsFalse(myList.VerifyLogin("", "Password1"));
+            Assert.IsFalse(myList.VerifyLogin("Player1", ""));
+        }
     }
 }
