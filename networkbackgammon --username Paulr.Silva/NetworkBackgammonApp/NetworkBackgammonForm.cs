@@ -26,6 +26,11 @@ namespace NetworkBackgammon
         delegate void OnShowBoardWithInitialDiceDelegate(bool show, GameSessionInitialDiceRollEvent initialDiceRollEvent);
         delegate void OnGameRoomDelegate(bool show);
 
+        /// <summary>
+        /// Delegate for handling a game terminated from server
+        /// </summary>
+        delegate void OnTerminateDelegate();
+
         public NetworkBackGammonForm()
         {
             InitializeComponent();
@@ -124,6 +129,17 @@ namespace NetworkBackgammon
             {
                m_backgammonLogin.Hide();
             }
+        }
+
+        /// <summary>
+        /// Handler for terminating from server
+        /// </summary>
+        private void OnTerminate()
+        {
+            // Inform player server admin has terminated the game
+            MessageBox.Show("This game has been terminated from the server, please try playing at a later time\n Thank you", "Server Message", MessageBoxButtons.OK);
+
+            ShowGameRoomScreen(true);
         }
 
         private void gameRoomToolStripMenuItem_Click(object sender, EventArgs e)
@@ -255,6 +271,17 @@ namespace NetworkBackgammon
                     {
                         ShowGameRoomScreen(true);
                         // ShowBoard(false);
+                    }
+                }
+                if (gameSessionEvt.EventType == NetworkBackgammonGameSessionEvent.GameSessionEventType.Terminated)
+                {
+                    if (InvokeRequired)
+                    {
+                        BeginInvoke(new OnTerminateDelegate(OnTerminate));
+                    }
+                    else
+                    {
+                        OnTerminate();
                     }
                 }
             }

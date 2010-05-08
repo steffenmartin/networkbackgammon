@@ -12,6 +12,7 @@ namespace NetworkBackgammonLib
         {
             GameFinished,
             Error,
+            Terminated,
             Invalid
         };
 

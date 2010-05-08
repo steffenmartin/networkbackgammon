@@ -182,6 +182,8 @@ namespace NetworkBackgammonGameLogic
 
             eventQueue.Clear();
 
+            // Terminate game for players
+            Broadcast(new NetworkBackgammonGameSessionEvent(NetworkBackgammonGameSessionEvent.GameSessionEventType.Terminated));
             if (player1 != null)
             {
                 // Game Session stops listening for events from Player 1
