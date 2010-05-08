@@ -259,9 +259,15 @@ namespace NetworkBackgammonServer
             ActivateServer(false);
         }
 
+        /// <summary>
+        /// Terminate all game sessions, but keep Game room open for future logins and players
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void killGamesButton_Click(object sender, EventArgs e)
         {
-
+            m_server.Shutdown();
+            UpdateList();
         }
 
     }
