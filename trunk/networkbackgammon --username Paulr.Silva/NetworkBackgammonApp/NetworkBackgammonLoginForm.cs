@@ -425,7 +425,11 @@ namespace NetworkBackgammon
             }
             else
             {
-                NetworkBackgammonClient.Instance.ConnectServer(m_ipAddrTextBox.Text, m_portTextBox.Text);
+                bool retVal = NetworkBackgammonClient.Instance.ConnectServer(m_ipAddrTextBox.Text, m_portTextBox.Text);
+                if (!retVal || !NetworkBackgammonClient.Instance.IsConnected)
+                {
+                    MessageBox.Show("Connection to NetworkBackgammon server failed, check IP and Port");
+                }
             }
 
             bool connected = NetworkBackgammonClient.Instance.IsConnected;
