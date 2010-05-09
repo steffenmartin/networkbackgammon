@@ -154,7 +154,7 @@ namespace NetworkBackgammon
                 serverIpAddress = ipAddr;
                 serverPort = port;
 
-                retval = true;
+                retval = gameRoom.VerifyConnection("ack") == "nack";
             }
             catch (Exception ex)
             {

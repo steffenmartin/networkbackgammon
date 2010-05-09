@@ -180,6 +180,19 @@ namespace NetworkBackgammonRemotingLib
             Shutdown();
         }
 
+        /// <summary>
+        /// Make sure Player has valid connection
+        /// (Tests correct IP connection)
+        /// </summary>
+        /// <returns></returns>
+        public string VerifyConnection(string ack)
+        {
+            if (ack == "ack")
+                return "nack";
+            else
+                return "bad";
+        }
+
         /**
          * Register as a user into the system.
          * @param username Unique name that the user has provided
