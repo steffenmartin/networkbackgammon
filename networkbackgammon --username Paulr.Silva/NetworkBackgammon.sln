@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkBackgammonGameLogicU
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkBackgammonNotificationTest", "NetworkBackgammonNotificationTest\NetworkBackgammonNotificationTest.csproj", "{080B12A3-FBF7-41E7-ABFC-01D2B9128D78}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleChannelsSpike", "MultipleChannelsSpike\MultipleChannelsSpike.csproj", "{8739AD2E-DABB-4870-A37C-93750F2DD3D7}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = NetworkBackgammon.vsmdi
@@ -134,6 +136,16 @@ Global
 		{080B12A3-FBF7-41E7-ABFC-01D2B9128D78}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{080B12A3-FBF7-41E7-ABFC-01D2B9128D78}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{080B12A3-FBF7-41E7-ABFC-01D2B9128D78}.Release|Win32.ActiveCfg = Release|Any CPU
+		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,5 +158,6 @@ Global
 		{48987DD3-A1F3-4055-A905-72B79CCC4AEC} = {F2F04DD8-E585-4217-9F31-48D4CE8E8FAD}
 		{080B12A3-FBF7-41E7-ABFC-01D2B9128D78} = {F2F04DD8-E585-4217-9F31-48D4CE8E8FAD}
 		{97DDCB0F-23F9-4496-94C2-5F740159D900} = {36035814-3C1B-4767-8DBA-A17B73340C0C}
+		{8739AD2E-DABB-4870-A37C-93750F2DD3D7} = {36035814-3C1B-4767-8DBA-A17B73340C0C}
 	EndGlobalSection
 EndGlobal
