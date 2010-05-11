@@ -25,6 +25,7 @@ namespace NetworkBackgammonServer
         private HttpChannel m_channel = null;
         // Local server object
         private NetworkBackgammonRemoteGameRoom m_server = null;
+        private NetworkBackgammonActivateServer m_turnOnServer = null;
         // Local delegated listener object
         INetworkBackgammonListener m_localListener = new NetworkBackgammonListener();
         // Log Message Delegate
@@ -88,8 +89,12 @@ namespace NetworkBackgammonServer
             {
                 if (activate)
                 {
-                    if (m_channel == null)
+                    if (m_turnOnServer == null)
                     {
+                        m_turnOnServer = new NetworkBackgammonActivateServer();
+                        m_server = m_turnOnServer.ActivateServer(m_portText.Text);
+                    }
+/*
                         // We need to use binary formatters, which allow the serialization of generic collections
                         BinaryServerFormatterSinkProvider serverProv = new BinaryServerFormatterSinkProvider();
                         serverProv.TypeFilterLevel = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
@@ -107,7 +112,7 @@ namespace NetworkBackgammonServer
                     // Assign the instantiated remote server to the local server
                     MarshalByRefObject obj = (MarshalByRefObject)RemotingServices.Connect(typeof(NetworkBackgammonRemoteGameRoom), "http://127.0.0.1:" + m_portText.Text + "/GameRoom");
                     m_server = obj as NetworkBackgammonRemoteGameRoom;
-
+*/
                     // Register delegated listener as a listener of the server object
                     retval = m_server.AddListener(this);
             
