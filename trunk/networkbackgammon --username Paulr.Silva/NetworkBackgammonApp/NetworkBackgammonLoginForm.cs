@@ -422,6 +422,7 @@ namespace NetworkBackgammon
             if (NetworkBackgammonClient.Instance.IsConnected)
             {
                 NetworkBackgammonClient.Instance.DisconnectServer();
+                UpdateGameRoomList();
             }
             else
             {
