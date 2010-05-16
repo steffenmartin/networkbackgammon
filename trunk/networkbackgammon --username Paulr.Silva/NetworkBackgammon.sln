@@ -29,6 +29,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkBackgammonNotificati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleChannelsSpike", "MultipleChannelsSpike\MultipleChannelsSpike.csproj", "{8739AD2E-DABB-4870-A37C-93750F2DD3D7}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "NetworkBackgammonServerSetup", "NetworkBackgammonServerSetup\NetworkBackgammonServerSetup.vdproj", "{0FF136C9-585D-4831-AF85-666BDE115B30}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "NetworkBackgammonClientSetup", "NetworkBackgammonClientSetup\NetworkBackgammonClientSetup.vdproj", "{56B9479C-9271-4252-852D-8D3C13AA09B7}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = NetworkBackgammon.vsmdi
@@ -146,6 +150,20 @@ Global
 		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{8739AD2E-DABB-4870-A37C-93750F2DD3D7}.Release|Win32.ActiveCfg = Release|Any CPU
+		{0FF136C9-585D-4831-AF85-666BDE115B30}.Debug|Any CPU.ActiveCfg = Debug
+		{0FF136C9-585D-4831-AF85-666BDE115B30}.Debug|Mixed Platforms.ActiveCfg = Debug
+		{0FF136C9-585D-4831-AF85-666BDE115B30}.Debug|Win32.ActiveCfg = Debug
+		{0FF136C9-585D-4831-AF85-666BDE115B30}.Release|Any CPU.ActiveCfg = Release
+		{0FF136C9-585D-4831-AF85-666BDE115B30}.Release|Any CPU.Build.0 = Release
+		{0FF136C9-585D-4831-AF85-666BDE115B30}.Release|Mixed Platforms.ActiveCfg = Release
+		{0FF136C9-585D-4831-AF85-666BDE115B30}.Release|Win32.ActiveCfg = Release
+		{56B9479C-9271-4252-852D-8D3C13AA09B7}.Debug|Any CPU.ActiveCfg = Debug
+		{56B9479C-9271-4252-852D-8D3C13AA09B7}.Debug|Mixed Platforms.ActiveCfg = Debug
+		{56B9479C-9271-4252-852D-8D3C13AA09B7}.Debug|Win32.ActiveCfg = Debug
+		{56B9479C-9271-4252-852D-8D3C13AA09B7}.Release|Any CPU.ActiveCfg = Release
+		{56B9479C-9271-4252-852D-8D3C13AA09B7}.Release|Any CPU.Build.0 = Release
+		{56B9479C-9271-4252-852D-8D3C13AA09B7}.Release|Mixed Platforms.ActiveCfg = Release
+		{56B9479C-9271-4252-852D-8D3C13AA09B7}.Release|Win32.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
