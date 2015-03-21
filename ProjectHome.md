@@ -1,0 +1,1 @@
+This application will be a backgammon game similar to the "Internet Backgammon" game that is available in Windows XP except that it would include a gaming room that would allow a user to select a specific opponent. This application would also include an optional chat session between opponents.
